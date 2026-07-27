@@ -7,12 +7,16 @@ import {
   transitionCommodityNodeEditorialCandidate,
   type CommodityNodeEditorialCandidate,
 } from '../shared/commoditynode-editorial-workflow';
+import { parseCommodityNodeEventExtraction } from '../shared/commoditynode-event-extraction';
 
 const completeCandidate = (): CommodityNodeEditorialCandidate => ({
   id: 'event-review-test',
   title: 'Reviewed test event',
   state: 'needs_review',
   isFixture: false,
+  commodityIds: ['copper'],
+  eventType: 'operations_halt',
+  direction: 'supply_negative',
   materiality: 'material',
   occurredAt: '2026-07-28',
   location: {
@@ -118,5 +122,33 @@ describe('CommodityNode editorial workflow', () => {
       ['request_sources', 'request_rights', 'send_to_editor', 'approve'],
     );
     assert.deepEqual(allowedCommodityNodeEditorialActions('retracted'), []);
+  });
+
+  it('accepts only schema-bound event extraction dimensions', () => {
+    const candidate = completeCandidate();
+    const parsed = parseCommodityNodeEventExtraction({
+      commodityIds: ['copper', 'copper'],
+      entityIds: candidate.entityIds,
+      location: candidate.location,
+      eventType: candidate.eventType,
+      direction: candidate.direction,
+      materiality: candidate.materiality,
+    });
+    assert.deepEqual(parsed.commodityIds, ['copper']);
+    assert.equal(parsed.eventType, 'operations_halt');
+    assert.throws(
+      () => parseCommodityNodeEventExtraction({
+        ...parsed,
+        direction: 'price_will_rise',
+      }),
+      /closed schema/,
+    );
+    assert.throws(
+      () => parseCommodityNodeEventExtraction({
+        ...parsed,
+        location: null,
+      }),
+      /location is required/,
+    );
   });
 });

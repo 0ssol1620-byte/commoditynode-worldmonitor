@@ -41,7 +41,7 @@ CNWM-039,3,Market contract,Implement MarketInstrument/BenchmarkContract schemas.
 CNWM-040,3,Provider adapters,"Wrap Yahoo/yfinance, official series and alternatives behind provider adapters.",P0,CNWM-037,complete
 CNWM-041,3,yfinance,"Implement yfinance/Yahoo proxy adapter with staggered fetch, cache and explicit source labels.",P0,CNWM-038,complete
 CNWM-042,3,Official data,"Add EIA, USGS, USDA, World Bank/FRED adapters for approved series.",P1,CNWM-036,complete
-CNWM-043,3,Asset registry,Import upstream commodity geography as candidate records.,P1,CNWM-035,planned
+CNWM-043,3,Asset registry,Import upstream commodity geography as candidate records.,P1,CNWM-035,complete
 CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locators.,P0,CNWM-035,complete
 CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,complete
 CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,in_progress
@@ -61,7 +61,7 @@ CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets
 CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,in_progress
 CNWM-061,5,News ingestion,Curate commodity-specific RSS/official/filing source catalog.,P0,CNWM-036,complete
 CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,complete
-CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,in_progress
+CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,complete
 CNWM-064,5,Corroboration,Require source diversity and primary evidence for high-materiality events.,P0,CNWM-061,complete
 CNWM-065,5,Editorial queue,"Build private review UI for event facts, claims, entities and graph candidates.",P0,"CNWM-061,CNWM-042",complete
 CNWM-066,5,Event publication,Publish approved Event Pulse records to Astro content/data build.,P1,CNWM-063,complete

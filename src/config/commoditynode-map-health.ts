@@ -1,5 +1,12 @@
-import type { FreshnessStatus } from '@/services/data-freshness';
 import type { MapLayers } from '@/types';
+
+type CommodityNodeFreshnessStatus =
+  | 'fresh'
+  | 'stale'
+  | 'very_stale'
+  | 'error'
+  | 'no_data'
+  | 'disabled';
 
 export type CommodityNodeMapHealthState =
   | 'current'
@@ -11,7 +18,7 @@ export type CommodityNodeMapHealthState =
 
 export interface CommodityNodeMapSourceState {
   name: string;
-  status: FreshnessStatus;
+  status: CommodityNodeFreshnessStatus;
   lastUpdate: Date | null;
 }
 

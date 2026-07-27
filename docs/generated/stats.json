@@ -1,13 +1,13 @@
 {
   "_generated": "scripts/docs-stats.mjs — do not edit by hand; run `npm run docs:stats`",
-  "layerDefinitions": 56,
+  "layerDefinitions": 57,
   "variantLayers": {
     "full": 37,
     "tech": 13,
     "finance": 17,
     "happy": 6,
     "commodity": 18,
-    "commoditynode": 18,
+    "commoditynode": 19,
     "energy": 18
   },
   "variantCount": 7,

@@ -16,6 +16,10 @@ import {
   getCommodityEventPulseFrame,
 } from '../src/config/commoditynode-map-events';
 import { deriveCommodityNodeMapLayerHealth } from '../src/config/commoditynode-map-health';
+import {
+  COMMODITYNODE_ASSET_CANDIDATES,
+  validateCommodityNodeAssetCandidates,
+} from '../src/config/commoditynode-asset-registry';
 
 describe('CommodityNode map product contract', () => {
   it('adapts curated assets into explicit discriminated marker records', () => {
@@ -158,6 +162,23 @@ describe('CommodityNode map product contract', () => {
     assert.equal(
       deriveCommodityNodeMapLayerHealth('miningSites', 'svg').state,
       'unavailable',
+    );
+  });
+
+  it('imports upstream geography into a private candidate registry', () => {
+    assert.ok(COMMODITYNODE_ASSET_CANDIDATES.length > 0);
+    assert.deepEqual(validateCommodityNodeAssetCandidates(), []);
+    assert.equal(
+      new Set(COMMODITYNODE_ASSET_CANDIDATES.map((candidate) => candidate.candidateId)).size,
+      COMMODITYNODE_ASSET_CANDIDATES.length,
+    );
+    assert.ok(
+      COMMODITYNODE_ASSET_CANDIDATES.every(
+        (candidate) =>
+          candidate.workflow.status === 'candidate'
+          && candidate.workflow.visibility === 'private'
+          && candidate.source.importedFrom === 'upstream',
+      ),
     );
   });
 });

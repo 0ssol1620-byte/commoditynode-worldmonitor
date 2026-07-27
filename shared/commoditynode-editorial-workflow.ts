@@ -58,6 +58,9 @@ export interface CommodityNodeEditorialCandidate {
   title: string;
   state: CommodityNodeEditorialState;
   isFixture: boolean;
+  commodityIds: readonly string[];
+  eventType: CommodityNodeEventType;
+  direction: CommodityNodeEventDirection;
   materiality: 'minor' | 'notable' | 'material' | 'critical';
   occurredAt: string;
   location: {
@@ -153,6 +156,9 @@ export function assessCommodityNodeEditorialCandidate(
   let linkedClaims = 0;
 
   if (candidate.isFixture) blockers.push('Fixture records cannot be approved or published.');
+  if (candidate.commodityIds.length === 0) {
+    blockers.push('At least one resolved commodity is required.');
+  }
   if (!validDate(candidate.occurredAt)) blockers.push('An exact event date is required.');
   if (!candidate.location) {
     blockers.push('An exact reviewed location is required.');
@@ -282,3 +288,7 @@ export function transitionCommodityNodeEditorialCandidate(
     decidedAt: input.decidedAt,
   };
 }
+import type {
+  CommodityNodeEventDirection,
+  CommodityNodeEventType,
+} from './commoditynode-event-extraction';

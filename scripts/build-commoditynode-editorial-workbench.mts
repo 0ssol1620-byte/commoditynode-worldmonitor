@@ -11,6 +11,11 @@ import {
   type CommodityNodeReviewAction,
 } from '../shared/commoditynode-editorial-workflow';
 import {
+  parseCommodityNodeEventExtraction,
+  type CommodityNodeEventDirection,
+  type CommodityNodeEventType,
+} from '../shared/commoditynode-event-extraction';
+import {
   COMMODITYNODE_SOURCE_CATALOG,
   validateCommodityNodeSourceCatalog,
 } from '../shared/commoditynode-source-catalog';
@@ -21,6 +26,9 @@ type ContentEvent = {
   occurredAt: string;
   status: 'candidate' | 'reviewed' | 'published' | 'superseded' | 'expired' | 'rejected';
   isFixture: boolean;
+  commodityIds: string[];
+  eventType: CommodityNodeEventType;
+  direction: CommodityNodeEventDirection;
   materiality: 'minor' | 'notable' | 'material' | 'critical';
   location?: CommodityNodeEditorialCandidate['location'];
   entities: Array<{ id: string; name: string; type: string }>;
@@ -69,15 +77,26 @@ function publicStatusToEditorialState(
 }
 
 function toWorkbenchItem(id: string, event: ContentEvent): CommodityNodeEditorialWorkbenchItem {
+  const extraction = parseCommodityNodeEventExtraction({
+    commodityIds: event.commodityIds,
+    entityIds: event.entities.map((entity) => entity.id),
+    location: event.location,
+    eventType: event.eventType,
+    direction: event.direction,
+    materiality: event.materiality,
+  });
   const candidate: CommodityNodeEditorialCandidate = {
     id,
     title: event.title,
     state: publicStatusToEditorialState(event.status),
     isFixture: event.isFixture,
+    commodityIds: extraction.commodityIds,
+    eventType: extraction.eventType,
+    direction: extraction.direction,
     materiality: event.materiality,
     occurredAt: event.occurredAt,
-    location: event.location ?? null,
-    entityIds: event.entities.map((entity) => entity.id),
+    location: extraction.location,
+    entityIds: extraction.entityIds,
     claims: event.claims,
     evidence: event.evidence,
     graphCandidates: event.impactPath.slice(0, -1).map((step, index) => {

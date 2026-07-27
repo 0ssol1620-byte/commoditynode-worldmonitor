@@ -18,6 +18,13 @@ coverage, an operating or reference status, and
 `sourceStatus: reviewed_registry`. Rendering code can switch on `kind` without
 guessing from optional fields.
 
+Upstream geography also enters a separate private intake contract in
+`src/config/commoditynode-asset-registry.ts`. Every mine, plant, and port is
+assigned a namespaced candidate ID, source locator, coordinates, commodity
+coverage, and an explicit `candidate`/`private` workflow state. Import is not
+publication: public renderers do not consume this candidate collection, and a
+record must receive rights, claim, and reviewer evidence before promotion.
+
 ## Layer navigation
 
 The layer drawer groups CommodityNode controls into:
