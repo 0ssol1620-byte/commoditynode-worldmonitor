@@ -114,4 +114,4 @@ CNWM-112,9,Upstream,Perform first upstream sync rehearsal and resolve conflicts 
 CNWM-113,9,Release,Create immutable release tag and production source snapshot.,P0,CNWM-007,planned
 CNWM-114,9,Operations,"Create incident, data correction, rights takedown and rollback runbooks.",P1,CNWM-108,complete
 CNWM-115,9,Launch QA,Run full desktop/mobile/browser/content/data/license/ad/SEO audit.,P0,all,in_progress
-CNWM-116,9,Post-launch,"Create weekly quality review covering data freshness, corrections, source rights, CWV and content performance.",P1,CNWM-112,planned
+CNWM-116,9,Post-launch,"Create weekly quality review covering data freshness, corrections, source rights, CWV and content performance.",P1,CNWM-112,complete

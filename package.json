@@ -99,6 +99,7 @@
     "commoditynode:performance": "node scripts/check-commoditynode-performance-budget.mjs",
     "commoditynode:resilience": "tsx scripts/run-commoditynode-outage-simulations.mts",
     "commoditynode:security": "npm run security:vite-env-secrets -- --strict-local && npm run security:local-env-dumps && npm run lint:rate-limit-policies && tsx --test api/rss-proxy.test.mjs api/commoditynode-cors.test.mjs tests/commoditynode-provider-adapters.test.mts tests/commoditynode-security-boundaries.test.mts tests/csp-filter.test.mjs tests/deploy-config.test.mjs tests/notification-webhook-ssrf.test.mts tests/rate-limit.test.mts tests/sanitize.test.mts tests/sanitize-safe-html.test.mts tests/security-audit-baseline.test.mjs",
+    "commoditynode:quality:weekly": "tsx scripts/build-commoditynode-weekly-review.mts",
     "commoditynode:upstream:rehearse": "node scripts/rehearse-commoditynode-upstream-sync.mjs",
     "typecheck": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json && node scripts/audit-convex-string-calls.cjs",
