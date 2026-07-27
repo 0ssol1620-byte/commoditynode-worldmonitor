@@ -49,5 +49,6 @@ export function postPath(id: string): string {
 }
 
 export function belongsToActiveSite(entry: CollectionEntry<'blog'>): boolean {
-  return (entry.data.site ?? 'worldmonitor') === site.key;
+  return (entry.data.site ?? 'worldmonitor') === site.key
+    && entry.data.publicationState === 'published';
 }

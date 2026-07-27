@@ -6,6 +6,10 @@ import '@fontsource/ibm-plex-mono/600.css';
 import '../styles/global.css';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
 import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
+import {
+  commodityNodeRobotsContent,
+  resolveCommodityNodeRoutePolicy,
+} from '../../../shared/commoditynode-route-policy';
 
 interface Props {
   title: string;
@@ -24,9 +28,10 @@ interface Props {
   breadcrumbLd?: Record<string, unknown>;
   faqLd?: Record<string, unknown>;
   attributionCampaign?: string;
+  robots?: string;
 }
 
-const { title, description, metaTitle, keywords, ogType, ogImage, ogImageAlt, canonicalUrl, publishedTime, modifiedTime, author, section, jsonLd, breadcrumbLd, faqLd, attributionCampaign } = Astro.props;
+const { title, description, metaTitle, keywords, ogType, ogImage, ogImageAlt, canonicalUrl, publishedTime, modifiedTime, author, section, jsonLd, breadcrumbLd, faqLd, attributionCampaign, robots } = Astro.props;
 const pageTitle = metaTitle || title;
 const resolvedOgImage = ogImage || site.ogImageUrl;
 const resolvedOgImageAlt = ogImageAlt || pageTitle;
@@ -43,6 +48,13 @@ const keywordTags = keywords ? keywords.split(',').map(k => k.trim()).slice(0, 6
 const resolvedCanonicalUrl = canonicalUrl || absoluteUrl(Astro.url.pathname);
 const proCtaUrl = productFacts.product.pricingUrl;
 const proCtaLabel = productFacts.product.primaryCtaLabel;
+const routePolicy = isCommodityNode
+  ? resolveCommodityNodeRoutePolicy(Astro.url.pathname)
+  : null;
+const robotsContent = robots
+  ?? (routePolicy
+    ? commodityNodeRobotsContent(routePolicy)
+    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
 
 function stringifyJsonLd(value: Record<string, unknown>): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
@@ -57,7 +69,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {keywords && <meta name="keywords" content={keywords} />}
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="robots" content={robotsContent} />
     <meta name="author" content={author || site.defaultAuthor} />
     <meta name="theme-color" content={isCommodityNode ? '#071116' : '#050505'} />
     <link rel="canonical" href={resolvedCanonicalUrl} />

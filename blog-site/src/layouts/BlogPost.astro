@@ -3,6 +3,7 @@ import Base from './Base.astro';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
 import { coverWebpSources } from '../lib/cover-webp';
 import { absoluteUrl, isCommodityNode, postPath, site } from '../lib/site-variant';
+import { resolveCommodityNodeRoutePolicy } from '../../../shared/commoditynode-route-policy';
 
 interface Props {
   title: string;
@@ -14,6 +15,11 @@ interface Props {
   author?: string;
   authorUrl?: string;
   authorBio?: string;
+  authorType?: 'Person' | 'Organization';
+  reviewedBy?: string;
+  reviewedAt?: Date;
+  indexable?: boolean;
+  adEligible?: boolean;
   audience?: string;
   heroImage?: string;
   slug?: string;
@@ -21,7 +27,7 @@ interface Props {
   relatedPosts?: { title: string; description: string; href: string }[];
 }
 
-const { title, description, metaTitle, keywords, pubDate, modifiedDate, author, authorUrl, authorBio, audience, heroImage, slug, rawBody, relatedPosts = [] } = Astro.props;
+const { title, description, metaTitle, keywords, pubDate, modifiedDate, author, authorUrl, authorBio, authorType = 'Person', reviewedBy, reviewedAt, indexable = true, adEligible = false, audience, heroImage, slug, rawBody, relatedPosts = [] } = Astro.props;
 function toAbsoluteSiteUrl(pathOrUrl: string | undefined): string | undefined {
   if (!pathOrUrl) return undefined;
   if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
@@ -32,6 +38,14 @@ const ogImage = toAbsoluteSiteUrl(
   heroImage || (!isCommodityNode && slug ? `/blog/images/blog/${slug}.jpg` : site.ogImageUrl),
 );
 const canonicalUrl = slug ? absoluteUrl(postPath(slug)) : absoluteUrl(Astro.url.pathname);
+const editorialRoutePolicy = isCommodityNode
+  ? resolveCommodityNodeRoutePolicy(new URL(canonicalUrl).pathname)
+  : null;
+if (editorialRoutePolicy && adEligible !== editorialRoutePolicy.adEligible) {
+  throw new Error(
+    `[CommodityNode ads] ${slug ?? canonicalUrl} frontmatter and manual route allowlist disagree`,
+  );
+}
 const formattedDate = pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
@@ -63,6 +77,7 @@ const avatarSrc = isCommodityNode
 const heroWebp = coverWebpSources(heroImage);
 const showUpdated = modifiedDate && modifiedDate.getTime() !== pubDate.getTime();
 const formattedModifiedDate = modifiedDate ? modifiedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+const formattedReviewedDate = reviewedAt ? reviewedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
 const wordCount = rawBody ? rawBody.trim().split(/\s+/).filter(Boolean).length : undefined;
 const readingMinutes = wordCount ? Math.max(1, Math.ceil(wordCount / 220)) : undefined;
 
@@ -134,7 +149,7 @@ const jsonLd = {
   ...(wordCount ? { "wordCount": wordCount } : {}),
   ...(readingMinutes ? { "timeRequired": `PT${readingMinutes}M` } : {}),
   "author": {
-    "@type": "Person",
+    "@type": authorType,
     "name": authorName,
     ...(resolvedAuthorUrl ? { "url": resolvedAuthorUrl } : {}),
     ...(!isCommodityNode && authorName === DEFAULT_AUTHOR ? {
@@ -220,6 +235,10 @@ const faqLd = extractFaqLd(rawBody);
   breadcrumbLd={breadcrumbLd}
   faqLd={faqLd ?? undefined}
   attributionCampaign={slug}
+  robots={indexable
+    ? undefined
+    : 'noindex, follow'
+  }
 >
   <article>
     <div class="article-header">
@@ -228,6 +247,12 @@ const faqLd = extractFaqLd(rawBody);
         <time datetime={isoDate}>{formattedDate}</time>
         {showUpdated && <span> &middot; Updated <time datetime={isoModifiedDate}>{formattedModifiedDate}</time></span>}
         {audience && <span> &middot; {audience}</span>}
+        {reviewedBy && reviewedAt && (
+          <span>
+            {' '}&middot; Reviewed by {reviewedBy} on
+            {' '}<time datetime={reviewedAt.toISOString()}>{formattedReviewedDate}</time>
+          </span>
+        )}
       </div>
     </div>
     {heroImage && (

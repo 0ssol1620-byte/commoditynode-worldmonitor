@@ -35,9 +35,9 @@ describe('CommodityNode research build', () => {
     assert.match(sitemap, /https:\/\/commoditynode\.com\/methodology\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/commodities\/copper\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/editorial-policy\//);
-    assert.match(sitemap, /https:\/\/commoditynode\.com\/search\//);
+    assert.match(sitemap, /https:\/\/commoditynode\.com\/authors\/commoditynode-editorial\//);
     assert.match(sitemap, /commodity-data-needs-two-timestamps/);
-    assert.doesNotMatch(sitemap, /glossary|authors|worldmonitor/);
+    assert.doesNotMatch(sitemap, /glossary|authors\/elie-habib|\/search\/|worldmonitor/);
     assert.match(robots, /Sitemap: https:\/\/commoditynode\.com\/sitemap-index\.xml/);
     assert.match(llms, /^# CommodityNode Research/m);
     assert.doesNotMatch(llms, /World Monitor Blog|worldmonitor\.app/);
@@ -76,6 +76,7 @@ describe('CommodityNode research build', () => {
       'search',
       'about',
       'privacy',
+      'authors/commoditynode-editorial',
     ]) {
       assert.ok(existsSync(resolve(researchRoot, page, 'index.html')), `${page} page is missing`);
     }
@@ -95,8 +96,17 @@ describe('CommodityNode research build', () => {
     assert.equal(posts.length, 3);
     for (const post of posts) {
       const html = read(`posts/${post.name}/index.html`);
-      assert.match(html, /CommodityNode Editorial Desk/);
+      assert.match(html, /CommodityNode Editorial/);
       assert.match(html, /<meta name="robots" content="index, follow/);
+      assert.match(html, /"author":\{"@type":"Organization"/);
+      assert.match(html, /Reviewed by CommodityNode Editorial/);
+      assert.match(html, /src="\/images\/blog\//);
+      assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication|data-ad-slot/);
     }
+    const searchHtml = read('search/index.html');
+    assert.match(searchHtml, /<meta name="robots" content="noindex, follow"/);
+    const authorHtml = read('authors/commoditynode-editorial/index.html');
+    assert.match(authorHtml, /It does not represent a fabricated person/);
+    assert.match(authorHtml, /"@type":"ProfilePage"/);
   });
 });

@@ -93,15 +93,15 @@ CNWM-091,7,B2B lead,Add custom commodity exposure brief request workflow.,P1,CNW
 CNWM-092,7,API plans,"Define API keys, quotas, public/free and paid scopes.",P2,"CNWM-075,CNWM-088",planned
 CNWM-093,7,MCP tools,"Expose commodity event, benchmark, route and evidence tools.",P3,CNWM-091,planned
 CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API conversions separately from ads.",P2,CNWM-085..091,planned
-CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,planned
-CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,in_progress
+CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,complete
+CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,complete
 CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,planned
 CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,planned
-CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,planned
-CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,planned
+CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,complete
+CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete
 CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,planned
 CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictions and ad stack.,P0,CNWM-099,planned
-CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,planned
+CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,in_progress
 CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after migration.,P1,CNWM-094,planned
 CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned
 CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,planned

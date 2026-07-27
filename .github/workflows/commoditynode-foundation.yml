@@ -58,9 +58,12 @@ jobs:
       - name: Verify third-party software inventory
         run: npm run commoditynode:licenses:check
 
+      - name: Verify people-first publication and ad eligibility
+        run: npm run commoditynode:editorial
+
       - name: Verify CommodityNode unit contracts
         run: |
-          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts
+          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts
           node --test api/commoditynode-cors.test.mjs tests/commoditynode-license-inventory.test.mjs
 
       - name: Type-check

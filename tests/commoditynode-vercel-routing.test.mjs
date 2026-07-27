@@ -31,6 +31,7 @@ describe('CommodityNode Vercel routing', () => {
     assert.ok(catchAllIndex > 0);
     for (const source of [
       '/posts/:path*',
+      '/authors/:path*',
       '/commodities/:path*',
       '/editorial-policy/:path*',
       '/corrections/:path*',
@@ -47,6 +48,8 @@ describe('CommodityNode Vercel routing', () => {
       '/sitemap-index.xml',
       '/sitemap-0.xml',
       '/_astro/:path*',
+      '/images/:path*',
+      '/og/:path*',
       '/commoditynode-mark.svg',
     ]) {
       const rewrite = findRewrite(source, '^(?:www\\.)?commoditynode\\.com$');

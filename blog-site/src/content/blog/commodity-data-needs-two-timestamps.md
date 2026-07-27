@@ -6,9 +6,18 @@ keywords: "commodity data, observation time, publication time, data freshness, r
 audience: "Analysts"
 pubDate: "2026-07-27"
 modifiedDate: "2026-07-27"
-author: "CommodityNode Editorial Desk"
+author: "CommodityNode Editorial"
+authorUrl: "https://commoditynode.com/authors/commoditynode-editorial/"
+authorBio: "The CommodityNode Editorial desk maintains benchmark definitions, source records, corrections, and publication controls."
+authorType: "Organization"
+reviewedBy: "CommodityNode Editorial"
+reviewedAt: "2026-07-28"
+publicationState: "published"
+indexable: true
+adEligible: false
+editorialPurpose: "Help analysts distinguish observation time, source publication time, and collection time before they rely on a commodity chart."
 site: "commoditynode"
-heroImage: "/blog/images/blog/commodity-data-needs-two-timestamps.jpg"
+heroImage: "/images/blog/commodity-data-needs-two-timestamps.jpg"
 pinned: true
 ---
 
