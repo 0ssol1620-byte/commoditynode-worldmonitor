@@ -63,7 +63,7 @@ jobs:
 
       - name: Verify CommodityNode unit contracts
         run: |
-          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts tests/commoditynode-event-pulse.test.mts
+          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts tests/commoditynode-event-pulse.test.mts tests/commoditynode-source-catalog.test.mts tests/commoditynode-editorial-workflow.test.mts tests/commoditynode-editorial-workbench.test.mts
           node --test api/commoditynode-cors.test.mjs tests/commoditynode-license-inventory.test.mjs tests/commoditynode-event-media.test.mjs
 
       - name: Type-check
