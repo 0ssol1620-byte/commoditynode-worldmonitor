@@ -33,6 +33,7 @@ describe('CommodityNode Vercel routing', () => {
       '/posts/:path*',
       '/authors/:path*',
       '/commodities/:path*',
+      '/events/:path*',
       '/editorial-policy/:path*',
       '/corrections/:path*',
       '/contact/:path*',

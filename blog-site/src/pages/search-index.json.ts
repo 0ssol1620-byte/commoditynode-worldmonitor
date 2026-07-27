@@ -1,11 +1,12 @@
 import { getCollection } from 'astro:content';
 import { belongsToActiveSite, postPath } from '../lib/site-variant';
+import { isPublishedCommodityEvent } from '../lib/published-events';
 
 export const prerender = true;
 
 interface SearchRecord {
   id: string;
-  type: 'commodity' | 'research' | 'policy';
+  type: 'commodity' | 'event' | 'research' | 'policy';
   title: string;
   description: string;
   url: string;
@@ -49,6 +50,7 @@ const policyRecords: SearchRecord[] = [
 
 export async function GET() {
   const commodities = await getCollection('commodities');
+  const events = (await getCollection('events')).filter(isPublishedCommodityEvent);
   const research = (await getCollection('blog')).filter(belongsToActiveSite);
 
   const records: SearchRecord[] = [
@@ -75,6 +77,22 @@ export async function GET() {
       description: post.data.description,
       url: postPath(post.id),
       terms: [post.data.keywords, post.data.audience],
+    })),
+    ...events.map((event): SearchRecord => ({
+      id: `event:${event.id}`,
+      type: 'event',
+      title: event.data.title,
+      description: event.data.summary,
+      url: `/events/${event.id}/`,
+      terms: [
+        ...event.data.commodityIds,
+        event.data.location.label,
+        event.data.location.countryCode,
+        event.data.eventType,
+        event.data.direction,
+        event.data.materiality,
+        ...event.data.entities.flatMap((entity) => [entity.name, entity.type]),
+      ],
     })),
     ...policyRecords,
   ].sort((a, b) => a.title.localeCompare(b.title));

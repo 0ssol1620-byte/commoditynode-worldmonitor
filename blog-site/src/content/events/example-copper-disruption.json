@@ -1,20 +1,79 @@
 {
   "title": "Fictional copper disruption fixture",
-  "summary": "Synthetic record used to test the event-to-impact publication workflow. It is not an observed event and must never enter public Event Pulse results.",
+  "summary": "Synthetic record used to test the event-to-impact publication workflow, evidence linkage, fixture exclusion, and accessible path rendering. It is not an observed event and must never enter public Event Pulse results.",
   "occurredAt": "2026-07-27",
+  "updatedAt": "2026-07-28",
   "commodityIds": ["copper"],
-  "location": "Fictional Andean region",
+  "entities": [
+    {
+      "id": "fixture-mine",
+      "name": "Fictional mine",
+      "type": "mine"
+    }
+  ],
+  "location": {
+    "id": "fictional-andean-region",
+    "label": "Fictional Andean region",
+    "countryCode": "ZZ",
+    "latitude": -20,
+    "longitude": -70
+  },
+  "eventType": "operations_halt",
+  "direction": "supply_negative",
   "materiality": "material",
+  "materialityRationale": "The materiality band exists solely to exercise the high-materiality review gate and must not be interpreted as an assessment of a real asset, location, supply share, or market outcome.",
   "status": "reviewed",
   "isFixture": true,
+  "fingerprint": "cne_01aa5319",
+  "claims": [
+    {
+      "id": "fixture-claim",
+      "type": "unknown",
+      "text": "This is a synthetic claim used only to prove that fixture content is excluded from public output.",
+      "evidenceIds": ["fixture-methodology"]
+    }
+  ],
   "evidence": [
     {
+      "id": "fixture-methodology",
       "label": "CommodityNode methodology",
       "url": "https://commoditynode.com/methodology/",
       "publisher": "CommodityNode",
-      "retrievedAt": "2026-07-27"
+      "retrievedAt": "2026-07-27",
+      "kind": "company_primary",
+      "locator": "Publication controls and fixture exclusion policy.",
+      "supportsClaims": ["fixture-claim"]
     }
   ],
+  "impactPath": [
+    {
+      "order": 1,
+      "nodeId": "fixture-event",
+      "label": "Synthetic event",
+      "nodeType": "event",
+      "mechanism": "Exercises the event review state without representing an observed occurrence.",
+      "confidence": "high"
+    },
+    {
+      "order": 2,
+      "nodeId": "fixture-mine",
+      "label": "Fictional mine",
+      "nodeType": "mine",
+      "mechanism": "Exercises entity linkage while remaining unavailable to every public event query.",
+      "confidence": "high"
+    }
+  ],
+  "timeline": [
+    {
+      "date": "2026-07-27",
+      "label": "Fixture created for publication-gate testing.",
+      "evidenceIds": ["fixture-methodology"]
+    }
+  ],
+  "contradictingEvidence": [],
+  "unknowns": ["Every real-world attribute is intentionally unknown because the record is synthetic."],
+  "author": "CommodityNode Editorial",
+  "authorUrl": "https://commoditynode.com/authors/commoditynode-editorial/",
   "reviewedBy": "CommodityNode fixture reviewer",
   "reviewedAt": "2026-07-27"
 }

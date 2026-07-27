@@ -1,0 +1,294 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import {
+  commodityEventPublicationDecision,
+  isPublishedCommodityEvent,
+} from '../../lib/published-events';
+import {
+  commodityNodeRobotsContent,
+  resolveCommodityNodeRoutePolicy,
+} from '../../../../shared/commoditynode-route-policy';
+
+export async function getStaticPaths() {
+  const events = (await getCollection('events')).filter(isPublishedCommodityEvent);
+  return events.map((event) => ({
+    params: { slug: event.id },
+    props: { event },
+  }));
+}
+
+interface Props {
+  event: CollectionEntry<'events'>;
+}
+
+const { event } = Astro.props;
+const decision = commodityEventPublicationDecision(event);
+const routePolicy = resolveCommodityNodeRoutePolicy(`/events/${event.id}/`, {
+  publicationState: event.data.status,
+  evidenceCount: event.data.evidence.length,
+  isFixture: event.data.isFixture,
+});
+const robots = commodityNodeRobotsContent(routePolicy);
+const publishedAt = event.data.publishedAt ?? event.data.reviewedAt ?? event.data.updatedAt;
+const eventUrl = `https://commoditynode.com/events/${event.id}/`;
+const evidenceById = new Map(event.data.evidence.map((item) => [item.id, item]));
+const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+const claimLabel = (type: string) => type.replaceAll('_', ' ');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  '@id': `${eventUrl}#article`,
+  headline: event.data.title,
+  description: event.data.summary,
+  url: eventUrl,
+  datePublished: publishedAt.toISOString(),
+  dateModified: event.data.updatedAt.toISOString(),
+  dateline: event.data.location.label,
+  inLanguage: 'en-US',
+  isAccessibleForFree: true,
+  author: {
+    '@type': 'Organization',
+    '@id': `${event.data.authorUrl}#organization`,
+    name: event.data.author,
+    url: event.data.authorUrl,
+  },
+  publisher: {
+    '@type': 'Organization',
+    '@id': 'https://commoditynode.com/#organization',
+    name: 'CommodityNode',
+    url: 'https://commoditynode.com',
+  },
+  about: event.data.commodityIds.map((commodity) => ({
+    '@type': 'Thing',
+    name: commodity,
+  })),
+  contentLocation: {
+    '@type': 'Place',
+    name: event.data.location.label,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: event.data.location.latitude,
+      longitude: event.data.location.longitude,
+    },
+  },
+  citation: event.data.evidence.map((item) => item.url),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Research',
+      item: 'https://commoditynode.com/',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Event Pulse',
+      item: 'https://commoditynode.com/events/',
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: event.data.title,
+      item: eventUrl,
+    },
+  ],
+};
+---
+
+<Base
+  title={event.data.title}
+  metaTitle={`${event.data.title} | Commodity Event Pulse`}
+  description={event.data.summary}
+  canonicalUrl={eventUrl}
+  ogType="article"
+  publishedTime={publishedAt.toISOString()}
+  modifiedTime={event.data.updatedAt.toISOString()}
+  author={event.data.author}
+  section="Commodity Event Pulse"
+  jsonLd={jsonLd}
+  breadcrumbLd={breadcrumbLd}
+  robots={robots}
+>
+  <div class="event-detail">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Research</a><span>/</span>
+      <a href="/events/">Event Pulse</a><span>/</span>
+      <span aria-current="page">{event.data.commodityIds[0]}</span>
+    </nav>
+
+    <header class="event-detail-header">
+      <div class="event-detail-kicker">
+        <span class:list={['event-materiality', `is-${event.data.materiality}`]}>
+          {event.data.materiality}
+        </span>
+        <span>Historical event</span>
+        <span>{event.data.location.countryCode}</span>
+      </div>
+      <h1>{event.data.title}</h1>
+      <p class="event-detail-summary">{event.data.summary}</p>
+      <dl class="event-detail-dates">
+        <div><dt>Occurred</dt><dd><time datetime={event.data.occurredAt.toISOString()}>{formatDate(event.data.occurredAt)}</time></dd></div>
+        <div><dt>Reviewed</dt><dd><time datetime={event.data.reviewedAt?.toISOString()}>{event.data.reviewedAt ? formatDate(event.data.reviewedAt) : 'Not recorded'}</time></dd></div>
+        <div><dt>Updated</dt><dd><time datetime={event.data.updatedAt.toISOString()}>{formatDate(event.data.updatedAt)}</time></dd></div>
+        <div><dt>Fingerprint</dt><dd><code>{event.data.fingerprint}</code></dd></div>
+      </dl>
+    </header>
+
+    <section class="event-signal-board" aria-labelledby="event-signal-title">
+      <header>
+        <div>
+          <p class="section-label">Bounded impact path</p>
+          <h2 id="event-signal-title">Observed supply interruption; price effect not isolated.</h2>
+        </div>
+        <p>
+          Lines show a reviewed transmission mechanism, not a forecast. Confidence applies to the
+          connection shown, not to a future market move.
+        </p>
+      </header>
+      <ol class="event-impact-path">
+        {event.data.impactPath
+          .slice()
+          .sort((a, b) => a.order - b.order)
+          .map((step) => (
+            <li>
+              <span class="event-path-order">{String(step.order).padStart(2, '0')}</span>
+              <div>
+                <span class="event-path-type">{step.nodeType}</span>
+                <strong>{step.label}</strong>
+                <p>{step.mechanism}</p>
+              </div>
+              <span class:list={['event-confidence', `is-${step.confidence}`]}>
+                {step.confidence}
+              </span>
+            </li>
+          ))}
+      </ol>
+    </section>
+
+    <div class="event-detail-grid">
+      <article class="event-claims" aria-labelledby="event-claims-title">
+        <header>
+          <p class="section-label">Claim ledger</p>
+          <h2 id="event-claims-title">What the evidence supports</h2>
+        </header>
+        <ol>
+          {event.data.claims.map((claim) => (
+            <li>
+              <div class="event-claim-heading">
+                <span>{claimLabel(claim.type)}</span>
+                <code>{claim.id}</code>
+              </div>
+              <p>{claim.text}</p>
+              <div class="event-claim-sources">
+                {claim.evidenceIds.map((evidenceId) => {
+                  const source = evidenceById.get(evidenceId);
+                  return source ? (
+                    <a href={`#source-${source.id}`}>{source.publisher}</a>
+                  ) : null;
+                })}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </article>
+
+      <aside class="event-context" aria-label="Event context and limitations">
+        <section>
+          <p class="section-label">Materiality</p>
+          <h2>Why this is {event.data.materiality}</h2>
+          <p>{event.data.materialityRationale}</p>
+        </section>
+        <section>
+          <p class="section-label">Affected entities</p>
+          <ul>
+            {event.data.entities.map((entity) => (
+              <li><span>{entity.type}</span><strong>{entity.name}</strong></li>
+            ))}
+          </ul>
+        </section>
+        <section>
+          <p class="section-label">Unknowns</p>
+          <ul class="event-unknown-list">
+            {event.data.unknowns.map((unknown) => <li>{unknown}</li>)}
+          </ul>
+        </section>
+        <section>
+          <p class="section-label">Boundary evidence</p>
+          <ul class="event-unknown-list">
+            {event.data.contradictingEvidence.map((item) => <li>{item}</li>)}
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <section class="event-timeline" aria-labelledby="event-timeline-title">
+      <header>
+        <p class="section-label">Timeline</p>
+        <h2 id="event-timeline-title">Decision and operating record</h2>
+      </header>
+      <ol>
+        {event.data.timeline
+          .slice()
+          .sort((a, b) => a.date.valueOf() - b.date.valueOf())
+          .map((item) => (
+            <li>
+              <time datetime={item.date.toISOString()}>{formatDate(item.date)}</time>
+              <p>{item.label}</p>
+              <div>
+                {item.evidenceIds.map((evidenceId) => {
+                  const source = evidenceById.get(evidenceId);
+                  return source ? <a href={`#source-${source.id}`}>{source.publisher}</a> : null;
+                })}
+              </div>
+            </li>
+          ))}
+      </ol>
+    </section>
+
+    <section class="event-sources" aria-labelledby="event-sources-title">
+      <header>
+        <div>
+          <p class="section-label">Exact sources</p>
+          <h2 id="event-sources-title">Open the record, not a copied article.</h2>
+        </div>
+        <p>{decision.sourceHosts.length} source host{decision.sourceHosts.length === 1 ? '' : 's'} · authoritative primary evidence {decision.hasAuthoritativePrimary ? 'present' : 'absent'}</p>
+      </header>
+      <ol>
+        {event.data.evidence.map((source) => (
+          <li id={`source-${source.id}`}>
+            <div>
+              <span>{source.kind.replaceAll('_', ' ')}</span>
+              <strong>{source.publisher}</strong>
+            </div>
+            <h3><a href={source.url} target="_blank" rel="noopener noreferrer">{source.label}</a></h3>
+            <p>{source.locator}</p>
+            <small>Retrieved {formatDate(source.retrievedAt)}</small>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <footer class="event-review-record">
+      <div>
+        <p class="section-label">Accountability</p>
+        <h2>Reviewed before publication</h2>
+      </div>
+      <p>
+        Written and reviewed by <a href={event.data.authorUrl}>{event.data.author}</a>.
+        Report a source, wording, or classification problem through the
+        <a href="/corrections/"> corrections process</a>.
+      </p>
+    </footer>
+  </div>
+</Base>

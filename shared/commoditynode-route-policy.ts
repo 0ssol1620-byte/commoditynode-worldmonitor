@@ -23,7 +23,7 @@ export interface CommodityNodeRoutePolicy {
 }
 
 export interface CommodityNodeRouteContext {
-  publicationState?: 'candidate' | 'reviewed' | 'published' | 'expired' | 'rejected';
+  publicationState?: 'candidate' | 'reviewed' | 'published' | 'superseded' | 'expired' | 'rejected';
   evidenceCount?: number;
   isFixture?: boolean;
 }

@@ -63,7 +63,7 @@ jobs:
 
       - name: Verify CommodityNode unit contracts
         run: |
-          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts
+          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts tests/commoditynode-event-pulse.test.mts
           node --test api/commoditynode-cors.test.mjs tests/commoditynode-license-inventory.test.mjs
 
       - name: Type-check
@@ -76,7 +76,7 @@ jobs:
         run: npm run commoditynode:performance
 
       - name: Verify built identity and metadata
-        run: node --test tests/commoditynode-built-html.test.mjs tests/commoditynode-design-tokens.test.mjs tests/commoditynode-research-build.test.mjs tests/commoditynode-vercel-routing.test.mjs
+        run: node --test tests/commoditynode-built-html.test.mjs tests/commoditynode-design-tokens.test.mjs tests/commoditynode-research-build.test.mjs tests/commoditynode-event-build.test.mjs tests/commoditynode-vercel-routing.test.mjs
 
       - name: Upload immutable build artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

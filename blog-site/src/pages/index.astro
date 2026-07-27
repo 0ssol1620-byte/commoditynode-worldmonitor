@@ -9,6 +9,10 @@ import {
   postPath,
   site,
 } from '../lib/site-variant';
+import {
+  isPublishedCommodityEvent,
+  sortCommodityEventsByOccurrence,
+} from '../lib/published-events';
 
 const posts = (await getCollection('blog'))
   .filter(belongsToActiveSite)
@@ -19,6 +23,12 @@ const posts = (await getCollection('blog'))
   );
 const commodityHubs = isCommodityNode
   ? (await getCollection('commodities')).sort((a, b) => a.data.name.localeCompare(b.data.name))
+  : [];
+const publishedEvents = isCommodityNode
+  ? (await getCollection('events'))
+      .filter(isPublishedCommodityEvent)
+      .sort(sortCommodityEventsByOccurrence)
+      .slice(0, 3)
   : [];
 
 // Committed covers have generated .webp / -640.webp siblings (guarded by
@@ -63,7 +73,7 @@ const jsonLd = {
       "datePublished": post.data.pubDate.toISOString(),
       ...(post.data.modifiedDate ? { "dateModified": post.data.modifiedDate.toISOString() } : {}),
       "author": {
-        "@type": "Person",
+        "@type": post.data.authorType || "Person",
         "name": authorName,
         ...(authorUrl ? { "url": authorUrl } : {}),
         ...(authorName === DEFAULT_AUTHOR ? { "@id": DEFAULT_AUTHOR_ID } : {})
@@ -95,7 +105,7 @@ const jsonLd = {
         </p>
         <div class="hero-actions">
           <a class="primary-action" href={site.liveUrl}>Open live intelligence</a>
-          <a class="secondary-action" href="/methodology/">Read the methodology</a>
+          <a class="secondary-action" href="/events/">Read Event Pulse</a>
         </div>
       </>
     ) : (
@@ -108,6 +118,41 @@ const jsonLd = {
   </div>
   {isCommodityNode && (
     <>
+      <section class="home-events" aria-labelledby="home-events-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Event Pulse</p>
+            <h2 id="home-events-title">A reviewed event record, with the uncertainty left in.</h2>
+          </div>
+          <a href="/events/">Open Event Pulse</a>
+        </div>
+        <div class="home-event-list">
+          {publishedEvents.map((event) => (
+            <article>
+              <div>
+                <span class:list={['event-materiality', `is-${event.data.materiality}`]}>
+                  {event.data.materiality}
+                </span>
+                <time datetime={event.data.occurredAt.toISOString()}>
+                  {event.data.occurredAt.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </time>
+              </div>
+              <p>{event.data.commodityIds.join(' · ')}</p>
+              <h3><a href={`/events/${event.id}/`}>{event.data.title}</a></h3>
+              <p>{event.data.summary}</p>
+              <footer>
+                <span>{event.data.evidence.length} source records</span>
+                <span>{event.data.unknowns.length} stated unknowns</span>
+              </footer>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section class="home-coverage" aria-labelledby="home-coverage-title">
         <div class="home-section-heading">
           <div>

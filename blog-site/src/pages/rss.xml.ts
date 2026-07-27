@@ -2,7 +2,8 @@ import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { absoluteUrl, belongsToActiveSite, postPath, site } from '../lib/site-variant';
+import { absoluteUrl, belongsToActiveSite, isCommodityNode, postPath, site } from '../lib/site-variant';
+import { isPublishedCommodityEvent } from '../lib/published-events';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const DEFAULT_AUTHOR = 'Elie Habib';
@@ -37,6 +38,41 @@ function getEnclosure(heroImage: string | undefined) {
 
 export async function GET(context: { site: URL }) {
   const posts = (await getCollection('blog')).filter(belongsToActiveSite);
+  const eventItems = isCommodityNode
+    ? (await getCollection('events'))
+        .filter(isPublishedCommodityEvent)
+        .map((event) => ({
+          title: event.data.title,
+          pubDate: event.data.publishedAt ?? event.data.updatedAt,
+          description: event.data.summary,
+          link: `/events/${event.id}/`,
+          categories: [
+            'Event Pulse',
+            event.data.materiality,
+            ...event.data.commodityIds,
+          ],
+          customData: [
+            `<dc:creator>${escapeXml(event.data.author)}</dc:creator>`,
+            `<atom:updated>${event.data.updatedAt.toISOString()}</atom:updated>`,
+          ].join(''),
+        }))
+    : [];
+  const postItems = posts.map((post) => {
+    const enclosure = getEnclosure(post.data.heroImage);
+    return {
+      title: post.data.title,
+      pubDate: post.data.pubDate,
+      description: post.data.description,
+      link: postPath(post.id),
+      categories: post.data.keywords?.split(',').map((k: string) => k.trim()),
+      ...(enclosure ? { enclosure } : {}),
+      customData: [
+        `<dc:creator>${escapeXml(post.data.author || DEFAULT_AUTHOR)}</dc:creator>`,
+        post.data.modifiedDate ? `<atom:updated>${post.data.modifiedDate.toISOString()}</atom:updated>` : '',
+        enclosure ? `<media:content url="${escapeXml(enclosure.url)}" medium="image" type="${enclosure.type}" />` : '',
+      ].filter(Boolean).join(''),
+    };
+  });
   return rss({
     title: site.publication,
     description: site.description,
@@ -50,23 +86,7 @@ export async function GET(context: { site: URL }) {
       '<language>en-us</language>',
       `<atom:link href="${absoluteUrl(site.rssPath)}" rel="self" type="application/rss+xml" />`,
     ].join(''),
-    items: posts
-      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-      .map((post) => {
-        const enclosure = getEnclosure(post.data.heroImage);
-        return {
-          title: post.data.title,
-          pubDate: post.data.pubDate,
-          description: post.data.description,
-          link: postPath(post.id),
-          categories: post.data.keywords?.split(',').map((k: string) => k.trim()),
-          ...(enclosure ? { enclosure } : {}),
-          customData: [
-            `<dc:creator>${escapeXml(post.data.author || DEFAULT_AUTHOR)}</dc:creator>`,
-            post.data.modifiedDate ? `<atom:updated>${post.data.modifiedDate.toISOString()}</atom:updated>` : '',
-            enclosure ? `<media:content url="${escapeXml(enclosure.url)}" medium="image" type="${enclosure.type}" />` : '',
-          ].filter(Boolean).join(''),
-        };
-      }),
+    items: [...eventItems, ...postItems]
+      .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf()),
   });
 }

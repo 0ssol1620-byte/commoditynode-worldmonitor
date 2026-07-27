@@ -28,7 +28,7 @@ CNWM-026,2,Content schemas,"Define collections for commodities, events, research
 CNWM-027,2,Home,Build the editorial home with a lazy live-map teaser and no ads.,P1,CNWM-023,in_progress
 CNWM-028,2,Directory,Build commodity directory with benchmark/proxy semantics and coverage states.,P1,CNWM-024,complete
 CNWM-029,2,Commodity hub,Build reusable Commodity Hub template.,P0,CNWM-024,complete
-CNWM-030,2,Event Pulse,Build Event Pulse index and detail templates.,P1,CNWM-024,planned
+CNWM-030,2,Event Pulse,Build Event Pulse index and detail templates.,P1,CNWM-024,complete
 CNWM-031,2,Research,"Build Research index/detail, author and reviewer components.",P1,CNWM-024,complete
 CNWM-032,2,Companies,Build company/asset exposure pages only for evidence-backed records.,P1,CNWM-024,planned
 CNWM-033,2,Trust pages,"Build Methodology, Sources, Editorial Policy, Corrections, About, Contact and legal pages.",P0,CNWM-023,complete
@@ -60,11 +60,11 @@ CNWM-058,4,Unavailable states,Implement source-specific stale/unavailable/partia
 CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets first.",P1,CNWM-048,planned
 CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,in_progress
 CNWM-061,5,News ingestion,Curate commodity-specific RSS/official/filing source catalog.,P0,CNWM-036,planned
-CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,planned
-CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,planned
-CNWM-064,5,Corroboration,Require source diversity and primary evidence for high-materiality events.,P0,CNWM-061,planned
+CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,complete
+CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,in_progress
+CNWM-064,5,Corroboration,Require source diversity and primary evidence for high-materiality events.,P0,CNWM-061,complete
 CNWM-065,5,Editorial queue,"Build private review UI for event facts, claims, entities and graph candidates.",P0,"CNWM-061,CNWM-042",planned
-CNWM-066,5,Event publication,Publish approved Event Pulse records to Astro content/data build.,P1,CNWM-063,planned
+CNWM-066,5,Event publication,Publish approved Event Pulse records to Astro content/data build.,P1,CNWM-063,complete
 CNWM-067,5,Visual brief,Generate structured AI editorial visual brief from approved event facts.,P1,CNWM-063,planned
 CNWM-068,5,Reference rights,"Allow input/reference images only when owned, licensed or public-domain and registered.",P0,CNWM-066,planned
 CNWM-069,5,Image generation,Generate text-free editorial visuals and variants.,P2,CNWM-067,planned
