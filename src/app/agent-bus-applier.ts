@@ -1,6 +1,7 @@
 import { SITE_VARIANT } from '@/config/variant';
 import { normalizeExclusiveChoropleths } from '@/components/resilience-choropleth-utils';
 import { getAllowedLayerKeys, isLayerExecutable, LAYER_REGISTRY, type MapRenderer, type MapVariant } from '@/config/map-layer-definitions';
+import { VALID_VARIANTS } from '@/config/variant-registry';
 import type { AppContext } from './app-context';
 import type { MapLayers, PanelConfig } from '@/types';
 import {
@@ -38,7 +39,7 @@ export interface AgentBusApplierOptions {
 }
 
 const DEFAULT_LAYER_RESULT: AgentBusApplyTargetResult[] = [];
-const MAP_VARIANTS = new Set<MapVariant>(['full', 'tech', 'finance', 'happy', 'commodity', 'energy']);
+const MAP_VARIANTS = new Set<MapVariant>(VALID_VARIANTS);
 
 function denied(message: string, reason: string, targets = DEFAULT_LAYER_RESULT, action?: DashboardControlAction): AgentBusApplyResult {
   return {

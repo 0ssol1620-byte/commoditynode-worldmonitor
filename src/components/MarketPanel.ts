@@ -4,7 +4,7 @@ import type { MarketData, CryptoData, TokenData } from '@/types';
 import { formatPrice, formatChange, getChangeClass, getHeatmapClass } from '@/utils';
 import { escapeHtml, unsafeRawHtml } from '@/utils/sanitize';
 import { miniSparkline } from '@/utils/sparkline';
-import { SITE_VARIANT } from '@/config';
+import { isCommoditySiteVariant, SITE_VARIANT } from '@/config';
 import { createWatchlistButton } from './watchlist-modal';
 import {
   renderChinaCorporateDisclosureSignals,
@@ -434,7 +434,7 @@ export class CommoditiesPanel extends Panel {
       if (
         tab === 'commodities' ||
         tab === 'fx' ||
-        (tab === 'xau' && SITE_VARIANT === 'commodity')
+        (tab === 'xau' && isCommoditySiteVariant(SITE_VARIANT))
       ) {
         this._tab = tab as CommoditiesTab;
         this._render();
@@ -495,7 +495,7 @@ export class CommoditiesPanel extends Panel {
 
   private _render(): void {
     const hasFx = this._fxRates.length > 0;
-    const hasXau = SITE_VARIANT === 'commodity' && this._commodityData.some(d => d.symbol === 'GC=F' && d.price !== null);
+    const hasXau = isCommoditySiteVariant(SITE_VARIANT) && this._commodityData.some(d => d.symbol === 'GC=F' && d.price !== null);
     if (this._tab === 'xau' && !hasXau) this._tab = 'commodities';
     const tabBar = this._buildTabBar(hasFx, hasXau);
 

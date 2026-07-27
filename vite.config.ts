@@ -218,6 +218,16 @@ function brotliPrecompressPlugin(): Plugin {
 function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDesktopBuild: boolean): Plugin {
   return {
     name: 'html-variant',
+    configureServer(server) {
+      if (activeVariant !== 'commoditynode') return;
+      server.middlewares.use((request, _response, next) => {
+        const pathname = request.url?.split('?', 1)[0];
+        if (pathname === '/source' || pathname === '/source/') {
+          request.url = `/source/index.html${request.url?.includes('?') ? request.url.slice(request.url.indexOf('?')) : ''}`;
+        }
+        next();
+      });
+    },
     transformIndexHtml(html) {
       let result = html
         .replace(/<title>.*?<\/title>/, `<title>${activeMeta.title}</title>`)
@@ -253,7 +263,7 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
       // before CSS loads. Web builds always use 'full' — runtime hostname detection handles variants.
       if (activeVariant !== 'full') {
         result = result.replace(
-          /if\(v\)document\.documentElement\.dataset\.variant=v;/,
+          /if\(v\)document\.documentElement\.dataset\.variant=v;else document\.documentElement\.removeAttribute\('data-variant'\);/,
           `v='${activeVariant}';document.documentElement.dataset.variant=v;`
         );
       }
@@ -280,6 +290,47 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
           .replace(/\/favico\/apple-touch-icon/g, `/favico/${activeVariant}/apple-touch-icon`)
           .replace(/\/favico\/android-chrome/g, `/favico/${activeVariant}/android-chrome`)
           .replace(/\/favico\/og-image/g, `/favico/${activeVariant}/og-image`);
+      }
+
+      if (activeVariant === 'commoditynode') {
+        const commodityNodeJsonLd = {
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: activeMeta.siteName,
+          url: activeMeta.url,
+          description: activeMeta.description,
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web',
+          isAccessibleForFree: true,
+          license: 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor/blob/main/LICENSE',
+          codeRepository: 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor',
+          featureList: activeMeta.features,
+          isBasedOn: {
+            '@type': 'SoftwareSourceCode',
+            name: 'World Monitor',
+            codeRepository: 'https://github.com/koala73/worldmonitor',
+          },
+        };
+        const structuredData = `<script type="application/ld+json">\n${JSON.stringify(commodityNodeJsonLd, null, 2)}\n</script>\n`;
+
+        result = result
+          .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g, '')
+          .replace('</head>', `    ${structuredData}  </head>`)
+          .replace(/<meta name="author" content="[^"]*" \/>/, '<meta name="author" content="CommodityNode contributors" />')
+          .replace(/\s*<meta name="twitter:(?:site|creator)" content="[^"]*" \/>/g, '')
+          .replace(/https:\/\/www\.worldmonitor\.app\/favico\/commoditynode\/og-image\.png/g, 'https://commoditynode.com/og/commoditynode-impact-universe.svg')
+          .replace(/https:\/\/www\.worldmonitor\.app\/dashboard(?:\?lang=[^"]+)?/g, activeMeta.url)
+          .replace(/<link rel="icon"[^>]*>/g, '<link rel="icon" type="image/svg+xml" href="/commoditynode-mark.svg" />')
+          .replace(/<link rel="apple-touch-icon"[^>]*>/g, '<link rel="apple-touch-icon" href="/commoditynode-mark.svg" />')
+          .replace(/(<h1 class="app-heading">)[^<]*(<\/h1>)/, `$1${activeMeta.title}$2`)
+          .replace('</head>', '    <meta name="robots" content="noindex, follow, max-image-preview:large" />\n  </head>')
+          .replace(/<meta property="og:image:alt" content="[^"]*" \/>/, '<meta property="og:image:alt" content="CommodityNode live commodity impact map and market intelligence dashboard" />')
+          .replace(/World Monitor’s interactive map, panels, alerts, and live analysis run in the browser\./, 'CommodityNode’s interactive map, panels, alerts, and live analysis run in the browser.')
+          .replace(/>World Monitor homepage</, '>CommodityNode research homepage<')
+          .replace(/aria-label="World Monitor references"/, 'aria-label="CommodityNode references"')
+          .replace(/(<div class="skeleton-brand"><span class="skeleton-brand-mark" aria-hidden="true"><\/span><span>)World Monitor(<\/span><\/div>)/, '$1CommodityNode$2')
+          .replace(/\.skeleton-brand-mark::after\{content:"W"\}/, '.skeleton-brand-mark::after{content:"C"}')
+          .replace(/if\(window\.self===window\.top&&!dismissed\)document\.documentElement\.classList\.add\('wm-pro-banner-reserved'\);/, '');
       }
 
       return result;
@@ -394,7 +445,7 @@ function polymarketPlugin(): Plugin {
         const order = ALLOWED_ORDER.includes(url.searchParams.get('order') ?? '') ? url.searchParams.get('order') : 'volume';
         const ascending = ['true', 'false'].includes(url.searchParams.get('ascending') ?? '') ? url.searchParams.get('ascending') : 'false';
         const rawLimit = parseInt(url.searchParams.get('limit') ?? '', 10);
-        const limit = isNaN(rawLimit) ? 50 : Math.max(1, Math.min(100, rawLimit));
+        const limit = Number.isNaN(rawLimit) ? 50 : Math.max(1, Math.min(100, rawLimit));
 
         const params = new URLSearchParams({ closed: closed!, order: order!, ascending: ascending!, limit: String(limit) });
         if (endpoint === 'events') {

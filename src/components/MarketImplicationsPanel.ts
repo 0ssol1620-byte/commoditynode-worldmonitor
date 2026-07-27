@@ -67,14 +67,25 @@ function renderCard(card: MarketImplicationCard): string {
 export class MarketImplicationsPanel extends Panel {
   private fwSelector: FrameworkSelector;
 
-  constructor() {
+  constructor(options: {
+    premium?: 'locked' | false;
+    frameworkAccess?: boolean;
+    title?: string;
+    infoTooltip?: string;
+  } = {}) {
+    const premium = options.premium === false ? undefined : (options.premium ?? 'locked');
     super({
       id: 'market-implications',
-      title: t('components.marketImplications.title'),
-      infoTooltip: t('components.marketImplications.infoTooltip'),
-      premium: 'locked',
+      title: options.title ?? t('components.marketImplications.title'),
+      infoTooltip: options.infoTooltip ?? t('components.marketImplications.infoTooltip'),
+      premium,
     });
-    this.fwSelector = new FrameworkSelector({ panelId: 'market-implications', isPremium: hasPremiumAccess(), panel: this, note: t('components.marketImplications.appliesToNext') });
+    this.fwSelector = new FrameworkSelector({
+      panelId: 'market-implications',
+      isPremium: options.frameworkAccess ?? hasPremiumAccess(),
+      panel: this,
+      note: t('components.marketImplications.appliesToNext'),
+    });
     this.header.appendChild(this.fwSelector.el);
 
     this.content.addEventListener('click', (e) => {

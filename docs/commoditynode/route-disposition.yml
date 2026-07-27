@@ -1,0 +1,53 @@
+schemaVersion: 1
+surfaces:
+  research:
+    origin: https://commoditynode.com
+    framework: astro
+    indexable: true
+  live:
+    origin: https://live.commoditynode.com
+    framework: vite
+    indexable: true
+routes:
+  /:
+    surface: research
+    action: keep
+  /commodities/:
+    surface: research
+    action: keep
+  /commodities/:slug/:
+    surface: research
+    action: keep
+  /events/:
+    surface: research
+    action: keep
+  /events/:year/:slug/:
+    surface: research
+    action: keep
+  /research/:
+    surface: research
+    action: keep
+  /research/:slug/:
+    surface: research
+    action: keep
+  /impact-universe/:
+    surface: research
+    action: keep
+  /tools/scenario/:
+    surface: research
+    action: keep
+  /live/:
+    surface: research
+    action: redirect
+    target: https://live.commoditynode.com/
+  /source/:
+    surface: live
+    action: keep
+  /publication-gate/:
+    surface: research
+    action: gone
+    status: 410
+  /compliance-portal/:
+    surface: research
+    action: gone
+    status: 410

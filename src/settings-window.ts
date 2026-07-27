@@ -36,23 +36,26 @@ function getLocalizedPanelName(panelKey: string, fallback: string): string {
 export function initSettingsWindow(): void {
   const appEl = document.getElementById('app');
   if (!appEl) return;
+  const isCommodityNode = SITE_VARIANT === 'commoditynode';
+  const variantPanelKeys = new Set(VARIANT_DEFAULTS[SITE_VARIANT] ?? []);
 
   // This window shows only "which panels to display" (panel display settings).
-  document.title = `${t('header.settings')} - World Monitor`;
+  document.title = `${t('header.settings')} - ${isCommodityNode ? 'CommodityNode' : 'World Monitor'}`;
 
   const panelSettings = loadFromStorage<Record<string, PanelConfig>>(
     STORAGE_KEYS.panels,
     DEFAULT_PANELS
   );
   // Prune stale panel keys not in current registry (e.g. renamed panels)
-  const validPanelKeys = new Set(Object.keys(ALL_PANELS));
+  const validPanelKeys = isCommodityNode
+    ? variantPanelKeys
+    : new Set(Object.keys(ALL_PANELS));
   for (const key of Object.keys(panelSettings)) {
     if (!validPanelKeys.has(key) && key !== 'runtime-config') delete panelSettings[key];
   }
-  const variantDefaults = new Set(VARIANT_DEFAULTS[SITE_VARIANT] ?? []);
-  for (const key of Object.keys(ALL_PANELS)) {
+  for (const key of validPanelKeys) {
     if (!(key in panelSettings)) {
-      panelSettings[key] = { ...getEffectivePanelConfig(key, SITE_VARIANT), enabled: variantDefaults.has(key) };
+      panelSettings[key] = { ...getEffectivePanelConfig(key, SITE_VARIANT), enabled: variantPanelKeys.has(key) };
     }
   }
 
@@ -60,7 +63,10 @@ export function initSettingsWindow(): void {
 
   function render(): void {
     const panelEntries = Object.entries(panelSettings).filter(
-      ([key]) => (key !== 'runtime-config' || isDesktopApp) && (!key.startsWith('cw-') || isProUser())
+      ([key]) =>
+        (key !== 'runtime-config' || isDesktopApp) &&
+        (!key.startsWith('cw-') || isProUser()) &&
+        (!isCommodityNode || variantPanelKeys.has(key))
     );
     const panelHtml = panelEntries
       .map(

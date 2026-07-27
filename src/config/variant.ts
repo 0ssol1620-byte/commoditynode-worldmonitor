@@ -1,39 +1,44 @@
-const buildVariant = (() => {
+import {
+  isLocalVariantHost,
+  isSiteVariant,
+  normalizeSiteVariant,
+  resolveSiteVariantFromHostname,
+  type SiteVariant,
+} from './variant-registry';
+
+const buildVariant: SiteVariant = (() => {
   try {
-    return import.meta.env.VITE_VARIANT || 'full';
+    return normalizeSiteVariant(import.meta.env.VITE_VARIANT);
   } catch {
     return 'full';
   }
 })();
 
-function loadStoredVariant(): string | null {
+function loadStoredVariant(): SiteVariant | null {
   try {
-    return localStorage.getItem('worldmonitor-variant');
+    const stored = localStorage.getItem('worldmonitor-variant');
+    return isSiteVariant(stored) ? stored : null;
   } catch {
     return null;
   }
 }
 
-export const SITE_VARIANT: string = (() => {
+export const SITE_VARIANT: SiteVariant = (() => {
   if (typeof window === 'undefined') return buildVariant;
 
   const isTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
   if (isTauri) {
     const stored = loadStoredVariant();
-    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy' || stored === 'commodity' || stored === 'energy') return stored;
+    if (stored) return stored;
     return buildVariant;
   }
 
-  const h = location.hostname;
-  if (h.startsWith('tech.')) return 'tech';
-  if (h.startsWith('finance.')) return 'finance';
-  if (h.startsWith('happy.')) return 'happy';
-  if (h.startsWith('commodity.')) return 'commodity';
-  if (h.startsWith('energy.')) return 'energy';
+  const hostVariant = resolveSiteVariantFromHostname(location.hostname);
+  if (hostVariant) return hostVariant;
 
-  if (h === 'localhost' || h === '127.0.0.1') {
+  if (isLocalVariantHost(location.hostname)) {
     const stored = loadStoredVariant();
-    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy' || stored === 'commodity' || stored === 'energy') return stored;
+    if (stored) return stored;
     return buildVariant;
   }
 

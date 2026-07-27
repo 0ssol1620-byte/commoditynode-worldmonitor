@@ -19,6 +19,7 @@ import {
   SITE_VARIANT,
   LAYER_TO_SOURCE,
   isPanelInVariantDefaults,
+  isCommoditySiteVariant,
 } from '@/config';
 import { resolveNewsCategories, enabledNewsCategoryKeys } from '@/config/feed-resolution';
 import {
@@ -626,8 +627,9 @@ export class DataLoaderManager implements AppModule {
 
     try {
       markLcpDebug('wm:data:feed-digest-start');
+      const digestVariant = SITE_VARIANT === 'commoditynode' ? 'commodity' : SITE_VARIANT;
       const resp = await publicRpcFetch(
-        toApiUrl(`/api/news/v1/list-feed-digest?variant=${SITE_VARIANT}&lang=${getCurrentLanguage()}`),
+        toApiUrl(`/api/news/v1/list-feed-digest?variant=${digestVariant}&lang=${getCurrentLanguage()}`),
         { signal: AbortSignal.timeout(this.digestRequestTimeoutMs) },
       );
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -790,7 +792,7 @@ export class DataLoaderManager implements AppModule {
       }
 
       // Trade policy + supply-chain data (FULL, FINANCE, COMMODITY, ENERGY variants use supply-chain surface)
-      if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || SITE_VARIANT === 'commodity' || SITE_VARIANT === 'energy') {
+      if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || isCommoditySiteVariant(SITE_VARIANT) || SITE_VARIANT === 'energy') {
         if (shouldLoad('trade-policy')) {
           tasks.push({ name: 'tradePolicy', task: () => runGuarded('tradePolicy', () => this.loadTradePolicy()) });
         }
@@ -1567,7 +1569,9 @@ export class DataLoaderManager implements AppModule {
 
     this.ctx.allNews = collectedNews;
     this.ctx.initialLoadComplete = true;
-    mountCommunityWidget();
+    if (SITE_VARIANT !== 'commoditynode') {
+      mountCommunityWidget();
+    }
 
     this.ctx.map?.updateHotspotActivity(this.ctx.allNews);
 
@@ -2114,7 +2118,7 @@ export class DataLoaderManager implements AppModule {
           sectorContext,
           earningsContext,
           frameworkAppend: getActiveFrameworkForPanel('daily-market-brief')?.systemPromptAppend,
-          newsCategories: SITE_VARIANT === 'commodity'
+          newsCategories: isCommoditySiteVariant(SITE_VARIANT)
             ? ['commodity-news', 'gold-silver', 'mining-news', 'energy', 'critical-minerals']
             : SITE_VARIANT === 'energy'
               ? ['live-news', 'energy', 'supply-chain']

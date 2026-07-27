@@ -17,6 +17,10 @@ if (SITE_VARIANT === 'happy') {
   void import('./styles/happy-theme.css');
 }
 
+if (SITE_VARIANT === 'commoditynode') {
+  void import('./styles/commoditynode-theme.css');
+}
+
 // Activate the deferred dashboard app stylesheet. The build
 // (deferDashboardStylesheetLinks in vite.config.ts) emits the large dashboard
 // CSS as <link media="print" data-wm-deferred-style="dashboard"> + a <noscript>

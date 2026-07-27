@@ -33,6 +33,7 @@ import { initI18n, t } from '@/services/i18n';
 import { applyStoredTheme } from '@/utils/theme-manager';
 import { applyFont } from '@/services/font-settings';
 import { trackFeatureToggle } from '@/services/analytics';
+import { SITE_VARIANT } from '@/config/variant';
 import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
 
 
@@ -845,9 +846,12 @@ async function initSettingsWindow(): Promise<void> {
   // Localize the static HTML shell (settings.html) — labels are baked in
   // English so the page paints something before this script runs; once
   // i18n is ready we swap them to the user's locale.
-  document.title = t('modals.settingsWindow.shellTitle');
+  const settingsTitle = SITE_VARIANT === 'commoditynode'
+    ? `${t('header.settings')} - CommodityNode`
+    : t('modals.settingsWindow.shellTitle');
+  document.title = settingsTitle;
   const headerTitle = document.querySelector('.settings-header-title');
-  if (headerTitle) headerTitle.textContent = t('modals.settingsWindow.shellTitle');
+  if (headerTitle) headerTitle.textContent = settingsTitle;
   const searchInputEl = document.getElementById('settingsSearch') as HTMLInputElement | null;
   if (searchInputEl) searchInputEl.placeholder = t('modals.settingsWindow.shellSearchPlaceholder');
   const cancelEl = document.getElementById('cancelBtn');

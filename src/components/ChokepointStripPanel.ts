@@ -53,10 +53,10 @@ function formatFlow(cp: ChokepointInfo): string {
 export class ChokepointStripPanel extends Panel {
   private data: GetChokepointStatusResponse | null = null;
 
-  constructor() {
+  constructor(options: { id?: string; title?: string } = {}) {
     super({
-      id: 'chokepoint-strip',
-      title: t('components.chokepointStrip.title'),
+      id: options.id ?? 'chokepoint-strip',
+      title: options.title ?? t('components.chokepointStrip.title'),
       infoTooltip: t('components.chokepointStrip.infoTooltip'),
     });
   }

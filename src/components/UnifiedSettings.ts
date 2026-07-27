@@ -364,7 +364,10 @@ export class UnifiedSettings {
 
   public open(tab?: TabId): void {
     const requestedTab = tab ?? this.activeTab;
-    this.activeTab = requestedTab === 'mcp-clients' && !hasFeature('mcpAccess')
+    this.activeTab = SITE_VARIANT === 'commoditynode' &&
+      (requestedTab === 'api-keys' || requestedTab === 'mcp-clients')
+      ? 'settings'
+      : requestedTab === 'mcp-clients' && !hasFeature('mcpAccess')
       ? 'settings'
       : requestedTab;
     this.resetPanelDraft();
@@ -546,13 +549,14 @@ export class UnifiedSettings {
     const notifs = showNotificationsTab
       ? renderNotificationsSettings({ isSignedIn })
       : null;
-    const showMcpClientsTab = hasFeature('mcpAccess');
+    const showUpstreamAccountTabs = SITE_VARIANT !== 'commoditynode';
+    const showMcpClientsTab = showUpstreamAccountTabs && hasFeature('mcpAccess');
     const availableTabs: TabId[] = [
       'settings',
       'panels',
       'sources',
       ...(showNotificationsTab ? ['notifications' as const] : []),
-      'api-keys',
+      ...(showUpstreamAccountTabs ? ['api-keys' as const] : []),
       ...(showMcpClientsTab ? ['mcp-clients' as const] : []),
     ];
     this.activeTab = normalizeSettingsTab(this.activeTab, availableTabs);
@@ -569,7 +573,7 @@ export class UnifiedSettings {
           <button class="${tabClass('panels')}" tabindex="${this.activeTab === 'panels' ? 0 : -1}" data-tab="panels" role="tab" aria-selected="${this.activeTab === 'panels'}" id="us-tab-panels" aria-controls="us-tab-panel-panels">${t('header.tabPanels')}</button>
           <button class="${tabClass('sources')}" tabindex="${this.activeTab === 'sources' ? 0 : -1}" data-tab="sources" role="tab" aria-selected="${this.activeTab === 'sources'}" id="us-tab-sources" aria-controls="us-tab-panel-sources">${t('header.tabSources')}</button>
           ${showNotificationsTab ? `<button class="${tabClass('notifications')}" tabindex="${this.activeTab === 'notifications' ? 0 : -1}" data-tab="notifications" role="tab" aria-selected="${this.activeTab === 'notifications'}" id="us-tab-notifications" aria-controls="us-tab-panel-notifications">${t('header.tabNotifications')}</button>` : ''}
-          <button class="${tabClass('api-keys')}" tabindex="${this.activeTab === 'api-keys' ? 0 : -1}" data-tab="api-keys" role="tab" aria-selected="${this.activeTab === 'api-keys'}" id="us-tab-api-keys" aria-controls="us-tab-panel-api-keys">API Keys <span class="panel-pro-badge">PRO</span></button>
+          ${showUpstreamAccountTabs ? `<button class="${tabClass('api-keys')}" tabindex="${this.activeTab === 'api-keys' ? 0 : -1}" data-tab="api-keys" role="tab" aria-selected="${this.activeTab === 'api-keys'}" id="us-tab-api-keys" aria-controls="us-tab-panel-api-keys">API Keys <span class="panel-pro-badge">PRO</span></button>` : ''}
           ${showMcpClientsTab ? `<button class="${tabClass('mcp-clients')}" tabindex="${this.activeTab === 'mcp-clients' ? 0 : -1}" data-tab="mcp-clients" role="tab" aria-selected="${this.activeTab === 'mcp-clients'}" id="us-tab-mcp-clients" aria-controls="us-tab-panel-mcp-clients">MCP Clients <span class="panel-pro-badge">PRO</span></button>` : ''}
         </div>
         <div class="unified-settings-tab-panel${this.activeTab === 'settings' ? ' active' : ''}" data-panel-id="settings" id="us-tab-panel-settings" role="tabpanel" aria-labelledby="us-tab-settings">
@@ -609,9 +613,9 @@ export class UnifiedSettings {
           ${notifs.html}
         </div>
         ` : ''}
-        <div class="unified-settings-tab-panel${this.activeTab === 'api-keys' ? ' active' : ''}" data-panel-id="api-keys" id="us-tab-panel-api-keys" role="tabpanel" aria-labelledby="us-tab-api-keys">
+        ${showUpstreamAccountTabs ? `<div class="unified-settings-tab-panel${this.activeTab === 'api-keys' ? ' active' : ''}" data-panel-id="api-keys" id="us-tab-panel-api-keys" role="tabpanel" aria-labelledby="us-tab-api-keys">
           ${this.renderApiKeysContent()}
-        </div>
+        </div>` : ''}
         ${showMcpClientsTab ? `
         <div class="unified-settings-tab-panel${this.activeTab === 'mcp-clients' ? ' active' : ''}" data-panel-id="mcp-clients" id="us-tab-panel-mcp-clients" role="tabpanel" aria-labelledby="us-tab-mcp-clients">
           ${this.renderMcpClientsContent()}
@@ -645,8 +649,8 @@ export class UnifiedSettings {
     this.renderSourcesGrid();
     this.updateSourcesCounter();
 
-    this.attachApiKeysHandlers();
-    if (this.activeTab === 'api-keys' || this.activeTab === 'mcp-clients') {
+    if (showUpstreamAccountTabs) this.attachApiKeysHandlers();
+    if (showUpstreamAccountTabs && (this.activeTab === 'api-keys' || this.activeTab === 'mcp-clients')) {
       void this.loadPlanLimitNotices();
     }
     if (this.activeTab === 'api-keys' && getAuthState().user && hasFeature('apiAccess')) {
@@ -696,6 +700,9 @@ export class UnifiedSettings {
   }
 
   private renderUpgradeSection(): string {
+    if (SITE_VARIANT === 'commoditynode') {
+      return '<div class="upgrade-pro-section upgrade-pro-hidden" hidden></div>';
+    }
     // Non-Dodo premium (API key / tester key / Clerk pro role without a
     // Convex subscription): neither "Upgrade" nor "Manage Billing" is
     // actionable. Checked FIRST so these users don't get stuck on the
@@ -861,9 +868,11 @@ export class UnifiedSettings {
 
   private getVisiblePanelEntries(): Array<[string, PanelConfig]> {
     const panelSettings = this.draftPanelSettings;
+    const variantPanelKeys = new Set(VARIANT_DEFAULTS[SITE_VARIANT] ?? []);
     let entries = Object.entries(panelSettings)
       .filter(([key]) => key !== 'runtime-config' || this.config.isDesktopApp)
-      .filter(([key]) => !key.startsWith('cw-'));
+      .filter(([key]) => !key.startsWith('cw-'))
+      .filter(([key]) => SITE_VARIANT !== 'commoditynode' || variantPanelKeys.has(key));
 
     if (this.activePanelCategory !== 'all') {
       const catDef = PANEL_CATEGORY_MAP[this.activePanelCategory];
@@ -927,11 +936,17 @@ export class UnifiedSettings {
   }
 
   private clonePanelSettings(source: Record<string, PanelConfig> = this.config.getPanelSettings()): Record<string, PanelConfig> {
+    const allowedKeys = SITE_VARIANT === 'commoditynode'
+      ? new Set(VARIANT_DEFAULTS.commoditynode)
+      : null;
     const cloned: Record<string, PanelConfig> = Object.fromEntries(
-      Object.entries(source).map(([key, panel]) => [key, { ...panel }]),
+      Object.entries(source)
+        .filter(([key]) => !allowedKeys || allowedKeys.has(key))
+        .map(([key, panel]) => [key, { ...panel }]),
     );
     const variantDefaults = new Set(VARIANT_DEFAULTS[SITE_VARIANT] ?? []);
-    for (const key of Object.keys(ALL_PANELS)) {
+    const panelKeys = allowedKeys ?? new Set(Object.keys(ALL_PANELS));
+    for (const key of panelKeys) {
       if (!(key in cloned)) {
         cloned[key] = { ...getEffectivePanelConfig(key, SITE_VARIANT), enabled: variantDefaults.has(key) };
       }

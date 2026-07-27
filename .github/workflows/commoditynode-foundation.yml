@@ -1,0 +1,76 @@
+name: CommodityNode foundation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commoditynode-foundation.yml'
+      - 'api/**'
+      - 'e2e/commoditynode-*.spec.ts'
+      - 'public/source/**'
+      - 'scripts/*commoditynode*'
+      - 'shared/commoditynode-*'
+      - 'src/**'
+      - 'tests/commoditynode-*'
+      - 'LICENSE'
+      - 'NOTICE.md'
+      - 'SOURCE-OFFER.md'
+      - 'UPSTREAM.md'
+      - 'package.json'
+      - 'package-lock.json'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commoditynode-foundation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: '1'
+      COMMODITYNODE_BUILD_SHA: ${{ github.sha }}
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify license and deployed-source contracts
+        run: npm run commoditynode:contracts
+
+      - name: Verify CommodityNode unit contracts
+        run: |
+          npx tsx --test tests/commoditynode-variant.test.mts
+          node --test api/commoditynode-cors.test.mjs
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build CommodityNode
+        run: npm run build:commoditynode
+
+      - name: Verify built identity and metadata
+        run: node --test tests/commoditynode-built-html.test.mjs
+
+      - name: Upload immutable build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: commoditynode-live-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14

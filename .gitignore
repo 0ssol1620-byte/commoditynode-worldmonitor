@@ -1,4 +1,6 @@
 node_modules/
+public/.well-known/commoditynode-build.json
+public/SOURCE-OFFER.md
 .idea/
 dist/
 public/blog/

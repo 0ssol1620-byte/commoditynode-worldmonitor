@@ -514,6 +514,18 @@ export class MapComponent {
     const happyLayers: (keyof MapLayers)[] = [
       'positiveEvents', 'kindness', 'happiness', 'speciesRecovery', 'renewableInstallations',
     ];
+    // Commodity variants use the SVG fallback in constrained/mobile/E2E
+    // environments. Keep its controls aligned with the product contract;
+    // unsupported asset/route layers stay absent instead of falling through
+    // to the geopolitical full-variant picker.
+    const commodityLayers: (keyof MapLayers)[] = [
+      'pipelines', 'waterways', 'commodityHubs', 'minerals',
+      'sanctions', 'natural', 'weather', 'fires', 'economic',
+    ];
+    const commodityNodeLayers: (keyof MapLayers)[] = [
+      'pipelines', 'waterways', 'commodityHubs', 'minerals',
+      'natural', 'weather', 'fires', 'economic',
+    ];
     // Energy variant — SVG/mobile fallback. Only include keys that actually render
     // in this file (commodityPorts/climate/tradeRoutes/resilienceScore/dayNight do
     // not, so they're omitted). Mirrors VARIANT_LAYER_ORDER.energy in
@@ -533,6 +545,8 @@ export class MapComponent {
     const layers = SITE_VARIANT === 'tech' ? techLayers
                  : SITE_VARIANT === 'finance' ? financeLayers
                  : SITE_VARIANT === 'happy' ? happyLayers
+                 : SITE_VARIANT === 'commoditynode' ? commodityNodeLayers
+                 : SITE_VARIANT === 'commodity' ? commodityLayers
                  : SITE_VARIANT === 'energy' ? energyLayers
                  : fullLayers;
     const MAX_SVG_LAYERS = 9;

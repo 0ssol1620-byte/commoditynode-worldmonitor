@@ -1,9 +1,10 @@
 import type { MapLayers } from '@/types';
+import type { SiteVariant } from './variant-registry';
 // boundary-ignore: isDesktopRuntime is a pure env probe with no service dependencies
 import { isDesktopRuntime } from '@/services/runtime';
 
 export type MapRenderer = 'flat' | 'globe';
-export type MapVariant = 'full' | 'tech' | 'finance' | 'happy' | 'commodity' | 'energy';
+export type MapVariant = SiteVariant;
 
 const _desktop = isDesktopRuntime();
 
@@ -321,6 +322,12 @@ const VARIANT_LAYER_ORDER: Record<MapVariant, Array<keyof MapLayers>> = {
     'minerals', 'pipelines', 'waterways', 'tradeRoutes',
     'ais', 'economic', 'fires', 'climate',
     'resilienceScore', 'natural', 'weather', 'outages', 'sanctions', 'dayNight',
+  ],
+  commoditynode: [
+    'miningSites', 'processingPlants', 'commodityPorts', 'commodityHubs',
+    'pipelines', 'waterways', 'tradeRoutes', 'natural',
+    'ais', 'sanctions', 'fires', 'outages', 'economic', 'climate',
+    'weather', 'minerals', 'resilienceScore', 'dayNight',
   ],
   energy: [
     // Core energy infrastructure — mirror of ENERGY_MAP_LAYERS in panels.ts

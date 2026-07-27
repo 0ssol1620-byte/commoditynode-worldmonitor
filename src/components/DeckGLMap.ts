@@ -94,6 +94,7 @@ import {
   PIPELINE_COLORS,
   STRATEGIC_WATERWAYS,
   SITE_VARIANT,
+  isCommoditySiteVariant,
   PORTS,
   STOCK_EXCHANGES,
   FINANCIAL_CENTERS,
@@ -5832,7 +5833,7 @@ export class DeckGLMap {
             { shape: shapes.circle('rgb(241, 196, 15)'), label: t('components.deckgl.legend.diseaseWatch'), layerKey: 'diseaseOutbreaks' },
             ...resilienceLegendItems,
           ]
-          : SITE_VARIANT === 'commodity'
+          : isCommoditySiteVariant(SITE_VARIANT)
             ? [
               { shape: shapes.hexagon(isLight ? 'rgb(180, 120, 0)' : 'rgb(255, 200, 0)'), label: t('components.deckgl.legend.commodityHub'), layerKey: 'commodityHubs' },
               { shape: shapes.circle('rgb(180, 80, 80)'), label: t('components.deckgl.legend.miningSite'), layerKey: 'miningSites' },

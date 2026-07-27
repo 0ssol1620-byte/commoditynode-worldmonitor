@@ -865,7 +865,7 @@ export const FEEDS = SITE_VARIANT === 'tech'
     ? FINANCE_FEEDS
     : SITE_VARIANT === 'happy'
       ? HAPPY_FEEDS
-      : SITE_VARIANT === 'commodity'
+      : SITE_VARIANT === 'commodity' || SITE_VARIANT === 'commoditynode'
         ? COMMODITY_FEEDS
         : SITE_VARIANT === 'energy'
           ? ENERGY_FEEDS

@@ -5,6 +5,14 @@
 // VITE_VARIANT=finance → finance.worldmonitor.app (markets/trading)
 
 export { SITE_VARIANT } from './variant';
+export {
+  VALID_VARIANTS,
+  isSiteVariant,
+  normalizeSiteVariant,
+  resolveSiteVariantFromHostname,
+  isCommoditySiteVariant,
+  type SiteVariant,
+} from './variant-registry';
 
 // Shared base configuration (always included)
 export {

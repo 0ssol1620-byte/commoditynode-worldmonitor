@@ -8,7 +8,7 @@ import {
 } from './variant-live-smoke-response-capture';
 import { PREMIUM_RPC_PATHS } from '../src/shared/premium-paths';
 
-type VariantName = 'full' | 'tech' | 'finance' | 'commodity' | 'energy' | 'happy';
+type VariantName = 'full' | 'tech' | 'finance' | 'commodity' | 'energy' | 'happy' | 'commoditynode';
 
 type PanelDiagnostic = {
   id: string;
@@ -22,6 +22,7 @@ const EXPECTED_BOOT_PANELS: Record<VariantName, string[]> = {
   tech: ['live-news', 'insights', 'ai', 'tech'],
   finance: ['live-news', 'insights', 'markets'],
   commodity: ['live-news', 'insights', 'commodity-news', 'markets'],
+  commoditynode: ['event-pulse', 'commodities', 'supply-chain', 'route-risk'],
   energy: ['chokepoint-strip', 'pipeline-status', 'live-news'],
   happy: ['positive-feed', 'progress', 'counters'],
 };
@@ -49,6 +50,7 @@ const normalizeVariant = (variant: string | undefined): VariantName => {
     variant === 'tech' ||
     variant === 'finance' ||
     variant === 'commodity' ||
+    variant === 'commoditynode' ||
     variant === 'energy' ||
     variant === 'happy'
   ) {
@@ -126,7 +128,8 @@ test.describe('variant live reliability smoke', () => {
     });
 
     await page.goto('/?variantSmoke=1', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('body')).toBeVisible();
+    await expect(page.locator('body')).toBeAttached();
+    await expect(page.locator('#app')).toBeVisible();
 
     await expect
       .poll(async () => page.locator('[data-panel]').count(), { timeout: 60_000 })

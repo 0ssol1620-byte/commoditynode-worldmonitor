@@ -125,7 +125,10 @@ function collectSkills() {
       type: 'skill-md',
       description: fm.description,
       url: `${PUBLIC_BASE}/.well-known/agent-skills/${name}/SKILL.md`,
-      digest: `sha256:${sha256Hex(bytes)}`,
+      // Git's Windows checkout can materialize CRLF while Vercel serves the
+      // repository's canonical LF text. Hash canonical LF bytes so the
+      // discovery manifest is reproducible across developer platforms.
+      digest: `sha256:${sha256Hex(Buffer.from(lfMd, 'utf-8'))}`,
     };
   });
 }

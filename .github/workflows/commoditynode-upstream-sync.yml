@@ -1,0 +1,97 @@
+name: CommodityNode upstream sync
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: commoditynode-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  mirror-and-open-pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream and record exact range
+        id: upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add upstream https://github.com/koala73/worldmonitor.git
+          git fetch upstream main --tags
+          upstream_sha="$(git rev-parse upstream/main)"
+          fork_sha="$(git rev-parse origin/main)"
+          echo "sha=$upstream_sha" >> "$GITHUB_OUTPUT"
+          echo "fork_sha=$fork_sha" >> "$GITHUB_OUTPUT"
+          echo "range=$fork_sha..$upstream_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Build sync impact report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only "${{ steps.upstream.outputs.range }}" | sort > /tmp/upstream-files.txt
+          sed -n 's/^[[:space:]]*upstreamFile:[[:space:]]*//p' docs/fork/patch-ledger.yml | sort -u > /tmp/red-zone-files.txt
+          comm -12 /tmp/upstream-files.txt /tmp/red-zone-files.txt > /tmp/red-zone-conflicts.txt
+          {
+            echo "## Upstream sync report"
+            echo
+            echo "- Fork main: \`${{ steps.upstream.outputs.fork_sha }}\`"
+            echo "- Upstream main: \`${{ steps.upstream.outputs.sha }}\`"
+            echo "- Range: \`${{ steps.upstream.outputs.range }}\`"
+            echo "- Changed files: \`$(wc -l < /tmp/upstream-files.txt | tr -d ' ')\`"
+            echo "- Patch-ledger intersections: \`$(wc -l < /tmp/red-zone-conflicts.txt | tr -d ' ')\`"
+            echo
+            echo "### Patch-ledger intersections"
+            if [[ -s /tmp/red-zone-conflicts.txt ]]; then
+              sed 's/^/- `/' /tmp/red-zone-conflicts.txt | sed 's/$/`/'
+            else
+              echo "- None"
+            fi
+            echo
+            echo "This pull request is never merged automatically. Review license, dependencies,"
+            echo "providers, red-zone changes, all upstream variants, and CommodityNode gates."
+          } > /tmp/upstream-sync-report.md
+
+      - name: Refresh exact upstream-main mirror
+        shell: bash
+        run: |
+          set -euo pipefail
+          current_remote="$(git ls-remote --heads origin refs/heads/upstream-main | cut -f1)"
+          git branch -f upstream-main "${{ steps.upstream.outputs.sha }}"
+          if [[ -n "$current_remote" ]]; then
+            git push origin upstream-main \
+              --force-with-lease="refs/heads/upstream-main:$current_remote"
+          else
+            git push origin upstream-main \
+              --force-with-lease="refs/heads/upstream-main:"
+          fi
+
+      - name: Open or update review-only pull request
+        shell: bash
+        run: |
+          set -euo pipefail
+          number="$(gh pr list --base main --head upstream-main --state open --json number --jq '.[0].number // empty')"
+          if [[ -n "$number" ]]; then
+            gh pr edit "$number" \
+              --title "chore: review upstream World Monitor sync" \
+              --body-file /tmp/upstream-sync-report.md
+          else
+            gh pr create \
+              --base main \
+              --head upstream-main \
+              --title "chore: review upstream World Monitor sync" \
+              --body-file /tmp/upstream-sync-report.md
+          fi
