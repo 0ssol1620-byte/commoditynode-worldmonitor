@@ -52,7 +52,9 @@ assert(buildInfo.sourceUrl === `${REPOSITORY}/tree/${expectedSha}`, 'Source URL 
 assert(buildInfo.sourceArchiveUrl === `${REPOSITORY}/archive/${expectedSha}.zip`, 'Source archive does not match the build SHA.');
 assert(buildInfo.upstream?.baseSha === UPSTREAM_BASE_SHA, 'Frozen upstream base drifted.');
 
-const licenseBytes = readFileSync(resolve(ROOT, 'LICENSE'));
+const licenseBytes = Buffer.from(
+  readFileSync(resolve(ROOT, 'LICENSE'), 'utf8').replace(/\r\n/g, '\n'),
+);
 assert(
   gitBlobHash(licenseBytes) === UPSTREAM_LICENSE_BLOB,
   'LICENSE bytes no longer match the frozen upstream blob.',
