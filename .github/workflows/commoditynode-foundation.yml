@@ -66,6 +66,9 @@ jobs:
       - name: Build CommodityNode
         run: npm run build:commoditynode
 
+      - name: Enforce CommodityNode performance budget
+        run: npm run commoditynode:performance
+
       - name: Verify built identity and metadata
         run: node --test tests/commoditynode-built-html.test.mjs tests/commoditynode-design-tokens.test.mjs tests/commoditynode-research-build.test.mjs tests/commoditynode-vercel-routing.test.mjs
 

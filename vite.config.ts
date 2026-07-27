@@ -1033,6 +1033,46 @@ export default defineConfig(({ mode }) => {
             '**/onnx*.wasm',
             '**/locale-*.js',
             '**/clerk-*.js',
+            // The dashboard imports these revisioned chunks only when their
+            // feature mounts. Precaching them downloaded the whole WebGL,
+            // globe, panel, and RPC surface during service-worker install,
+            // defeating route-level lazy loading and adding ~8–10 MB to a
+            // first visit. They are cached on first use by `feature-chunks`
+            // below, so a used feature still becomes restart/offline capable.
+            '**/maplibre-*.js',
+            '**/deck-stack-*.js',
+            '**/protomaps-*.js',
+            '**/GlobeMap-*.js',
+            '**/d3-*.js',
+            '**/topojson-*.js',
+            '**/h3-js-*.js',
+            '**/panels-markets-*.js',
+            '**/panels-energy-*.js',
+            '**/panels-defense-*.js',
+            '**/panels-news-*.js',
+            '**/panels-economy-*.js',
+            '**/panels-intel-*.js',
+            '**/panels-risk-*.js',
+            '**/rpc-client-*.js',
+            '**/hls-*.js',
+            '**/sentry-*.js',
+            '**/conflict-zone-*.js',
+            '**/gdelt-intel-*.js',
+            '**/*-data-*.js',
+            '**/layer-explanation-card-*.js',
+            '**/UnifiedSettings-*.js',
+            '**/Map-*.js',
+            '**/MapContainer-*.js',
+            '**/search-manager-*.js',
+            '**/apt-groups-*.js',
+            '**/*.worker-*.js',
+            '**/RouteExplorer-*.js',
+            '**/oref-locations-*.js',
+            '**/military-surge-*.js',
+            '**/maplibre-*.css',
+            '**/embed-*.css',
+            '**/embed-url-*.css',
+            'mapbox-gl-rtl-text.min.js',
             // Fonts are fetched only when their stylesheet applies. Precache
             // would pull every local weight into the first mobile visit.
             '**/*.woff2',
@@ -1042,6 +1082,11 @@ export default defineConfig(({ mode }) => {
             'pro/**',
             'favico/**',
             'textures/**',
+            // The apex research build is copied into the same deployment
+            // artifact, but it is a separate static site. Its editorial
+            // covers and Astro assets must not be installed by the Live
+            // dashboard service worker.
+            'commoditynode-site/**',
             // #4891: blog OG covers + post images are generated into the prod
             // build (absent locally), and the png glob was precaching all ~40
             // of them (~700KB) on every first dashboard visit — and again on
@@ -1061,6 +1106,19 @@ export default defineConfig(({ mode }) => {
           importScripts: ['/push-handler.js'],
 
           runtimeCaching: [
+            {
+              urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) =>
+                sameOrigin
+                && /^(?:\/mapbox-gl-rtl-text\.min\.js|\/assets\/(?:maplibre|deck-stack|protomaps|GlobeMap|d3|topojson|h3-js|panels-(?:markets|energy|defense|news|economy|intel|risk)-|rpc-client-|hls-|sentry-|conflict-zone-|gdelt-intel-|layer-explanation-card-|UnifiedSettings-|Map-|MapContainer-|search-manager-|apt-groups-|RouteExplorer-|oref-locations-|military-surge-|[^/]+-data-)[^/]*\.(?:js|css))$/i.test(
+                  url.pathname,
+                ),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'feature-chunks',
+                expiration: { maxEntries: 80, maxAgeSeconds: 30 * 24 * 60 * 60 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
             {
               urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
               handler: 'NetworkFirst',

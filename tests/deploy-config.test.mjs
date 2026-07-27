@@ -454,6 +454,7 @@ describe('deploy/cache configuration guardrails', () => {
     assertGlobIgnore('pro/**');
     assertGlobIgnore('favico/**');
     assertGlobIgnore('textures/**');
+    assertGlobIgnore('commoditynode-site/**');
     assertGlobIgnore('**/*.woff2');
     // #4891: blog OG covers exist only in prod builds (blog generated at
     // deploy), so a local dist/sw.js never exposes the regression — guard the
@@ -596,6 +597,48 @@ describe('welcome landing page routing', () => {
       variantUrls.commoditynode,
       'https://live.commoditynode.com/',
       'the independently deployed CommodityNode variant owns its live root canonical',
+    );
+  });
+
+  it('caches heavy feature chunks on first use instead of during service-worker install', () => {
+    for (const pattern of [
+      '**/maplibre-*.js',
+      '**/deck-stack-*.js',
+      '**/protomaps-*.js',
+      '**/GlobeMap-*.js',
+      '**/d3-*.js',
+      '**/topojson-*.js',
+      '**/h3-js-*.js',
+      '**/panels-markets-*.js',
+      '**/panels-energy-*.js',
+      '**/panels-defense-*.js',
+      '**/panels-news-*.js',
+      '**/panels-economy-*.js',
+      '**/panels-intel-*.js',
+      '**/panels-risk-*.js',
+      '**/rpc-client-*.js',
+      '**/hls-*.js',
+      '**/sentry-*.js',
+      '**/conflict-zone-*.js',
+      '**/gdelt-intel-*.js',
+      '**/*-data-*.js',
+      '**/UnifiedSettings-*.js',
+      '**/Map-*.js',
+      '**/MapContainer-*.js',
+      '**/search-manager-*.js',
+      '**/maplibre-*.css',
+      '**/embed-*.css',
+      'mapbox-gl-rtl-text.min.js',
+    ]) {
+      assert.match(
+        viteConfigSource,
+        new RegExp(`globIgnores:\\s*\\[[\\s\\S]*'${escapeRegExp(pattern)}'[\\s\\S]*\\]`),
+      );
+    }
+    assert.match(viteConfigSource, /cacheName:\s*'feature-chunks'/);
+    assert.match(
+      viteConfigSource,
+      /maplibre\|deck-stack\|protomaps\|GlobeMap\|d3\|topojson\|h3-js\|panels-\(\?:markets\|energy\|defense\|news\|economy\|intel\|risk\)-\|rpc-client-/,
     );
   });
 
