@@ -16,7 +16,7 @@ export function validateCommodityNodeProviderRegistry(
 ): void {
   const adapterIds = new Set<string>();
   const seriesIds = new Set<string>();
-  const sourceIds = new Set(COMMODITYNODE_DATA_SOURCES.map((source) => source.id));
+  const sourceIds = new Set<string>(COMMODITYNODE_DATA_SOURCES.map((source) => source.id));
   for (const adapter of adapters) {
     if (adapterIds.has(adapter.id)) {
       throw new Error(`[commoditynode-provider] duplicate adapter ${adapter.id}`);

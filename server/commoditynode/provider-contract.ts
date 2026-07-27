@@ -89,7 +89,9 @@ export async function runCommodityNodeProviderAdapter(
         throw new Error(`provider returned invalid as-of time for ${series.id}`);
       }
     }
-    return createCommodityNodeFreshnessEnvelope({
+    return createCommodityNodeFreshnessEnvelope<
+      readonly CommodityNodeNormalizedObservation[]
+    >({
       data: observations,
       sourceId: adapter.sourceId,
       asOf: observations[0]!.asOf,
@@ -100,7 +102,9 @@ export async function runCommodityNodeProviderAdapter(
       reason: series.publicDisplayApproved ? null : series.rightsNote,
     });
   } catch (error) {
-    return createCommodityNodeFreshnessEnvelope({
+    return createCommodityNodeFreshnessEnvelope<
+      readonly CommodityNodeNormalizedObservation[]
+    >({
       data: null,
       sourceId: adapter.sourceId,
       asOf: null,
@@ -126,7 +130,7 @@ export function toProviderTimestamp(value: string): string {
 
 export function toProviderNumber(value: unknown): number | null {
   if (value === null || value === undefined || value === '' || value === '.') return null;
-  const normalized = typeof value === 'string' ? value.replaceAll(',', '').trim() : value;
+  const normalized = typeof value === 'string' ? value.replace(/,/g, '').trim() : value;
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }

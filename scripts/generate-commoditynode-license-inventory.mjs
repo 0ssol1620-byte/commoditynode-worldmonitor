@@ -65,6 +65,11 @@ function repositoryUrl(value) {
   return null;
 }
 
+function compareCodePoints(left, right) {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+}
+
 const packageMap = new Map();
 const manifestHash = createHash('sha256');
 
@@ -100,8 +105,15 @@ for (const lockfile of lockfiles) {
 }
 
 const packages = [...packageMap.values()]
-  .map((entry) => ({ ...entry, installRoots: [...entry.installRoots].sort() }))
-  .sort((a, b) => a.name.localeCompare(b.name) || a.version.localeCompare(b.version));
+  .map((entry) => ({
+    ...entry,
+    installRoots: [...entry.installRoots].sort(compareCodePoints),
+  }))
+  .sort(
+    (a, b) =>
+      compareCodePoints(a.name, b.name) ||
+      compareCodePoints(a.version, b.version),
+  );
 const unresolved = packages.filter((entry) => entry.license === 'NOASSERTION');
 
 const inventory = {
