@@ -64,6 +64,9 @@ jobs:
       - name: Verify CommodityNode PostgreSQL contract
         run: npm run commoditynode:database
 
+      - name: Verify governed Impact Universe graph
+        run: npm run commoditynode:graph
+
       - name: Verify CommodityNode unit contracts
         run: |
           npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts tests/commoditynode-route-policy.test.mts tests/commoditynode-event-pulse.test.mts tests/commoditynode-source-catalog.test.mts tests/commoditynode-editorial-workflow.test.mts tests/commoditynode-editorial-workbench.test.mts tests/commoditynode-provider-adapters.test.mts

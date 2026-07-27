@@ -74,6 +74,21 @@ export interface CommodityPort {
 // ============================================================
 export const MINING_SITES: MineSite[] = [
 
+  {
+    id: 'cobre-panama',
+    name: 'Cobre Panama',
+    lat: 8.854,
+    lon: -80.647,
+    mineral: 'Copper',
+    country: 'Panama',
+    operator: 'First Quantum Minerals',
+    status: 'care-and-maintenance',
+    significance:
+      'Historical event focus: production halted in November 2023. The asset is shown as an evidence-linked case, not a live operating site.',
+    annualOutput: '331kt copper reported for 2023 before the halt',
+    openPitOrUnderground: 'open-pit',
+  },
+
   // === GOLD ===
   {
     id: 'carlin-trend',
@@ -1147,6 +1162,17 @@ export const PROCESSING_PLANTS: ProcessingPlant[] = [
 // COMMODITY PORTS — Major mineral export/import terminals
 // ============================================================
 export const COMMODITY_PORTS: CommodityPort[] = [
+  {
+    id: 'punta-rincon-port',
+    name: 'Punta Rincón port',
+    lat: 9.02,
+    lon: -80.52,
+    country: 'Panama',
+    city: 'Colón Province',
+    commodities: ['Copper'],
+    significance:
+      'Dedicated concentrate export route in the reviewed Cobre Panama historical event record.',
+  },
   {
     id: 'port-hedland',
     name: 'Port Hedland',

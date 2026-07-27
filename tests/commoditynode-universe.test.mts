@@ -6,6 +6,7 @@ import {
   COMMODITY_UNIVERSE_EDGES,
   COMMODITY_UNIVERSE_NODES,
   getCommodityUniverseEdgesForNode,
+  getCommodityUniverseNodeIdForLabel,
   validateCommodityUniverseModel,
 } from '../src/config/commoditynode-universe';
 
@@ -41,5 +42,11 @@ describe('CommodityNode Impact Universe contract', () => {
     assert.ok(getCommodityUniverseEdgesForNode('copper').length > 0);
     assert.ok(getCommodityUniverseEdgesForNode('wti').length > 0);
     assert.ok(getCommodityUniverseEdgesForNode('wheat').length > 0);
+  });
+
+  it('resolves map-layer mineral labels into universe selections', () => {
+    assert.equal(getCommodityUniverseNodeIdForLabel('Copper'), 'copper');
+    assert.equal(getCommodityUniverseNodeIdForLabel('Aluminium'), 'aluminum');
+    assert.equal(getCommodityUniverseNodeIdForLabel('Cobalt'), null);
   });
 });

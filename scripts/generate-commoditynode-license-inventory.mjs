@@ -75,12 +75,13 @@ const manifestHash = createHash('sha256');
 
 for (const lockfile of lockfiles) {
   const source = readFileSync(resolve(root, lockfile), 'utf8');
+  const canonicalSource = source.replace(/\r\n/g, '\n');
   manifestHash.update(lockfile);
   manifestHash.update('\0');
-  manifestHash.update(source);
+  manifestHash.update(canonicalSource);
   manifestHash.update('\0');
 
-  const lock = JSON.parse(source);
+  const lock = JSON.parse(canonicalSource);
   for (const [packagePath, metadata] of Object.entries(lock.packages ?? {})) {
     const name = packageNameFromLockPath(packagePath);
     if (!name || !metadata?.version) continue;

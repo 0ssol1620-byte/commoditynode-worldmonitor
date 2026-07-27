@@ -110,6 +110,7 @@ import {
 import { STARTUP_HUBS, ACCELERATORS, TECH_HQS, CLOUD_REGIONS } from '@/config/tech-geo';
 import { AI_DATA_CENTERS } from '@/config/ai-datacenters';
 import { UNDERSEA_CABLES, NUCLEAR_FACILITIES, ECONOMIC_CENTERS, SPACEPORTS, CRITICAL_MINERALS, SANCTIONED_COUNTRIES_ALPHA2 } from '@/config/geo-map';
+import { getCommodityUniverseNodeIdForLabel } from '@/config/commoditynode-universe';
 import type { GulfInvestment } from '@/types';
 import { resolveTradeRouteSegments, TRADE_ROUTES as TRADE_ROUTES_LIST, type TradeRouteSegment, type TradeRouteStatus } from '@/config/trade-routes';
 import type { ScenarioVisualState } from '@/config/scenario-templates';
@@ -824,6 +825,13 @@ export class DeckGLMap {
   private lastAircraftFetchCenter: [number, number] | null = null;
   private lastAircraftFetchZoom = -1;
   private aircraftFetchSeq = 0;
+  private readonly handleCommodityUniverseSelection = (event: Event): void => {
+    if (SITE_VARIANT !== 'commoditynode') return;
+    const detail = (event as CustomEvent<{ commodityId?: string }>).detail;
+    if (detail?.commodityId === 'copper') {
+      this.setCenter(8.854, -80.647, 7.5);
+    }
+  };
 
   constructor(container: HTMLElement, initialState: DeckMapState, options: DeckGLMapOptions = {}) {
     this.container = container;
@@ -867,6 +875,10 @@ export class DeckGLMap {
       void this.switchBasemap();
     };
     window.addEventListener('map-theme-changed', this.handleMapThemeChange);
+    window.addEventListener(
+      'commoditynode:universe-selection',
+      this.handleCommodityUniverseSelection,
+    );
     this.tradeReducedMotionMedia = window.matchMedia(PREFERS_REDUCED_MOTION_QUERY);
     this.tradeReducedMotionMedia.addEventListener('change', this.handleTradeMotionPreferenceChange);
 
@@ -5000,6 +5012,40 @@ export class DeckGLMap {
     const rawClickLayerId = info.layer?.id || '';
     const layerId = rawClickLayerId.endsWith('-ghost') ? rawClickLayerId.slice(0, -6) : rawClickLayerId;
 
+    if (
+      SITE_VARIANT === 'commoditynode'
+      && ['mining-sites-layer', 'processing-plants-layer', 'commodity-ports-layer'].includes(
+        layerId,
+      )
+    ) {
+      const object = info.object as {
+        id?: string;
+        name?: string;
+        mineral?: string;
+        materials?: string[];
+        commodities?: string[];
+        lat?: number;
+        lon?: number;
+      };
+      const commodityLabel =
+        object.mineral ?? object.materials?.[0] ?? object.commodities?.[0] ?? null;
+      const commodityId = getCommodityUniverseNodeIdForLabel(commodityLabel);
+      if (commodityId) {
+        window.dispatchEvent(
+          new CustomEvent('commoditynode:map-selection', {
+            detail: {
+              commodityId,
+              entityId: object.id ?? null,
+              entityName: object.name ?? null,
+              layerId,
+              latitude: object.lat ?? null,
+              longitude: object.lon ?? null,
+            },
+          }),
+        );
+      }
+    }
+
     // Hotspots show popup with related news
     if (layerId === 'hotspots-layer') {
       const hotspot = info.object as Hotspot;
@@ -7809,6 +7855,10 @@ export class DeckGLMap {
     this._unsubscribeEntitlement = null;
     window.removeEventListener('theme-changed', this.handleThemeChange);
     window.removeEventListener('map-theme-changed', this.handleMapThemeChange);
+    window.removeEventListener(
+      'commoditynode:universe-selection',
+      this.handleCommodityUniverseSelection,
+    );
     this.tradeReducedMotionMedia?.removeEventListener('change', this.handleTradeMotionPreferenceChange);
     this.tradeReducedMotionMedia = null;
     this.debouncedRebuildLayers.cancel();

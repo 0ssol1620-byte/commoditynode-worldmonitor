@@ -16,6 +16,50 @@ test.describe('CommodityNode live shell', () => {
 
     await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
     await expect(page.locator('[data-panel="impact-universe"]')).not.toContainText(/\bRL\b/);
+    await expect(page.locator('#cn-universe-case-title')).toHaveText(
+      'Verified historical impact path',
+    );
+    await expect(page.locator('.cn-universe-evidence-drawer')).toContainText(
+      'First Quantum Minerals',
+    );
+    await page
+      .locator('[data-universe-evidence="edge-copper-supplies-industry"]')
+      .click();
+    await expect(page.locator('.cn-universe-evidence-drawer')).toContainText(
+      'replacement supply',
+    );
+    await page.evaluate(() => {
+      (window as typeof window & { __commodityNodeSelection?: string }).__commodityNodeSelection =
+        '';
+      window.addEventListener(
+        'commoditynode:universe-selection',
+        (event) => {
+          const detail = (event as CustomEvent<{ commodityId?: string }>).detail;
+          (
+            window as typeof window & { __commodityNodeSelection?: string }
+          ).__commodityNodeSelection = detail?.commodityId ?? '';
+        },
+        { once: true },
+      );
+    });
+    await page.locator('.cn-universe-node[data-universe-node="gold"]').click();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            (window as typeof window & { __commodityNodeSelection?: string })
+              .__commodityNodeSelection,
+        ),
+      )
+      .toBe('gold');
+    await page.evaluate(() => {
+      window.dispatchEvent(
+        new CustomEvent('commoditynode:map-selection', {
+          detail: { commodityId: 'copper' },
+        }),
+      );
+    });
+    await expect(page.locator('#cn-universe-case-title')).toBeVisible();
 
     for (const panel of ['airline-intel', 'world-clock', 'polymarket', 'military-correlation']) {
       await expect(page.locator(`[data-panel="${panel}"]`)).toHaveCount(0);
@@ -64,5 +108,16 @@ test.describe('CommodityNode live shell', () => {
     const searchFab = page.locator('#searchMobileFab');
     await expect(searchFab.locator('svg')).toBeAttached();
     await expect(searchFab).not.toContainText('🔍');
+
+    const universeInspector = page.locator('.cn-universe-inspector');
+    await expect(universeInspector).toBeAttached();
+    const universeScroll = await universeInspector.evaluate((element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+    }));
+    expect(universeScroll.scrollHeight).toBeGreaterThan(universeScroll.clientHeight);
+    await expect(
+      page.locator('[data-universe-evidence="edge-copper-supplies-industry"]'),
+    ).toHaveCSS('min-height', '44px');
   });
 });

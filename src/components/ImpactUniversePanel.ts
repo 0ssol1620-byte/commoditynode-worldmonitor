@@ -10,6 +10,13 @@ import {
   type CommodityUniverseNode,
 } from '@/config/commoditynode-universe';
 import { formatChange, formatPrice } from '@/utils';
+import {
+  COBRE_PANAMA_GRAPH_SNAPSHOT,
+  COBRE_PANAMA_IMPACT_EVENT,
+  COBRE_PANAMA_TIMELINE,
+} from '../../shared/commoditynode-cobre-panama-impact';
+import type { PublishedImpactEdge } from '../../shared/commodity-impact-ontology';
+import { findImpactPaths } from '@/services/commodity-impact-graph';
 
 export interface ImpactUniverseQuote {
   symbol?: string;
@@ -59,7 +66,16 @@ function quotePrice(quote: ImpactUniverseQuote | undefined): string {
 export class ImpactUniversePanel extends Panel {
   private quotes = new Map<string, ImpactUniverseQuote>();
   private selectedId = 'copper';
+  private selectedEvidenceId: string | null = 'edge-cobre-produces-copper';
   private view: UniverseView;
+  private readonly mapSelectionHandler = ((event: CustomEvent<{ commodityId?: string }>) => {
+    const id = event.detail?.commodityId;
+    if (id && getCommodityUniverseNode(id)) {
+      this.selectedId = id;
+      this.selectedEvidenceId = id === 'copper' ? 'edge-cobre-produces-copper' : null;
+      this.render();
+    }
+  }) as EventListener;
 
   constructor() {
     super({
@@ -74,7 +90,13 @@ export class ImpactUniversePanel extends Panel {
     this.content.classList.add('cn-universe-content');
     this.content.addEventListener('click', (event) => this.handleClick(event));
     this.content.addEventListener('keydown', (event) => this.handleKeydown(event));
+    window.addEventListener('commoditynode:map-selection', this.mapSelectionHandler);
     this.render();
+  }
+
+  override destroy(): void {
+    window.removeEventListener('commoditynode:map-selection', this.mapSelectionHandler);
+    super.destroy();
   }
 
   public renderCommodities(data: ImpactUniverseQuote[]): void {
@@ -96,9 +118,26 @@ export class ImpactUniversePanel extends Panel {
       return;
     }
 
+    const evidence = target.closest<HTMLElement>('[data-universe-evidence]');
+    if (evidence?.dataset.universeEvidence) {
+      this.selectedEvidenceId =
+        this.selectedEvidenceId === evidence.dataset.universeEvidence
+          ? null
+          : evidence.dataset.universeEvidence;
+      this.render();
+      return;
+    }
+
     const node = target.closest<HTMLElement>('[data-universe-node]');
     if (node?.dataset.universeNode) {
       this.selectedId = node.dataset.universeNode;
+      this.selectedEvidenceId =
+        this.selectedId === 'copper' ? 'edge-cobre-produces-copper' : null;
+      window.dispatchEvent(
+        new CustomEvent('commoditynode:universe-selection', {
+          detail: { commodityId: this.selectedId },
+        }),
+      );
       this.render();
     }
   }
@@ -125,6 +164,13 @@ export class ImpactUniversePanel extends Panel {
     const next = COMMODITY_UNIVERSE_NODES[nextIndex];
     if (!next) return;
     this.selectedId = next.id;
+    this.selectedEvidenceId =
+      this.selectedId === 'copper' ? 'edge-cobre-produces-copper' : null;
+    window.dispatchEvent(
+      new CustomEvent('commoditynode:universe-selection', {
+        detail: { commodityId: this.selectedId },
+      }),
+    );
     this.render();
     this.content
       .querySelector<HTMLElement>(`[data-universe-node="${next.id}"]`)
@@ -420,7 +466,208 @@ export class ImpactUniversePanel extends Panel {
     methodology.rel = 'noopener';
     methodology.textContent = 'Read graph methodology';
 
-    inspector.append(heading, metrics, note, relatedTitle, list, methodology);
+    inspector.append(heading, metrics, note);
+    if (node.id === 'copper') inspector.appendChild(this.buildCopperEvidenceCase());
+    inspector.append(relatedTitle, list, methodology);
     return inspector;
+  }
+
+  private buildCopperEvidenceCase(): HTMLElement {
+    const section = document.createElement('section');
+    section.className = 'cn-universe-case';
+    section.setAttribute('aria-labelledby', 'cn-universe-case-title');
+
+    const heading = document.createElement('div');
+    heading.className = 'cn-universe-case-heading';
+    const title = document.createElement('h4');
+    title.id = 'cn-universe-case-title';
+    title.textContent = 'Verified historical impact path';
+    heading.append(
+      title,
+      textElement('cn-universe-case-status', 'REVIEWED · 28 NOV 2023 EVENT'),
+    );
+
+    const summary = document.createElement('p');
+    summary.className = 'cn-universe-case-summary';
+    summary.textContent =
+      'Cobre Panama left normal production and its export route was disrupted. The reviewed evidence supports a supply interruption; it does not isolate a copper-price effect.';
+
+    const paths = findImpactPaths(
+      COBRE_PANAMA_GRAPH_SNAPSHOT,
+      COBRE_PANAMA_IMPACT_EVENT,
+      'industry-copper-consuming',
+      { maxHops: 3, now: COBRE_PANAMA_GRAPH_SNAPSHOT.createdAt },
+    );
+    const path = paths[0];
+    const pathList = document.createElement('ol');
+    pathList.className = 'cn-universe-evidence-path';
+    if (path) {
+      for (const [index, entityId] of path.entityIds.entries()) {
+        const entity = COBRE_PANAMA_GRAPH_SNAPSHOT.entities.find(
+          (candidate) => candidate.id === entityId,
+        );
+        if (!entity) continue;
+        const item = document.createElement('li');
+        item.appendChild(textElement('cn-universe-path-step', String(index + 1)));
+        const copy = document.createElement('span');
+        copy.append(
+          textElement('cn-universe-path-name', entity.name),
+          textElement('cn-universe-path-type', entity.type),
+        );
+        item.appendChild(copy);
+        const edgeId = index > 0 ? path.edgeIds[index - 1] : null;
+        if (edgeId) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.universeEvidence = edgeId;
+          button.setAttribute('aria-expanded', String(this.selectedEvidenceId === edgeId));
+          button.textContent = 'Evidence';
+          item.appendChild(button);
+        }
+        pathList.appendChild(item);
+      }
+    }
+
+    const conditional = document.createElement('p');
+    conditional.className = 'cn-universe-case-condition';
+    conditional.textContent =
+      'Downstream transmission remains conditional on inventories, substitution, replacement supply, and demand.';
+
+    const branchTitle = document.createElement('h5');
+    branchTitle.textContent = 'Operating and export branch';
+    const branch = document.createElement('ul');
+    branch.className = 'cn-universe-case-branch';
+    const branchItems = [
+      {
+        name: 'First Quantum Minerals',
+        role: 'Operator',
+        edgeId: 'edge-fqm-operates-cobre',
+      },
+      {
+        name: 'Punta Rincón port',
+        role: 'Export route',
+        edgeId: 'edge-cobre-ships-punta-rincon',
+      },
+    ];
+    for (const item of branchItems) {
+      const row = document.createElement('li');
+      const copy = document.createElement('span');
+      copy.append(
+        textElement('cn-universe-path-name', item.name),
+        textElement('cn-universe-path-type', item.role),
+      );
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.universeEvidence = item.edgeId;
+      button.setAttribute('aria-expanded', String(this.selectedEvidenceId === item.edgeId));
+      button.textContent = 'Evidence';
+      row.append(copy, button);
+      branch.appendChild(row);
+    }
+
+    section.append(heading, summary, pathList, branchTitle, branch, conditional);
+    const selectedEdge = COBRE_PANAMA_GRAPH_SNAPSHOT.edges.find(
+      (edge) => edge.id === this.selectedEvidenceId,
+    );
+    if (selectedEdge) section.appendChild(this.buildEvidenceDrawer(selectedEdge));
+    section.appendChild(this.buildCaseTimeline());
+
+    const eventLink = document.createElement('a');
+    eventLink.className = 'cn-universe-event-link';
+    eventLink.href = 'https://commoditynode.com/events/cobre-panama-production-halt/';
+    eventLink.target = '_blank';
+    eventLink.rel = 'noopener';
+    eventLink.textContent = 'Open the complete event record';
+    section.appendChild(eventLink);
+    return section;
+  }
+
+  private buildEvidenceDrawer(edge: PublishedImpactEdge): HTMLElement {
+    const drawer = document.createElement('div');
+    drawer.className = 'cn-universe-evidence-drawer';
+    const relation = document.createElement('div');
+    relation.className = 'cn-universe-evidence-relation';
+    relation.append(
+      textElement('cn-universe-eyebrow', 'EDGE EVIDENCE'),
+      textElement(
+        'cn-universe-evidence-title',
+        edge.relationType.replace(/_/g, ' '),
+      ),
+    );
+    const facts = document.createElement('dl');
+    const entries: Array<readonly [string, string]> = [
+      ['Direction', edge.direction],
+      ['Confidence', edge.confidenceBand],
+      [
+        'Lag',
+        edge.lagMinDays === undefined
+          ? 'Not estimated'
+          : `${edge.lagMinDays}–${edge.lagMaxDays ?? edge.lagMinDays} days`,
+      ],
+    ];
+    for (const [term, value] of entries) {
+      const dt = document.createElement('dt');
+      dt.textContent = term;
+      const dd = document.createElement('dd');
+      dd.textContent = value;
+      facts.append(dt, dd);
+    }
+    drawer.append(relation, facts);
+
+    if (edge.condition) {
+      const condition = document.createElement('p');
+      condition.append(
+        textElement('cn-universe-evidence-label', 'Condition'),
+        document.createTextNode(edge.condition),
+      );
+      drawer.appendChild(condition);
+    }
+    if (edge.invalidation) {
+      const invalidation = document.createElement('p');
+      invalidation.append(
+        textElement('cn-universe-evidence-label', 'Invalidation'),
+        document.createTextNode(edge.invalidation),
+      );
+      drawer.appendChild(invalidation);
+    }
+
+    const sources = document.createElement('ul');
+    sources.className = 'cn-universe-evidence-sources';
+    for (const evidenceId of edge.evidenceIds) {
+      const evidence = COBRE_PANAMA_GRAPH_SNAPSHOT.evidence.find(
+        (candidate) => candidate.id === evidenceId,
+      );
+      if (!evidence) continue;
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = evidence.sourceUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = evidence.publisher;
+      const locator = document.createElement('p');
+      locator.textContent = evidence.locator;
+      item.append(link, locator);
+      sources.appendChild(item);
+    }
+    drawer.appendChild(sources);
+    return drawer;
+  }
+
+  private buildCaseTimeline(): HTMLElement {
+    const details = document.createElement('details');
+    details.className = 'cn-universe-timeline';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Four-source timeline';
+    const list = document.createElement('ol');
+    for (const entry of COBRE_PANAMA_TIMELINE) {
+      const item = document.createElement('li');
+      const time = document.createElement('time');
+      time.dateTime = entry.date;
+      time.textContent = entry.date;
+      item.append(time, document.createTextNode(entry.label));
+      list.appendChild(item);
+    }
+    details.append(summary, list);
+    return details;
   }
 }

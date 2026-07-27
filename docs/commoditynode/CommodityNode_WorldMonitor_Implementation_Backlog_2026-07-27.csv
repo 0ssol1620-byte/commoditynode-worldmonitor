@@ -72,17 +72,17 @@ CNWM-070,5,UI overlay,"Render facts, dates, labels, logos and values as HTML/SVG
 CNWM-071,5,Image optimization,"Create AVIF/WebP/JPEG fallbacks, srcset, dimensions and blur placeholders.",P1,CNWM-068,complete
 CNWM-072,5,Media audit,"Store generation model, brief hash, references, rights, reviewer and disclosure.",P1,CNWM-068,complete
 CNWM-073,6,Ontology schema,"Implement Entity, Edge, Evidence, Event and GraphSnapshot schemas.",P0,"CNWM-035,CNWM-042",complete
-CNWM-074,6,Entity resolution,"Resolve company, mine, plant, port, commodity and country aliases.",P1,CNWM-071,planned
+CNWM-074,6,Entity resolution,"Resolve company, mine, plant, port, commodity and country aliases.",P1,CNWM-071,complete
 CNWM-075,6,Edge workflow,Create candidate → reviewed → published → superseded/rejected lifecycle.,P0,CNWM-071,complete
 CNWM-076,6,Propagation,Implement explainable 1–3 hop impact path scoring.,P1,CNWM-073,complete
-CNWM-077,6,Graph API,"Add subgraph, path, evidence and snapshot RPCs.",P1,CNWM-073,planned
-CNWM-078,6,Graph renderer,Build Impact Universe using Graphology/Sigma or a dedicated WebGL graph island.,P1,CNWM-075,planned
+CNWM-077,6,Graph API,"Add subgraph, path, evidence and snapshot RPCs.",P1,CNWM-073,complete
+CNWM-078,6,Graph renderer,Build Impact Universe using Graphology/Sigma or a dedicated WebGL graph island.,P1,CNWM-075,in_progress
 CNWM-079,6,Clustering,Implement semantic clusters and progressive expansion.,P1,CNWM-076,planned
-CNWM-080,6,Evidence drawer,Build edge/node evidence and invalidation drawer.,P0,CNWM-075,planned
-CNWM-081,6,Map sync,Synchronize selected map entity/event with graph focus.,P1,"CNWM-076,CNWM-050",planned
-CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,planned
+CNWM-080,6,Evidence drawer,Build edge/node evidence and invalidation drawer.,P0,CNWM-075,complete
+CNWM-081,6,Map sync,Synchronize selected map entity/event with graph focus.,P1,"CNWM-076,CNWM-050",complete
+CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,in_progress
 CNWM-083,6,Table parity,Provide accessible path list/table equivalent to graph.,P0,CNWM-076,complete
-CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,in_progress
+CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,complete
 CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,planned
 CNWM-086,7,Analytics,Define privacy-aware event taxonomy across research and live surfaces.,P1,CNWM-020,planned
 CNWM-087,7,Watchlists,"Enable account-based saved commodities, companies and routes.",P2,CNWM-057,planned

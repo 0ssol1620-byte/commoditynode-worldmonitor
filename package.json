@@ -88,6 +88,7 @@
     "commoditynode:editorial:dev": "tsx scripts/serve-commoditynode-editorial.mts",
     "commoditynode:database": "node scripts/check-commoditynode-database-schema.mjs && node --test tests/commoditynode-database-schema.test.mjs",
     "commoditynode:providers": "tsx --test tests/commoditynode-provider-adapters.test.mts",
+    "commoditynode:graph": "tsx --test tests/commoditynode-impact-ontology.test.mts tests/commoditynode-impact-graph-service.test.mts tests/commoditynode-universe.test.mts",
     "commoditynode:sources": "tsx --test tests/commoditynode-source-catalog.test.mts",
     "commoditynode:event-visual:cobre-panama": "node scripts/process-commoditynode-event-visual.mjs assets/commoditynode/media-source/cobre-panama-supply-path.png shared/commoditynode-visual-briefs/cobre-panama-supply-path.json blog-site/public/images/events/cobre-panama-supply-path",
     "commoditynode:licenses": "node scripts/generate-commoditynode-license-inventory.mjs",

@@ -365,6 +365,37 @@ export function getCommodityUniverseNeighbor(
   return NODE_BY_ID.get(edge.source === nodeId ? edge.target : edge.source);
 }
 
+export function getCommodityUniverseNodeIdForLabel(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+  const normalized = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('en-US')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  const aliases: Readonly<Record<string, string>> = {
+    aluminium: 'aluminum',
+    'crude oil': 'wti',
+    oil: 'wti',
+    'natural gas': 'natural-gas',
+  };
+  const direct = aliases[normalized] ?? normalized;
+  return COMMODITY_UNIVERSE_NODES.find((node) =>
+    [node.id, node.label, node.name]
+      .map((candidate) =>
+        candidate
+          .normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLocaleLowerCase('en-US')
+          .replace(/[^a-z0-9]+/g, ' ')
+          .trim(),
+      )
+      .includes(direct),
+  )?.id ?? null;
+}
+
 export function validateCommodityUniverseModel(): string[] {
   const issues: string[] = [];
   const ids = new Set<string>();
