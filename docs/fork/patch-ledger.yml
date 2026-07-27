@@ -2,6 +2,8 @@ schemaVersion: 1
 upstream:
   repository: https://github.com/koala73/worldmonitor
   baseSha: eb51542990b244fdde1314d6682f813c9e29ff70
+  lastRehearsedSha: 456995b35271cdf29e6580a78f791dfcf70f51c2
+  lastRehearsedAt: 2026-07-28
 fork:
   repository: https://github.com/0ssol1620-byte/commoditynode-worldmonitor
   variant: commoditynode

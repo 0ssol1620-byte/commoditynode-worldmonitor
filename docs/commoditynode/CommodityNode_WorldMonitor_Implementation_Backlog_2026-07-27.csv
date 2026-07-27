@@ -110,7 +110,7 @@ CNWM-108,9,Privacy,"Implement account export/deletion, retention and audit loggi
 CNWM-109,9,Performance,Enforce separate research/live bundle and Core Web Vitals budgets.,P0,"CNWM-023,CNWM-055",complete
 CNWM-110,9,Accessibility,"Complete keyboard, screen-reader, contrast, motion and chart/table parity review.",P0,CNWM-081,in_progress
 CNWM-111,9,Reliability,"Run provider, Redis, DB, image and AI outage simulations.",P0,"CNWM-044,CNWM-056",planned
-CNWM-112,9,Upstream,Perform first upstream sync rehearsal and resolve conflicts using patch ledger.,P1,"CNWM-021,CNWM-022",planned
+CNWM-112,9,Upstream,Perform first upstream sync rehearsal and resolve conflicts using patch ledger.,P1,"CNWM-021,CNWM-022",complete
 CNWM-113,9,Release,Create immutable release tag and production source snapshot.,P0,CNWM-007,planned
 CNWM-114,9,Operations,"Create incident, data correction, rights takedown and rollback runbooks.",P1,CNWM-108,planned
 CNWM-115,9,Launch QA,Run full desktop/mobile/browser/content/data/license/ad/SEO audit.,P0,all,in_progress
