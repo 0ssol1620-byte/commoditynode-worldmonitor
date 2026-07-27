@@ -17,6 +17,9 @@ const posts = (await getCollection('blog'))
       Number(b.data.pinned ?? false) - Number(a.data.pinned ?? false) ||
       b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
   );
+const commodityHubs = isCommodityNode
+  ? (await getCollection('commodities')).sort((a, b) => a.data.name.localeCompare(b.data.name))
+  : [];
 
 // Committed covers have generated .webp / -640.webp siblings (guarded by
 // tests/blog-cover-webp.test.mjs); coverWebpSources() returns null when the
@@ -103,7 +106,56 @@ const jsonLd = {
       </>
     )}
   </div>
+  {isCommodityNode && (
+    <>
+      <section class="home-coverage" aria-labelledby="home-coverage-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Flagship coverage</p>
+            <h2 id="home-coverage-title">Start with a defined instrument, not an ambiguous ticker.</h2>
+          </div>
+          <a href="/commodities/">View coverage directory</a>
+        </div>
+        <div class="home-commodity-list">
+          {commodityHubs.map((commodity) => (
+            <a href={`/commodities/${commodity.id}/`}>
+              <span>{commodity.data.name}</span>
+              <small>{commodity.data.benchmark.name}</small>
+              <code>{commodity.data.benchmark.symbol}</code>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="home-transmission" aria-labelledby="home-transmission-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Physical world → market impact</p>
+            <h2 id="home-transmission-title">Follow the chain before interpreting the move.</h2>
+          </div>
+          <p>
+            Event paths are published only when entities, direction, lag, claims, and reviewer status
+            satisfy the graph contract.
+          </p>
+        </div>
+        <ol>
+          <li><span>01</span><strong>Source event</strong><p>Official notice, company disclosure, or corroborated observation.</p></li>
+          <li><span>02</span><strong>Physical constraint</strong><p>Mine, plant, storage, port, route, or processing capacity.</p></li>
+          <li><span>03</span><strong>Market transmission</strong><p>Benchmark, inventory, freight, substitution, and time lag.</p></li>
+          <li><span>04</span><strong>Exposure</strong><p>Company segment, industry input, or final-product cost channel.</p></li>
+        </ol>
+      </section>
+    </>
+  )}
   <div class="blog-list">
+    {isCommodityNode && (
+      <div class="home-section-heading research-heading">
+        <div>
+          <p class="section-label">Reviewed research</p>
+          <h2>Methods and analyses you can inspect.</h2>
+        </div>
+      </div>
+    )}
     <div class="post-grid">
       {posts.map((post) => {
         const cover = coverWebpSources(post.data.heroImage);

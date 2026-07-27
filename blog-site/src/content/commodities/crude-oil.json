@@ -1,0 +1,31 @@
+{
+  "name": "Crude Oil",
+  "shortName": "Crude oil",
+  "description": "Crude oil links upstream production, storage, pipelines, ports, tanker routes, refineries, product inventories, and end demand. CommodityNode separates the WTI benchmark from Brent and from physical grades.",
+  "group": "energy",
+  "coverage": "live",
+  "benchmark": {
+    "name": "NYMEX WTI Crude Oil futures",
+    "symbol": "CL=F",
+    "instrumentType": "futures_benchmark",
+    "exchange": "NYMEX",
+    "unit": "USD/barrel",
+    "currency": "USD",
+    "provider": "Yahoo Finance via provider adapter",
+    "delayPolicy": "Provider-defined; use the displayed as-of timestamp.",
+    "caveat": "WTI futures are not interchangeable with Brent or every physical crude grade."
+  },
+  "productionRegions": ["United States", "Saudi Arabia", "Russia", "Canada", "Iraq"],
+  "supplyStages": ["Field", "Gathering system", "Pipeline", "Storage", "Port", "Refinery"],
+  "demandSectors": ["Road transport", "Aviation", "Petrochemicals", "Industry"],
+  "evidence": [
+    {
+      "label": "World Oil Transit Chokepoints",
+      "url": "https://www.eia.gov/international/content/analysis/special_topics/World_Oil_Transit_Chokepoints/",
+      "publisher": "U.S. Energy Information Administration",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-27"
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Fictional copper disruption fixture",
+  "summary": "Synthetic record used to test the event-to-impact publication workflow. It is not an observed event and must never enter public Event Pulse results.",
+  "occurredAt": "2026-07-27",
+  "commodityIds": ["copper"],
+  "location": "Fictional Andean region",
+  "materiality": "material",
+  "status": "reviewed",
+  "isFixture": true,
+  "evidence": [
+    {
+      "label": "CommodityNode methodology",
+      "url": "https://commoditynode.com/methodology/",
+      "publisher": "CommodityNode",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode fixture reviewer",
+  "reviewedAt": "2026-07-27"
+}

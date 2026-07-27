@@ -14,6 +14,19 @@ export async function GET() {
     `Canonical index: ${absoluteUrl(site.indexPath)}`,
     `RSS feed: ${absoluteUrl(site.rssPath)}`,
     '',
+    ...(site.key === 'commoditynode'
+      ? [
+          '## Commodity definitions',
+          '',
+          `- [Coverage directory](${absoluteUrl('/commodities/')}): reviewed benchmark contracts, symbols, units, provider semantics, and caveats`,
+          `- [Methodology](${absoluteUrl('/methodology/')}): claim, timestamp, relationship, and publication rules`,
+          `- [Sources](${absoluteUrl('/sources/')}): provenance and data-rights policy`,
+          `- [Editorial policy](${absoluteUrl('/editorial-policy/')}): sourcing, review, AI-assistance, and conflicts`,
+          `- [Corrections](${absoluteUrl('/corrections/')}): correction levels and public log`,
+          `- [Contact](${absoluteUrl('/contact/')}): editorial, security, and accessibility channels`,
+          '',
+        ]
+      : []),
     '## Articles',
     '',
     ...posts.flatMap((post) => [

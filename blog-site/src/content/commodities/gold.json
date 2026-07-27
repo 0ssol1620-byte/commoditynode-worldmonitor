@@ -1,0 +1,31 @@
+{
+  "name": "Gold",
+  "shortName": "Gold",
+  "description": "Gold is both a physical commodity and a financial asset. Its market context includes mine supply, recycling, central-bank activity, investment flows, real yields, currencies, and futures positioning.",
+  "group": "precious-metals",
+  "coverage": "live",
+  "benchmark": {
+    "name": "COMEX Gold futures",
+    "symbol": "GC=F",
+    "instrumentType": "futures_benchmark",
+    "exchange": "COMEX",
+    "unit": "USD/troy ounce",
+    "currency": "USD",
+    "provider": "Yahoo Finance via provider adapter",
+    "delayPolicy": "Provider-defined; use the displayed as-of timestamp.",
+    "caveat": "The futures benchmark is not a claim about local physical premiums or availability."
+  },
+  "productionRegions": ["China", "Australia", "Russia", "Canada", "United States"],
+  "supplyStages": ["Mine", "Processor", "Refinery", "Vault", "Exchange", "Fabricator"],
+  "demandSectors": ["Investment", "Jewelry", "Central banks", "Technology"],
+  "evidence": [
+    {
+      "label": "USGS Gold Statistics and Information",
+      "url": "https://www.usgs.gov/centers/national-minerals-information-center/gold-statistics-and-information",
+      "publisher": "U.S. Geological Survey",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-27"
+}

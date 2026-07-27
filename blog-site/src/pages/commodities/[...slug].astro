@@ -1,0 +1,181 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { absoluteUrl, site } from '../../lib/site-variant';
+
+export async function getStaticPaths() {
+  const commodities = await getCollection('commodities');
+  return commodities.map((commodity) => ({
+    params: { slug: commodity.id },
+    props: { commodity },
+  }));
+}
+
+interface Props {
+  commodity: CollectionEntry<'commodities'>;
+}
+
+const { commodity } = Astro.props;
+const { data } = commodity;
+const groupLabel = {
+  energy: 'Energy',
+  'industrial-metals': 'Industrial metals',
+  'precious-metals': 'Precious metals',
+  agriculture: 'Agriculture',
+}[data.group];
+const instrumentLabel = {
+  futures_benchmark: 'Futures benchmark',
+  regional_futures_benchmark: 'Regional futures benchmark',
+  etf_proxy: 'ETF proxy',
+}[data.benchmark.instrumentType];
+const canonicalUrl = absoluteUrl(`/commodities/${commodity.id}/`);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  '@id': `${canonicalUrl}#dataset`,
+  name: `${data.name} benchmark and supply-chain coverage`,
+  description: data.description,
+  url: canonicalUrl,
+  dateModified: data.reviewedAt.toISOString(),
+  creator: {
+    '@type': 'Organization',
+    name: site.name,
+    url: site.origin,
+  },
+  variableMeasured: [
+    {
+      '@type': 'PropertyValue',
+      name: data.benchmark.name,
+      propertyID: data.benchmark.symbol,
+      unitText: data.benchmark.unit,
+    },
+  ],
+  isBasedOn: data.evidence.map((item) => item.url),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Research', item: site.origin },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Commodities',
+      item: absoluteUrl('/commodities/'),
+    },
+    { '@type': 'ListItem', position: 3, name: data.name, item: canonicalUrl },
+  ],
+};
+---
+
+<Base
+  title={`${data.name} commodity hub`}
+  metaTitle={`${data.name}: Benchmark, Supply Chain and Evidence | CommodityNode`}
+  description={data.description}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+  breadcrumbLd={breadcrumbLd}
+>
+  <article class="commodity-hub">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Research</a><span aria-hidden="true">/</span>
+      <a href="/commodities/">Commodities</a><span aria-hidden="true">/</span>
+      <span aria-current="page">{data.shortName}</span>
+    </nav>
+
+    <header class="commodity-hub-header">
+      <div>
+        <p class="section-label">{groupLabel} · reviewed {data.reviewedAt.toISOString().slice(0, 10)}</p>
+        <h1>{data.name}</h1>
+        <p class="commodity-dek">{data.description}</p>
+      </div>
+      <div class="coverage-block">
+        <span>Coverage</span>
+        <strong class:list={['coverage-state', `is-${data.coverage}`]}>{data.coverage}</strong>
+        <small>Reviewed by {data.reviewedBy}</small>
+      </div>
+    </header>
+
+    <section class="benchmark-contract" aria-labelledby="benchmark-contract-title">
+      <div class="benchmark-contract-heading">
+        <div>
+          <p class="section-label">Benchmark contract</p>
+          <h2 id="benchmark-contract-title">{data.benchmark.name}</h2>
+        </div>
+        <code>{data.benchmark.symbol}</code>
+      </div>
+      <dl>
+        <div><dt>Instrument</dt><dd>{instrumentLabel}</dd></div>
+        <div><dt>Exchange</dt><dd>{data.benchmark.exchange}</dd></div>
+        <div><dt>Unit</dt><dd>{data.benchmark.unit}</dd></div>
+        <div><dt>Currency</dt><dd>{data.benchmark.currency}</dd></div>
+        <div><dt>Provider</dt><dd>{data.benchmark.provider}</dd></div>
+        <div><dt>Timing</dt><dd>{data.benchmark.delayPolicy}</dd></div>
+      </dl>
+      {data.benchmark.caveat && <p class="contract-caveat"><strong>Interpretation:</strong> {data.benchmark.caveat}</p>}
+    </section>
+
+    <div class="commodity-hub-grid">
+      <section aria-labelledby="supply-chain-title">
+        <p class="section-label">Physical chain</p>
+        <h2 id="supply-chain-title">From source to demand</h2>
+        <ol class="supply-stage-list">
+          {data.supplyStages.map((stage, index) => (
+            <li>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{stage}</strong>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="exposure-title">
+        <p class="section-label">Exposure context</p>
+        <h2 id="exposure-title">Where the chain matters</h2>
+        <div class="exposure-list">
+          <h3>Production regions</h3>
+          <ul>{data.productionRegions.map((region) => <li>{region}</li>)}</ul>
+          <h3>Demand sectors</h3>
+          <ul>{data.demandSectors.map((sector) => <li>{sector}</li>)}</ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="hub-live-bridge" aria-labelledby="live-bridge-title">
+      <div>
+        <p class="section-label">Live intelligence</p>
+        <h2 id="live-bridge-title">Continue from definition to current context.</h2>
+        <p>
+          The live application adds current quote state, related instruments, routes, chokepoints,
+          and published Event Pulse records. Universe lines remain taxonomy until an evidence-backed
+          event path is published.
+        </p>
+      </div>
+      <a class="primary-action" href={site.liveUrl}>Open {data.shortName} in live intelligence</a>
+    </section>
+
+    <section class="source-register" aria-labelledby="source-register-title">
+      <div>
+        <p class="section-label">Source register</p>
+        <h2 id="source-register-title">Evidence used for this definition</h2>
+      </div>
+      <ol>
+        {data.evidence.map((item) => (
+          <li>
+            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.label}</a>
+            <span>{item.publisher}</span>
+            <time datetime={item.retrievedAt.toISOString()}>
+              Retrieved {item.retrievedAt.toISOString().slice(0, 10)}
+            </time>
+          </li>
+        ))}
+      </ol>
+      <p>
+        Found a definition or source problem? Use the correction channel on the
+        <a href="/about/"> About page</a>.
+      </p>
+    </section>
+  </article>
+</Base>

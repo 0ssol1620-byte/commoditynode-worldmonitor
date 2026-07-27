@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { absoluteUrl, site } from '../../lib/site-variant';
+
+const commodities = (await getCollection('commodities')).sort(
+  (a, b) => a.data.name.localeCompare(b.data.name),
+);
+
+const groupLabels = {
+  energy: 'Energy',
+  'industrial-metals': 'Industrial metals',
+  'precious-metals': 'Precious metals',
+  agriculture: 'Agriculture',
+} as const;
+
+const instrumentLabels = {
+  futures_benchmark: 'Futures benchmark',
+  regional_futures_benchmark: 'Regional futures benchmark',
+  etf_proxy: 'ETF proxy',
+} as const;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': `${absoluteUrl('/commodities/')}#collection`,
+  name: 'Commodity coverage directory',
+  description:
+    'CommodityNode commodity coverage with explicit benchmark, unit, provider, delay, and coverage semantics.',
+  url: absoluteUrl('/commodities/'),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: site.name,
+    url: site.origin,
+  },
+  hasPart: commodities.map((commodity) => ({
+    '@type': 'Dataset',
+    name: commodity.data.name,
+    url: absoluteUrl(`/commodities/${commodity.id}/`),
+    variableMeasured: commodity.data.benchmark.name,
+  })),
+};
+---
+
+<Base
+  title="Commodity coverage directory"
+  metaTitle="Commodity Benchmarks and Coverage | CommodityNode"
+  description="Compare CommodityNode benchmark contracts, symbols, units, provider semantics, and evidence coverage before using a quote."
+  canonicalUrl={absoluteUrl('/commodities/')}
+  jsonLd={jsonLd}
+>
+  <header class="directory-header">
+    <p class="section-label">Coverage directory</p>
+    <h1>Know what each market number represents.</h1>
+    <p>
+      A futures benchmark, regional contract, ETF proxy, and physical assessment are not interchangeable.
+      This directory states the instrument and caveat before showing analysis.
+    </p>
+  </header>
+
+  <section class="commodity-directory" aria-labelledby="coverage-table-title">
+    <div class="directory-summary">
+      <div>
+        <h2 id="coverage-table-title">Reviewed commodity hubs</h2>
+        <p>{commodities.length} flagship definitions have completed the first editorial review.</p>
+      </div>
+      <a href={site.liveUrl}>Open all 23 live instruments</a>
+    </div>
+
+    <div class="directory-table-wrap">
+      <table class="directory-table">
+        <caption>
+          Published commodity benchmark contracts. Coverage describes CommodityNode content, not exchange availability.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Commodity</th>
+            <th scope="col">Group</th>
+            <th scope="col">Benchmark or proxy</th>
+            <th scope="col">Symbol</th>
+            <th scope="col">Unit</th>
+            <th scope="col">Coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {commodities.map((commodity) => (
+            <tr>
+              <th scope="row">
+                <a href={`/commodities/${commodity.id}/`}>{commodity.data.name}</a>
+              </th>
+              <td>{groupLabels[commodity.data.group]}</td>
+              <td>
+                <span>{commodity.data.benchmark.name}</span>
+                <small>{instrumentLabels[commodity.data.benchmark.instrumentType]}</small>
+              </td>
+              <td><code>{commodity.data.benchmark.symbol}</code></td>
+              <td>{commodity.data.benchmark.unit}</td>
+              <td><span class:list={['coverage-state', `is-${commodity.data.coverage}`]}>{commodity.data.coverage}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <aside class="coverage-note" aria-labelledby="coverage-note-title">
+      <h2 id="coverage-note-title">Coverage policy</h2>
+      <p>
+        “Live” means the live application requests the listed market proxy and displays its as-of state.
+        It does not mean exchange-direct, tick-level, or physically assessed pricing. Missing and stale data
+        remain visible as missing or stale.
+      </p>
+      <a href="/methodology/">Read the full publication method</a>
+    </aside>
+  </section>
+</Base>

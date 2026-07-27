@@ -31,6 +31,10 @@ describe('CommodityNode Vercel routing', () => {
     assert.ok(catchAllIndex > 0);
     for (const source of [
       '/posts/:path*',
+      '/commodities/:path*',
+      '/editorial-policy/:path*',
+      '/corrections/:path*',
+      '/contact/:path*',
       '/methodology/:path*',
       '/sources/:path*',
       '/about/:path*',

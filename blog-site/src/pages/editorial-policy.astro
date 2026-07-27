@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/editorial-policy/');
+---
+
+<Base
+  title="Editorial policy"
+  metaTitle="Editorial Policy | CommodityNode"
+  description="CommodityNode publication, sourcing, review, conflicts, AI-assistance, and correction standards."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Editorial standards</p>
+    <h1>Evidence before narrative.</h1>
+    <p class="article-dek">
+      CommodityNode publishes commodity-impact research only when the claim type, source trail,
+      timestamps, units, uncertainty, and reviewer are visible.
+    </p>
+
+    <h2>What counts as a publishable fact</h2>
+    <p>
+      A verified fact must be directly supported by a named source. A reported claim remains
+      attributed to the party making it. Calculated metrics identify their inputs and method.
+      Analyst inferences and scenarios are labeled and are never presented as observed facts.
+    </p>
+
+    <h2>Source threshold</h2>
+    <p>
+      Material and critical Event Pulse records require an authoritative primary source or at
+      least two independently useful sources. Exact event date and location, affected entities,
+      known contradictions, and unsupported capacity figures are checked before publication.
+    </p>
+
+    <h2>AI assistance</h2>
+    <p>
+      Automation may help classify records, identify entities, compare revisions, or prepare a
+      draft. It cannot supply missing evidence, invent a number, approve its own output, or create
+      an undisclosed byline. A human reviewer remains responsible for published analysis.
+    </p>
+
+    <h2>Independence and conflicts</h2>
+    <p>
+      Advertising, sponsorship, affiliate relationships, or product access do not determine a
+      conclusion. Material financial or commercial conflicts must be disclosed with the affected
+      article. Sponsored material, if introduced, will be labeled before the title and excluded
+      from editorial scoring.
+    </p>
+
+    <h2>Corrections and expiry</h2>
+    <p>
+      New evidence may revise or invalidate an edge, event, or conclusion. Material changes keep
+      their earlier state in the audit record and publish a correction note. Read the
+      <a href="/corrections/"> corrections policy</a> for severity and response rules.
+    </p>
+  </article>
+</Base>
