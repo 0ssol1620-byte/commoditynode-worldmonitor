@@ -37,12 +37,12 @@ jobs:
       COMMODITYNODE_BUILD_SHA: ${{ github.sha }}
     steps:
       - name: Check out exact source
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
           cache: npm
@@ -68,7 +68,7 @@ jobs:
         run: node --test tests/commoditynode-built-html.test.mjs
 
       - name: Upload immutable build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: commoditynode-live-${{ github.sha }}
           path: dist/

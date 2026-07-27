@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import {
@@ -88,5 +89,21 @@ describe('CommodityNode additive variant contract', () => {
     assert.equal(meta.url, 'https://live.commoditynode.com/');
     assert.doesNotMatch(meta.description, /\b(?:2M|500\+|190 countries|56 layers)\b/i);
     assert.doesNotMatch(meta.title, /World Monitor/i);
+  });
+
+  it('keeps the live surface on an independent Vercel deployment contract', () => {
+    const config = JSON.parse(
+      readFileSync(new URL('../vercel.commoditynode.json', import.meta.url), 'utf8'),
+    ) as {
+      buildCommand: string;
+      outputDirectory: string;
+      rewrites: Array<{ source: string; destination: string }>;
+    };
+    assert.equal(config.buildCommand, 'npm run build:commoditynode');
+    assert.equal(config.outputDirectory, 'dist');
+    assert.deepEqual(
+      config.rewrites.find((rewrite) => rewrite.source === '/'),
+      { source: '/', destination: '/dashboard' },
+    );
   });
 });

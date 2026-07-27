@@ -56,7 +56,7 @@ describe('variant env guards', () => {
   it('computes the build variant through a guarded import.meta.env access', () => {
     assert.match(
       variantSrc,
-      /const buildVariant = \(\(\) => \{\s*try \{\s*return import\.meta\.env\.VITE_VARIANT \|\| 'full';\s*\} catch \{\s*return 'full';\s*\}\s*\}\)\(\);/s,
+      /const buildVariant: SiteVariant = \(\(\) => \{\s*try \{\s*return normalizeSiteVariant\(import\.meta\.env\.VITE_VARIANT\);\s*\} catch \{\s*return 'full';\s*\}\s*\}\)\(\);/s,
     );
   });
 
