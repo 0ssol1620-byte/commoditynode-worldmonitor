@@ -15,6 +15,8 @@ test.describe('CommodityNode live shell', () => {
     }
 
     await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
+    await expect(page.locator('.cn-universe-graph-stage')).toBeVisible();
+    await expect(page.locator('.cn-universe-webgl-canvas')).toBeAttached();
     await expect(page.locator('[data-panel="impact-universe"]')).not.toContainText(/\bRL\b/);
     await expect(page.locator('#cn-universe-case-title')).toHaveText(
       'Verified historical impact path',
@@ -28,6 +30,24 @@ test.describe('CommodityNode live shell', () => {
     await expect(page.locator('.cn-universe-evidence-drawer')).toContainText(
       'replacement supply',
     );
+    await page
+      .getByRole('button', { name: 'Show previous evidence snapshot', exact: true })
+      .click();
+    await expect(page.locator('.cn-universe-timeline-position')).toHaveText('3 / 4');
+    await expect(page.locator('.cn-universe-timeline li[aria-current="step"]')).toContainText(
+      '2024-01-15',
+    );
+    await expect(page.locator('.cn-universe-timeline-disclosure')).toContainText(
+      'Retrospective reconstruction',
+    );
+    await page.getByRole('button', { name: 'Metals', exact: true }).click();
+    await page.getByRole('button', { name: 'Accessible table', exact: true }).click();
+    await expect(page.locator('.cn-universe-table tbody tr')).toHaveCount(4);
+    await expect(page.locator('.cn-universe-table caption')).toContainText(
+      'Industrial & transition metals',
+    );
+    await page.getByRole('button', { name: 'All 23', exact: true }).click();
+    await page.getByRole('button', { name: 'Universe', exact: true }).click();
     await page.evaluate(() => {
       (window as typeof window & { __commodityNodeSelection?: string }).__commodityNodeSelection =
         '';
@@ -118,6 +138,9 @@ test.describe('CommodityNode live shell', () => {
     expect(universeScroll.scrollHeight).toBeGreaterThan(universeScroll.clientHeight);
     await expect(
       page.locator('[data-universe-evidence="edge-copper-supplies-industry"]'),
+    ).toHaveCSS('min-height', '44px');
+    await expect(
+      page.getByRole('button', { name: 'All 23', exact: true }),
     ).toHaveCSS('min-height', '44px');
   });
 });

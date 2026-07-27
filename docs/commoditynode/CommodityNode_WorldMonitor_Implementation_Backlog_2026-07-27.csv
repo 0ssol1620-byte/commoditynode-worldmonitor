@@ -76,11 +76,11 @@ CNWM-074,6,Entity resolution,"Resolve company, mine, plant, port, commodity and 
 CNWM-075,6,Edge workflow,Create candidate → reviewed → published → superseded/rejected lifecycle.,P0,CNWM-071,complete
 CNWM-076,6,Propagation,Implement explainable 1–3 hop impact path scoring.,P1,CNWM-073,complete
 CNWM-077,6,Graph API,"Add subgraph, path, evidence and snapshot RPCs.",P1,CNWM-073,complete
-CNWM-078,6,Graph renderer,Build Impact Universe using Graphology/Sigma or a dedicated WebGL graph island.,P1,CNWM-075,in_progress
-CNWM-079,6,Clustering,Implement semantic clusters and progressive expansion.,P1,CNWM-076,planned
+CNWM-078,6,Graph renderer,Build Impact Universe using Graphology/Sigma or a dedicated WebGL graph island.,P1,CNWM-075,complete
+CNWM-079,6,Clustering,Implement semantic clusters and progressive expansion.,P1,CNWM-076,complete
 CNWM-080,6,Evidence drawer,Build edge/node evidence and invalidation drawer.,P0,CNWM-075,complete
 CNWM-081,6,Map sync,Synchronize selected map entity/event with graph focus.,P1,"CNWM-076,CNWM-050",complete
-CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,in_progress
+CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,complete
 CNWM-083,6,Table parity,Provide accessible path list/table equivalent to graph.,P0,CNWM-076,complete
 CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,complete
 CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,planned

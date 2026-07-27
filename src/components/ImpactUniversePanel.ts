@@ -13,10 +13,12 @@ import { formatChange, formatPrice } from '@/utils';
 import {
   COBRE_PANAMA_GRAPH_SNAPSHOT,
   COBRE_PANAMA_IMPACT_EVENT,
+  COBRE_PANAMA_PLAYBACK_SNAPSHOTS,
   COBRE_PANAMA_TIMELINE,
 } from '../../shared/commoditynode-cobre-panama-impact';
 import type { PublishedImpactEdge } from '../../shared/commodity-impact-ontology';
 import { findImpactPaths } from '@/services/commodity-impact-graph';
+import { CommodityUniverseWebGLRenderer } from './commodity-universe-webgl';
 
 export interface ImpactUniverseQuote {
   symbol?: string;
@@ -26,6 +28,7 @@ export interface ImpactUniverseQuote {
 }
 
 type UniverseView = 'graph' | 'table';
+type UniverseFocus = CommodityUniverseGroup | 'all';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -68,6 +71,9 @@ export class ImpactUniversePanel extends Panel {
   private selectedId = 'copper';
   private selectedEvidenceId: string | null = 'edge-cobre-produces-copper';
   private view: UniverseView;
+  private focusedGroup: UniverseFocus = 'all';
+  private timelineIndex = COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1;
+  private webglRenderer: CommodityUniverseWebGLRenderer | null = null;
   private readonly mapSelectionHandler = ((event: CustomEvent<{ commodityId?: string }>) => {
     const id = event.detail?.commodityId;
     if (id && getCommodityUniverseNode(id)) {
@@ -95,6 +101,8 @@ export class ImpactUniversePanel extends Panel {
   }
 
   override destroy(): void {
+    this.webglRenderer?.destroy();
+    this.webglRenderer = null;
     window.removeEventListener('commoditynode:map-selection', this.mapSelectionHandler);
     super.destroy();
   }
@@ -124,6 +132,44 @@ export class ImpactUniversePanel extends Panel {
         this.selectedEvidenceId === evidence.dataset.universeEvidence
           ? null
           : evidence.dataset.universeEvidence;
+      this.render();
+      return;
+    }
+
+    const group = target.closest<HTMLElement>('[data-universe-group]');
+    const nextGroup = group?.dataset.universeGroup as UniverseFocus | undefined;
+    if (
+      nextGroup === 'all'
+      || (nextGroup
+        && Object.prototype.hasOwnProperty.call(COMMODITY_GROUP_LABELS, nextGroup))
+    ) {
+      this.focusedGroup = nextGroup;
+      const selected = getCommodityUniverseNode(this.selectedId);
+      if (nextGroup !== 'all' && selected?.group !== nextGroup) {
+        this.selectedId =
+          COMMODITY_UNIVERSE_NODES.find((candidate) => candidate.group === nextGroup)?.id
+          ?? this.selectedId;
+        this.selectedEvidenceId =
+          this.selectedId === 'copper' ? 'edge-cobre-produces-copper' : null;
+      }
+      this.render();
+      return;
+    }
+
+    const timeline = target.closest<HTMLElement>('[data-universe-timeline]');
+    const timelineDirection = timeline?.dataset.universeTimeline;
+    if (timelineDirection === 'previous' || timelineDirection === 'next') {
+      this.timelineIndex = Math.min(
+        COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1,
+        Math.max(
+          0,
+          this.timelineIndex + (timelineDirection === 'previous' ? -1 : 1),
+        ),
+      );
+      this.selectedEvidenceId =
+        this.timelineIndex < 2
+          ? 'edge-cobre-located-colon'
+          : 'edge-cobre-produces-copper';
       this.render();
       return;
     }
@@ -178,6 +224,8 @@ export class ImpactUniversePanel extends Panel {
   }
 
   private render(): void {
+    this.webglRenderer?.destroy();
+    this.webglRenderer = null;
     const shell = document.createElement('div');
     shell.className = 'cn-universe-shell';
     shell.append(this.buildIntro(), this.buildToolbar());
@@ -190,6 +238,18 @@ export class ImpactUniversePanel extends Panel {
     shell.appendChild(body);
 
     this.content.replaceChildren(shell);
+    const canvas = this.content.querySelector<HTMLCanvasElement>(
+      '.cn-universe-webgl-canvas',
+    );
+    if (canvas) {
+      try {
+        this.webglRenderer = new CommodityUniverseWebGLRenderer(canvas);
+        this.webglRenderer.update(this.selectedId, this.focusedGroup);
+        canvas.closest('.cn-universe-graph-stage')?.classList.add('is-webgl');
+      } catch {
+        canvas.hidden = true;
+      }
+    }
   }
 
   private buildIntro(): HTMLElement {
@@ -219,7 +279,29 @@ export class ImpactUniversePanel extends Panel {
   private buildToolbar(): HTMLElement {
     const toolbar = document.createElement('div');
     toolbar.className = 'cn-universe-toolbar';
-    toolbar.setAttribute('aria-label', 'Impact Universe view');
+    const clusters = document.createElement('div');
+    clusters.className = 'cn-universe-clusters';
+    clusters.setAttribute('aria-label', 'Commodity semantic cluster');
+    const groups: Array<readonly [UniverseFocus, string]> = [
+      ['all', 'All 23'],
+      ['energy', 'Energy'],
+      ['industrial-metals', 'Metals'],
+      ['precious-metals', 'Precious'],
+      ['agriculture', 'Agriculture'],
+    ];
+    for (const [group, label] of groups) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'cn-universe-cluster-button';
+      button.dataset.universeGroup = group;
+      button.setAttribute('aria-pressed', String(this.focusedGroup === group));
+      button.textContent = label;
+      clusters.appendChild(button);
+    }
+
+    const views = document.createElement('div');
+    views.className = 'cn-universe-views';
+    views.setAttribute('aria-label', 'Impact Universe view');
     for (const view of ['graph', 'table'] as const) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -227,12 +309,19 @@ export class ImpactUniversePanel extends Panel {
       button.dataset.universeView = view;
       button.setAttribute('aria-pressed', String(this.view === view));
       button.textContent = view === 'graph' ? 'Universe' : 'Accessible table';
-      toolbar.appendChild(button);
+      views.appendChild(button);
     }
+    toolbar.append(clusters, views);
     return toolbar;
   }
 
-  private buildGraph(): SVGSVGElement {
+  private buildGraph(): HTMLElement {
+    const stage = document.createElement('div');
+    stage.className = 'cn-universe-graph-stage';
+    const canvas = document.createElement('canvas');
+    canvas.className = 'cn-universe-webgl-canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+
     const svg = svgElement('svg', {
       class: 'cn-universe-graph',
       viewBox: '0 0 1000 620',
@@ -274,13 +363,22 @@ export class ImpactUniversePanel extends Panel {
       const source = getCommodityUniverseNode(edge.source);
       const target = getCommodityUniverseNode(edge.target);
       if (!source || !target) continue;
+      const isDimmed =
+        this.focusedGroup !== 'all'
+        && source.group !== this.focusedGroup
+        && target.group !== this.focusedGroup;
       edgeLayer.appendChild(
         svgElement('line', {
           x1: String(source.x),
           y1: String(source.y),
           x2: String(target.x),
           y2: String(target.y),
-          class: selectedEdges.has(edge.id) ? 'is-related' : '',
+          class: [
+            selectedEdges.has(edge.id) ? 'is-related' : '',
+            isDimmed ? 'is-dimmed' : '',
+          ]
+            .filter(Boolean)
+            .join(' '),
           'data-edge-kind': edge.kind,
         }),
       );
@@ -292,7 +390,8 @@ export class ImpactUniversePanel extends Panel {
       nodeLayer.appendChild(this.buildGraphNode(node, selectedEdges));
     }
     svg.appendChild(nodeLayer);
-    return svg;
+    stage.append(canvas, svg);
+    return stage;
   }
 
   private buildGraphNode(
@@ -312,6 +411,9 @@ export class ImpactUniversePanel extends Panel {
         `state-${state}`,
         isSelected ? 'is-selected' : '',
         isRelated ? 'is-related' : '',
+        this.focusedGroup !== 'all' && node.group !== this.focusedGroup
+          ? 'is-dimmed'
+          : '',
       ].filter(Boolean).join(' '),
       transform: `translate(${node.x} ${node.y})`,
       tabindex: '0',
@@ -351,7 +453,10 @@ export class ImpactUniversePanel extends Panel {
     const table = document.createElement('table');
     table.className = 'cn-universe-table';
     const caption = document.createElement('caption');
-    caption.textContent = 'All commodity instruments and current quote coverage';
+    caption.textContent =
+      this.focusedGroup === 'all'
+        ? 'All commodity instruments and current quote coverage'
+        : `${COMMODITY_GROUP_LABELS[this.focusedGroup]} instruments and current quote coverage`;
     const head = document.createElement('thead');
     const headRow = document.createElement('tr');
     for (const label of ['Commodity', 'Group', 'Instrument', 'Price', 'Session move', 'Coverage']) {
@@ -363,7 +468,13 @@ export class ImpactUniversePanel extends Panel {
     head.appendChild(headRow);
     const body = document.createElement('tbody');
 
-    for (const node of COMMODITY_UNIVERSE_NODES) {
+    const visibleNodes =
+      this.focusedGroup === 'all'
+        ? COMMODITY_UNIVERSE_NODES
+        : COMMODITY_UNIVERSE_NODES.filter(
+            (node) => node.group === this.focusedGroup,
+          );
+    for (const node of visibleNodes) {
       const quote = this.quotes.get(node.symbol);
       const row = document.createElement('tr');
       row.className = node.id === this.selectedId ? 'is-selected' : '';
@@ -476,6 +587,9 @@ export class ImpactUniversePanel extends Panel {
     const section = document.createElement('section');
     section.className = 'cn-universe-case';
     section.setAttribute('aria-labelledby', 'cn-universe-case-title');
+    const playback =
+      COBRE_PANAMA_PLAYBACK_SNAPSHOTS[this.timelineIndex]
+      ?? COBRE_PANAMA_PLAYBACK_SNAPSHOTS[COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1];
 
     const heading = document.createElement('div');
     heading.className = 'cn-universe-case-heading';
@@ -484,7 +598,10 @@ export class ImpactUniversePanel extends Panel {
     title.textContent = 'Verified historical impact path';
     heading.append(
       title,
-      textElement('cn-universe-case-status', 'REVIEWED · 28 NOV 2023 EVENT'),
+      textElement(
+        'cn-universe-case-status',
+        `REVIEWED RECONSTRUCTION · ${playback?.date ?? '2023-11-28'}`,
+      ),
     );
 
     const summary = document.createElement('p');
@@ -654,20 +771,71 @@ export class ImpactUniversePanel extends Panel {
   }
 
   private buildCaseTimeline(): HTMLElement {
-    const details = document.createElement('details');
-    details.className = 'cn-universe-timeline';
-    const summary = document.createElement('summary');
-    summary.textContent = 'Four-source timeline';
+    const section = document.createElement('section');
+    section.className = 'cn-universe-timeline';
+    section.setAttribute('aria-label', 'Cobre Panama evidence timeline playback');
+    const playback =
+      COBRE_PANAMA_PLAYBACK_SNAPSHOTS[this.timelineIndex]
+      ?? COBRE_PANAMA_PLAYBACK_SNAPSHOTS[0];
+
+    const heading = document.createElement('div');
+    heading.className = 'cn-universe-timeline-heading';
+    heading.append(
+      textElement('cn-universe-timeline-title', 'Evidence playback'),
+      textElement(
+        'cn-universe-timeline-position',
+        `${this.timelineIndex + 1} / ${COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length}`,
+      ),
+    );
+
+    const controls = document.createElement('div');
+    controls.className = 'cn-universe-timeline-controls';
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.dataset.universeTimeline = 'previous';
+    previous.disabled = this.timelineIndex === 0;
+    previous.setAttribute('aria-label', 'Show previous evidence snapshot');
+    previous.textContent = 'Previous';
+    const state = document.createElement('div');
+    state.className = 'cn-universe-timeline-state';
+    state.setAttribute('aria-live', 'polite');
+    const time = document.createElement('time');
+    time.dateTime = playback?.date ?? '';
+    time.textContent = playback?.date ?? 'Unknown date';
+    state.append(
+      time,
+      textElement(
+        'cn-universe-timeline-state-label',
+        playback?.label ?? 'Evidence snapshot unavailable.',
+      ),
+    );
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.dataset.universeTimeline = 'next';
+    next.disabled = this.timelineIndex === COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1;
+    next.setAttribute('aria-label', 'Show next evidence snapshot');
+    next.textContent = 'Next';
+    controls.append(previous, state, next);
+
+    const disclosure = document.createElement('p');
+    disclosure.className = 'cn-universe-timeline-disclosure';
+    disclosure.textContent =
+      'Retrospective reconstruction prepared in 2026. Each step shows the reviewed evidence accumulated through that date, not a claim about what CommodityNode published at the time.';
+
     const list = document.createElement('ol');
-    for (const entry of COBRE_PANAMA_TIMELINE) {
+    for (const [index, entry] of COBRE_PANAMA_TIMELINE.entries()) {
       const item = document.createElement('li');
+      if (index === this.timelineIndex) {
+        item.classList.add('is-active');
+        item.setAttribute('aria-current', 'step');
+      }
       const time = document.createElement('time');
       time.dateTime = entry.date;
       time.textContent = entry.date;
       item.append(time, document.createTextNode(entry.label));
       list.appendChild(item);
     }
-    details.append(summary, list);
-    return details;
+    section.append(heading, controls, disclosure, list);
+    return section;
   }
 }

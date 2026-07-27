@@ -10,6 +10,21 @@ The Impact Universe has two distinct layers:
 Node position and size in the overview do not represent market value,
 liquidity, causality, or forecast confidence.
 
+## Progressive renderer and semantic focus
+
+The overview uses a dedicated WebGL 2 rendering island for orbits, stars,
+relationships, and commodity bodies. The browser-visible SVG remains mounted
+above it as the keyboard, focus, label, and screen-reader interaction layer.
+If WebGL 2 is unavailable or the context is lost, the SVG immediately remains
+as the complete fallback. Rendering is demand-driven, observes container
+resizes, caps device-pixel ratio at 2, and performs no continuous animation.
+
+Energy, industrial and transition metals, precious metals, and agriculture
+are semantic focus controls rather than separate universes. Focusing a group
+dims the other nodes without deleting them from the graph. The accessible
+table applies the same focus as an explicit row filter and always offers an
+`All 23` reset.
+
 ## Published reference case
 
 `shared/commoditynode-cobre-panama-impact.ts` is the first non-fixture graph
@@ -59,6 +74,16 @@ Selecting Copper in the universe focuses the map on the reviewed Cobre Panama
 case. The synchronization uses typed custom-event payloads and listeners are
 removed when either component is destroyed.
 
+## Deterministic evidence playback
+
+The Cobre Panama case offers four cumulative evidence snapshots derived from
+the reviewed timeline. Previous and next controls always select a fixed
+snapshot; there is no clock-driven or nondeterministic playback. The interface
+labels the sequence as a retrospective reconstruction prepared in 2026 so it
+cannot be mistaken for a contemporaneous CommodityNode archive. The active
+step is exposed with `aria-current="step"` and the current date and position
+are announced through a polite live region.
+
 ## Verification
 
 Run:
@@ -71,4 +96,5 @@ npm run test:e2e:commoditynode
 
 The graph suite validates ontology integrity, evidence closure, aliases,
 budgets, deterministic paths, CORS behavior, mobile scrolling, 44-pixel touch
-targets, and the evidence drawer.
+targets, WebGL fallback contracts, semantic filtering, deterministic playback,
+and the evidence drawer.

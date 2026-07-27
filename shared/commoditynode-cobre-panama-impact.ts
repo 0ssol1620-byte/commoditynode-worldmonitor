@@ -48,6 +48,22 @@ export const COBRE_PANAMA_TIMELINE = [
   },
 ] as const;
 
+export const COBRE_PANAMA_PLAYBACK_SNAPSHOTS = COBRE_PANAMA_TIMELINE.map(
+  (entry, index) => ({
+    id: `cobre-panama-playback-${index + 1}`,
+    date: entry.date,
+    label: entry.label,
+    evidenceIds: [
+      ...new Set(
+        COBRE_PANAMA_TIMELINE.slice(0, index + 1).flatMap((item) => [
+          ...item.evidenceIds,
+        ]),
+      ),
+    ],
+    reconstruction: true as const,
+  }),
+);
+
 export const COBRE_PANAMA_GRAPH_SNAPSHOT: GraphSnapshot = {
   id: 'graph-cobre-panama-2026-07-28',
   ontologyVersion: COMMODITY_ONTOLOGY_VERSION,
