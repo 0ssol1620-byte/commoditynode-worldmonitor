@@ -6,6 +6,7 @@ on:
       - '.github/workflows/commoditynode-foundation.yml'
       - 'api/**'
       - 'e2e/commoditynode-*.spec.ts'
+      - 'blog-site/**'
       - 'public/source/**'
       - 'scripts/*commoditynode*'
       - 'shared/commoditynode-*'
@@ -17,6 +18,7 @@ on:
       - 'UPSTREAM.md'
       - 'package.json'
       - 'package-lock.json'
+      - 'vercel.json'
   push:
     branches: [main]
   workflow_dispatch:
@@ -65,7 +67,7 @@ jobs:
         run: npm run build:commoditynode
 
       - name: Verify built identity and metadata
-        run: node --test tests/commoditynode-built-html.test.mjs
+        run: node --test tests/commoditynode-built-html.test.mjs tests/commoditynode-design-tokens.test.mjs tests/commoditynode-research-build.test.mjs tests/commoditynode-vercel-routing.test.mjs
 
       - name: Upload immutable build artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

@@ -16,6 +16,7 @@ const blog = defineCollection({
     authorBio: z.string().optional(),
     heroImage: z.string().optional(),
     pinned: z.boolean().optional(),
+    site: z.enum(['worldmonitor', 'commoditynode']).default('worldmonitor'),
   }),
 });
 

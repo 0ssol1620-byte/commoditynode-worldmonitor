@@ -2,12 +2,13 @@
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { belongsToActiveSite, postPath } from '../../lib/site-variant';
 
 type BlogEntry = CollectionEntry<'blog'>;
 type RelatedPost = { title: string; description: string; href: string };
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = (await getCollection('blog')).filter(belongsToActiveSite);
   const stopWords = new Set(['and', 'for', 'the', 'with', 'worldmonitor', 'world', 'monitor']);
   const tokenize = (value: string | undefined): Set<string> => new Set((value || '')
     .toLowerCase()
@@ -31,7 +32,7 @@ export async function getStaticPaths() {
       .map(({ post }) => ({
         title: post.data.title,
         description: post.data.description,
-        href: `/blog/posts/${post.id}/`,
+        href: postPath(post.id),
       }));
     return [current.id, relatedPosts];
   }));

@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+
+const canonicalUrl = absoluteUrl('/methodology/');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'CommodityNode methodology',
+  description: 'How CommodityNode links sources, physical assets, routes, benchmarks, and market implications.',
+  url: canonicalUrl,
+  inLanguage: 'en-US',
+};
+---
+
+<Base
+  title="Methodology"
+  metaTitle="CommodityNode Methodology | Evidence and Impact Paths"
+  description="How CommodityNode links source observations to physical disruptions, benchmark exposure, and market implications."
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <article class="static-page prose">
+    <p class="section-label">Research standard</p>
+    <h1>Methodology</h1>
+    <p class="article-dek">
+      CommodityNode separates source observations from product inferences. Read every impact path in that order.
+    </p>
+
+    <h2>1. Preserve the observation</h2>
+    <p>
+      A source record keeps its publisher, original URL, source timestamp, collection timestamp, geography, units, and revision state. Missing fields stay blank rather than appearing as zero.
+    </p>
+
+    <h2>2. Normalize without erasing meaning</h2>
+    <p>
+      Values are converted only when the source unit and conversion rule are known. The interface displays the resulting unit beside the value. Series with incompatible definitions stay separate even when their labels look similar.
+    </p>
+
+    <h2>3. Build typed relationships</h2>
+    <p>
+      Nodes represent commodities, benchmarks, mines, fields, refineries, ports, routes, companies, industries, countries, and events. An edge must state what connects the two nodes: production, processing, transport, substitution, ownership, consumption, or observed price co-movement.
+    </p>
+
+    <h2>4. Separate evidence from inference</h2>
+    <p>
+      Direct observations and calculated indicators are labeled separately. A scenario path records a testable chain of assumptions; it does not predict a price. Readers can inspect what would need to hold for an event to reach a benchmark or industry.
+    </p>
+
+    <h2>5. Expose uncertainty and freshness</h2>
+    <p>
+      Confidence is based on source agreement, recency, coverage, and the number of inferred steps. The label describes evidence quality and gives no probability of price direction. Stale or partial sources remain visible with their limitations instead of being silently dropped.
+    </p>
+
+    <h2>What the product does not do</h2>
+    <p>
+      CommodityNode is research software, not an execution venue or investment adviser. It does not guarantee completeness, timeliness, or a market outcome. Users should verify material decisions against the original sources and their own risk controls.
+    </p>
+  </article>
+</Base>

@@ -1,32 +1,30 @@
 import { getCollection } from 'astro:content';
+import { absoluteUrl, belongsToActiveSite, postPath, site } from '../lib/site-variant';
 
 export async function GET() {
-  const posts = (await getCollection('blog')).sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-  );
+  const posts = (await getCollection('blog'))
+    .filter(belongsToActiveSite)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   const lines = [
-    '# World Monitor Blog',
+    `# ${site.publication}`,
     '',
-    '> Analysis, practical guides, and methodology for real-time global intelligence, OSINT, geopolitics, markets, supply chains, and AI agents.',
+    `> ${site.description}`,
     '',
-    'Canonical blog index: https://www.worldmonitor.app/blog/',
-    'RSS feed: https://www.worldmonitor.app/blog/rss.xml',
-    'Author: https://www.worldmonitor.app/blog/authors/elie-habib/',
+    `Canonical index: ${absoluteUrl(site.indexPath)}`,
+    `RSS feed: ${absoluteUrl(site.rssPath)}`,
     '',
     '## Articles',
     '',
     ...posts.flatMap((post) => [
-      `- [${post.data.title}](https://www.worldmonitor.app/blog/posts/${post.id}/): ${post.data.description}`,
+      `- [${post.data.title}](${absoluteUrl(postPath(post.id))}): ${post.data.description}`,
       `  Published: ${post.data.pubDate.toISOString().slice(0, 10)}${post.data.modifiedDate ? `; updated: ${post.data.modifiedDate.toISOString().slice(0, 10)}` : ''}`,
     ]),
     '',
     '## Related machine-readable resources',
     '',
-    '- [World Monitor overview](https://www.worldmonitor.app/llms.txt)',
-    '- [Extended platform reference](https://www.worldmonitor.app/llms-full.txt)',
-    '- [Developer and API reference](https://www.worldmonitor.app/api/llms.txt)',
-    '- [Global intelligence glossary](https://www.worldmonitor.app/blog/glossary/)',
+    `- [Live intelligence](${site.liveUrl})`,
+    `- [Corresponding source](${site.sourceUrl})`,
     '',
   ];
 

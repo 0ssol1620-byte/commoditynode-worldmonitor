@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/privacy/');
+---
+
+<Base
+  title="Privacy"
+  metaTitle="CommodityNode Privacy"
+  description="CommodityNode privacy and measurement principles."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Trust</p>
+    <h1>Privacy</h1>
+    <p class="article-dek">
+      The public research site is designed to work without an account and currently ships without third-party audience analytics.
+    </p>
+
+    <h2>Data the site receives</h2>
+    <p>
+      Hosting and security providers may process ordinary request data such as IP address, user agent, requested path, time, and error details. CommodityNode does not ask for personal information on this site.
+    </p>
+
+    <h2>Advertising and measurement</h2>
+    <p>
+      Advertising is not enabled by default. If measurement or advertising is introduced, consent, provider identity, retention, and opt-out controls must be documented here before the scripts are deployed.
+    </p>
+
+    <h2>Contact and corrections</h2>
+    <p>
+      Privacy or source-attribution issues can be reported through the public repository. Do not include confidential information in a public issue.
+    </p>
+  </article>
+</Base>

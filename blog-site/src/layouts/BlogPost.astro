@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
 import { coverWebpSources } from '../lib/cover-webp';
+import { absoluteUrl, isCommodityNode, postPath, site } from '../lib/site-variant';
 
 interface Props {
   title: string;
@@ -21,16 +22,16 @@ interface Props {
 }
 
 const { title, description, metaTitle, keywords, pubDate, modifiedDate, author, authorUrl, authorBio, audience, heroImage, slug, rawBody, relatedPosts = [] } = Astro.props;
-function toAbsoluteWorldMonitorUrl(pathOrUrl: string | undefined): string | undefined {
+function toAbsoluteSiteUrl(pathOrUrl: string | undefined): string | undefined {
   if (!pathOrUrl) return undefined;
   if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
-  return new URL(pathOrUrl, 'https://www.worldmonitor.app').href;
+  return absoluteUrl(pathOrUrl);
 }
 
-const ogImage = toAbsoluteWorldMonitorUrl(heroImage || (slug ? `/blog/images/blog/${slug}.jpg` : undefined));
-const canonicalUrl = slug
-  ? `https://www.worldmonitor.app/blog/posts/${slug}/`
-  : new URL(Astro.url.pathname, 'https://www.worldmonitor.app').href;
+const ogImage = toAbsoluteSiteUrl(
+  heroImage || (!isCommodityNode && slug ? `/blog/images/blog/${slug}.jpg` : site.ogImageUrl),
+);
+const canonicalUrl = slug ? absoluteUrl(postPath(slug)) : absoluteUrl(Astro.url.pathname);
 const formattedDate = pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
@@ -38,18 +39,24 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 });
 const isoDate = pubDate.toISOString();
 const isoModifiedDate = modifiedDate ? modifiedDate.toISOString() : isoDate;
-const DEFAULT_AUTHOR = 'Elie Habib';
-const DEFAULT_AUTHOR_URL = 'https://www.worldmonitor.app/blog/authors/elie-habib/';
-const DEFAULT_AUTHOR_ID = `${DEFAULT_AUTHOR_URL}#person`;
-const DEFAULT_AUTHOR_BIO = 'Founder of World Monitor. Previously co-founder &amp; CEO of Anghami (NASDAQ: ANGH). Building open-source global intelligence infrastructure.';
+const DEFAULT_AUTHOR = site.defaultAuthor;
+const DEFAULT_AUTHOR_URL = isCommodityNode
+  ? undefined
+  : 'https://www.worldmonitor.app/blog/authors/elie-habib/';
+const DEFAULT_AUTHOR_ID = DEFAULT_AUTHOR_URL ? `${DEFAULT_AUTHOR_URL}#person` : undefined;
+const DEFAULT_AUTHOR_BIO = isCommodityNode
+  ? 'CommodityNode research is edited against named sources, explicit units, timestamps, and stated limitations.'
+  : 'Founder of World Monitor. Previously co-founder &amp; CEO of Anghami (NASDAQ: ANGH). Building open-source global intelligence infrastructure.';
 const DEFAULT_AUTHOR_GITHUB = 'koala73';
-const DEFAULT_SECTION = 'Global Intelligence';
+const DEFAULT_SECTION = site.defaultSection;
 const authorName = author || DEFAULT_AUTHOR;
 const resolvedAuthorUrl = authorUrl || (authorName === DEFAULT_AUTHOR ? DEFAULT_AUTHOR_URL : undefined);
 const resolvedAuthorBio = authorBio || (authorName === DEFAULT_AUTHOR ? DEFAULT_AUTHOR_BIO : undefined);
-const avatarSrc = authorName === DEFAULT_AUTHOR
-  ? `https://unavatar.io/github/${DEFAULT_AUTHOR_GITHUB}`
-  : '/favico/apple-touch-icon.png';
+const avatarSrc = isCommodityNode
+  ? site.markUrl
+  : authorName === DEFAULT_AUTHOR
+    ? `https://unavatar.io/github/${DEFAULT_AUTHOR_GITHUB}`
+    : '/favico/apple-touch-icon.png';
 // Committed covers have generated .webp / -640.webp siblings (guarded by
 // tests/blog-cover-webp.test.mjs); coverWebpSources() returns null when the
 // siblings don't exist (e.g. deploy-generated /blog/og/*.png covers).
@@ -68,7 +75,13 @@ function extractCitations(body: string | undefined): { "@type": string; name: st
   while ((match = linkRegex.exec(body)) !== null) {
     const url = match[2];
     const host = new URL(url).hostname.replace(/^www\./, '');
-    if (host === 'worldmonitor.app' || host.endsWith('.worldmonitor.app') || seen.has(url)) continue;
+    if (
+      host === 'worldmonitor.app'
+      || host.endsWith('.worldmonitor.app')
+      || host === 'commoditynode.com'
+      || host.endsWith('.commoditynode.com')
+      || seen.has(url)
+    ) continue;
     seen.add(url);
     citations.push({
       "@type": "CreativeWork",
@@ -88,8 +101,8 @@ const breadcrumbLd = {
     {
       "@type": "ListItem",
       "position": 1,
-      "name": "Blog",
-      "item": "https://www.worldmonitor.app/blog/"
+      "name": site.publication,
+      "item": absoluteUrl(site.indexPath)
     },
     {
       "@type": "ListItem",
@@ -124,7 +137,7 @@ const jsonLd = {
     "@type": "Person",
     "name": authorName,
     ...(resolvedAuthorUrl ? { "url": resolvedAuthorUrl } : {}),
-    ...(authorName === DEFAULT_AUTHOR ? {
+    ...(!isCommodityNode && authorName === DEFAULT_AUTHOR ? {
       "@id": DEFAULT_AUTHOR_ID,
       "sameAs": [
         "https://x.com/eliehabib",
@@ -134,29 +147,28 @@ const jsonLd = {
   },
   "publisher": {
     "@type": "Organization",
-    "@id": "https://www.worldmonitor.app/#organization",
-    "name": "World Monitor",
-    "url": "https://www.worldmonitor.app",
+    "@id": `${site.origin}/#organization`,
+    "name": site.name,
+    "url": site.origin,
     "sameAs": [
-      "https://github.com/koala73/worldmonitor",
-      "https://x.com/worldmonitorai"
+      site.sourceUrl
     ],
     "logo": {
       "@type": "ImageObject",
-      "url": "https://www.worldmonitor.app/favico/apple-touch-icon.png"
+      "url": absoluteUrl(site.markUrl)
     }
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": canonicalUrl
   },
-  "image": ogImage || "https://www.worldmonitor.app/favico/og-image.png",
+  "image": ogImage || site.ogImageUrl,
   "url": canonicalUrl,
   "isPartOf": {
     "@type": "Blog",
-    "@id": "https://www.worldmonitor.app/blog/#blog",
-    "name": "World Monitor Blog",
-    "url": "https://www.worldmonitor.app/blog/"
+    "@id": `${absoluteUrl(site.indexPath)}#publication`,
+    "name": site.publication,
+    "url": absoluteUrl(site.indexPath)
   },
   ...(citations.length > 0 ? { "citation": citations } : {}),
   ...(keywords ? { "keywords": keywords } : {})
@@ -198,7 +210,7 @@ const faqLd = extractFaqLd(rawBody);
   keywords={keywords}
   ogType="article"
   ogImage={ogImage}
-  ogImageAlt={`${title} - World Monitor Blog`}
+  ogImageAlt={`${title} - ${site.publication}`}
   canonicalUrl={canonicalUrl}
   publishedTime={isoDate}
   modifiedTime={isoModifiedDate}
@@ -211,7 +223,7 @@ const faqLd = extractFaqLd(rawBody);
 >
   <article>
     <div class="article-header">
-      <a href="/blog/" class="back">&larr; All articles</a>
+      <a href={site.indexPath} class="back">&larr; All research</a>
       <div class="meta">
         <time datetime={isoDate}>{formattedDate}</time>
         {showUpdated && <span> &middot; Updated <time datetime={isoModifiedDate}>{formattedModifiedDate}</time></span>}
@@ -237,11 +249,11 @@ const faqLd = extractFaqLd(rawBody);
     </div>
     {relatedPosts.length > 0 && (
       <nav class="related-posts" aria-labelledby="related-posts-title">
-        <h2 id="related-posts-title">Related Intelligence Guides</h2>
+        <h2 id="related-posts-title">Related research</h2>
         <div class="related-post-grid">
           {relatedPosts.map((post) => (
             <a href={post.href} class="related-post-card">
-              <span>Read Next</span>
+              <span>Read next</span>
               <h3>{post.title}</h3>
               <p>{post.description}</p>
             </a>
@@ -249,30 +261,41 @@ const faqLd = extractFaqLd(rawBody);
         </div>
       </nav>
     )}
-    <div class="cta-banner">
-      <h3>Put the Intelligence to Work</h3>
-      <p>Open the live dashboard free, or explore Pro for deeper analyst workflows, alerts, and AI research.</p>
-      <div class="cta-actions">
-        <TrackedProductLink
-          destination="dashboard"
-          placement="article-cta-dashboard"
-          campaign={slug}
-          class="btn"
-        >
-          Open Dashboard
-        </TrackedProductLink>
-        <TrackedProductLink
-          destination="pro"
-          placement="article-cta-pro"
-          campaign={slug}
-          class="btn btn-secondary"
-        >
-          Explore Pro
-        </TrackedProductLink>
+    {isCommodityNode ? (
+      <aside class="cta-banner" aria-labelledby="live-evidence-title">
+        <h3 id="live-evidence-title">Inspect the current evidence</h3>
+        <p>The live product keeps source time, observation time, units, and known gaps next to the signal.</p>
+        <div class="cta-actions">
+          <a href={site.liveUrl} class="btn">Open live intelligence</a>
+          <a href="/methodology/" class="btn btn-secondary">Review methodology</a>
+        </div>
+      </aside>
+    ) : (
+      <div class="cta-banner">
+        <h3>Put the Intelligence to Work</h3>
+        <p>Open the live dashboard free, or explore Pro for deeper analyst workflows, alerts, and AI research.</p>
+        <div class="cta-actions">
+          <TrackedProductLink
+            destination="dashboard"
+            placement="article-cta-dashboard"
+            campaign={slug}
+            class="btn"
+          >
+            Open Dashboard
+          </TrackedProductLink>
+          <TrackedProductLink
+            destination="pro"
+            placement="article-cta-pro"
+            campaign={slug}
+            class="btn btn-secondary"
+          >
+            Explore Pro
+          </TrackedProductLink>
+        </div>
       </div>
-    </div>
+    )}
     <div class="author-bio">
-      <img src={avatarSrc} alt={authorName} width="48" height="48" class="author-avatar" loading="lazy" onerror="this.src='/favico/apple-touch-icon.png'" />
+      <img src={avatarSrc} alt="" width="48" height="48" class="author-avatar" loading="lazy" />
       <div class="author-info">
         <div class="author-name">
           {resolvedAuthorUrl

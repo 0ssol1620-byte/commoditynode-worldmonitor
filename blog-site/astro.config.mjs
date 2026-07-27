@@ -4,7 +4,10 @@ import sitemap from '@astrojs/sitemap';
 import { readdirSync, readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
-const SITE_URL = 'https://www.worldmonitor.app';
+const IS_COMMODITYNODE = process.env.PUBLIC_SITE_VARIANT === 'commoditynode';
+const SITE_URL = IS_COMMODITYNODE
+  ? 'https://commoditynode.com'
+  : 'https://www.worldmonitor.app';
 const BLOG_DIR = new URL('./src/content/blog/', import.meta.url);
 
 function readFrontmatterDate(markdown, key) {
@@ -48,11 +51,15 @@ function buildPostDateMap() {
 const POST_DATES = buildPostDateMap();
 
 export default defineConfig({
-  site: 'https://www.worldmonitor.app',
-  base: '/blog',
+  site: SITE_URL,
+  base: IS_COMMODITYNODE ? '/' : '/blog',
   output: 'static',
   integrations: [
     sitemap({
+      filter(page) {
+        if (!IS_COMMODITYNODE) return true;
+        return !/\/(?:authors\/elie-habib|glossary)(?:\/|$)/.test(new URL(page).pathname);
+      },
       serialize(item) {
         const lastmod = POST_DATES.get(item.url);
         if (lastmod) return { ...item, lastmod };

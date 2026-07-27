@@ -1,6 +1,11 @@
 ---
 import productFacts from '../../../shared/product-facts.generated.json';
+import '@fontsource-variable/source-sans-3';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '../styles/global.css';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
+import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
 
 interface Props {
   title: string;
@@ -23,14 +28,19 @@ interface Props {
 
 const { title, description, metaTitle, keywords, ogType, ogImage, ogImageAlt, canonicalUrl, publishedTime, modifiedTime, author, section, jsonLd, breadcrumbLd, faqLd, attributionCampaign } = Astro.props;
 const pageTitle = metaTitle || title;
-const resolvedOgImage = ogImage || 'https://www.worldmonitor.app/favico/og-image.png';
+const resolvedOgImage = ogImage || site.ogImageUrl;
 const resolvedOgImageAlt = ogImageAlt || pageTitle;
-const resolvedOgImageType = resolvedOgImage.toLowerCase().split(/[?#]/)[0].endsWith('.png')
+const resolvedOgImagePath = resolvedOgImage.toLowerCase().split(/[?#]/)[0];
+const resolvedOgImageType = resolvedOgImagePath.endsWith('.png')
   ? 'image/png'
-  : 'image/jpeg';
+  : resolvedOgImagePath.endsWith('.svg')
+    ? 'image/svg+xml'
+    : resolvedOgImagePath.endsWith('.webp')
+      ? 'image/webp'
+      : 'image/jpeg';
 const resolvedOgType = ogType || 'website';
 const keywordTags = keywords ? keywords.split(',').map(k => k.trim()).slice(0, 6) : [];
-const resolvedCanonicalUrl = canonicalUrl || new URL(Astro.url.pathname, 'https://www.worldmonitor.app').href;
+const resolvedCanonicalUrl = canonicalUrl || absoluteUrl(Astro.url.pathname);
 const proCtaUrl = productFacts.product.pricingUrl;
 const proCtaLabel = productFacts.product.primaryCtaLabel;
 
@@ -40,7 +50,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-site={site.key}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -48,15 +58,15 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     <meta name="description" content={description} />
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="author" content={author || 'World Monitor'} />
-    <meta name="theme-color" content="#050505" />
+    <meta name="author" content={author || site.defaultAuthor} />
+    <meta name="theme-color" content={isCommodityNode ? '#071116' : '#050505'} />
     <link rel="canonical" href={resolvedCanonicalUrl} />
 
     <meta property="og:type" content={resolvedOgType} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={resolvedCanonicalUrl} />
-    <meta property="og:site_name" content="World Monitor Blog" />
+    <meta property="og:site_name" content={site.publication} />
     <meta property="og:image" content={resolvedOgImage} />
     <meta property="og:image:secure_url" content={resolvedOgImage} />
     <meta property="og:image:type" content={resolvedOgImageType} />
@@ -66,7 +76,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     <meta property="og:image:alt" content={resolvedOgImageAlt} />
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
-    {resolvedOgType === 'article' && <meta property="article:publisher" content="https://www.worldmonitor.app" />}
+    {resolvedOgType === 'article' && <meta property="article:publisher" content={site.origin} />}
     {section && <meta property="article:section" content={section} />}
     {keywordTags.map(tag => <meta property="article:tag" content={tag} />)}
 
@@ -75,14 +85,16 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="twitter:image:alt" content={resolvedOgImageAlt} />
-    <meta name="twitter:site" content="@worldmonitorai" />
-    <meta name="twitter:creator" content="@worldmonitorai" />
+    {!isCommodityNode && <meta name="twitter:site" content="@worldmonitorai" />}
+    {!isCommodityNode && <meta name="twitter:creator" content="@worldmonitorai" />}
 
-    <link rel="icon" type="image/x-icon" href="/favico/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favico/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favico/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favico/apple-touch-icon.png" />
-    <link rel="alternate" type="application/rss+xml" title="World Monitor Blog" href="/blog/rss.xml" />
+    {isCommodityNode
+      ? <link rel="icon" type="image/svg+xml" href="/commoditynode-mark.svg" />
+      : <link rel="icon" type="image/x-icon" href="/favico/favicon.ico" />
+    }
+    {!isCommodityNode && <link rel="icon" type="image/png" sizes="32x32" href="/favico/favicon-32x32.png" />}
+    {!isCommodityNode && <link rel="apple-touch-icon" sizes="180x180" href="/favico/apple-touch-icon.png" />}
+    <link rel="alternate" type="application/rss+xml" title={site.publication} href={site.rssPath} />
 
     {jsonLd && (
       <script type="application/ld+json" set:html={stringifyJsonLd(jsonLd)} />
@@ -94,79 +106,98 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
       <script type="application/ld+json" set:html={stringifyJsonLd(faqLd)} />
     )}
 
-    <style is:global>
-      @import '../styles/global.css';
-    </style>
-
-    <script defer src="https://abacus.worldmonitor.app/script.js" data-website-id="e8800335-c853-46a8-8497-c993ed2f58bc" data-domains="worldmonitor.app,www.worldmonitor.app,tech.worldmonitor.app,finance.worldmonitor.app,commodity.worldmonitor.app,happy.worldmonitor.app"></script>
+    {!isCommodityNode && (
+      <script defer src="https://abacus.worldmonitor.app/script.js" data-website-id="e8800335-c853-46a8-8497-c993ed2f58bc" data-domains="worldmonitor.app,www.worldmonitor.app,tech.worldmonitor.app,finance.worldmonitor.app,commodity.worldmonitor.app,happy.worldmonitor.app"></script>
+    )}
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
-      <nav>
-        <a href="/blog/" class="logo">
-          <img src="/favico/favicon-32x32.png" alt="World Monitor" width="28" height="28" class="logo-icon-img" />
+      <nav aria-label="Primary">
+        <a href={site.indexPath} class="logo" aria-label={`${site.name} home`}>
+          <img src={site.markUrl} alt="" width="32" height="32" class="logo-icon-img" />
           <div class="logo-text">
-            <span class="logo-name">WORLD MONITOR</span>
-            <span class="logo-sub">by Someone.ceo</span>
+            <span class="logo-name">{site.name}</span>
+            <span class="logo-sub">{isCommodityNode ? 'Research' : 'by Someone.ceo'}</span>
           </div>
         </a>
         <ul class="nav-links">
-          <li><a href="/blog/">Blog</a></li>
-          <li><a href="/blog/glossary/">Glossary</a></li>
-          <li>
-            <TrackedProductLink destination="dashboard" placement="header-dashboard" campaign={attributionCampaign}>
-              Dashboard
-            </TrackedProductLink>
-          </li>
-          <li>
-            <TrackedProductLink destination="pro" placement="header-pro" campaign={attributionCampaign}>
-              Pro
-            </TrackedProductLink>
-          </li>
-          <li><a href="https://www.worldmonitor.app/docs" target="_blank" rel="noopener noreferrer">Docs</a></li>
-          <li><a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          {isCommodityNode ? (
+            <>
+              <li><a href="/">Research</a></li>
+              <li><a href="/methodology/">Methodology</a></li>
+              <li><a href="/sources/">Sources</a></li>
+              <li><a href="/about/">About</a></li>
+            </>
+          ) : (
+            <>
+              <li><a href="/blog/">Blog</a></li>
+              <li><a href="/blog/glossary/">Glossary</a></li>
+              <li>
+                <TrackedProductLink destination="dashboard" placement="header-dashboard" campaign={attributionCampaign}>
+                  Dashboard
+                </TrackedProductLink>
+              </li>
+              <li>
+                <TrackedProductLink destination="pro" placement="header-pro" campaign={attributionCampaign}>
+                  Pro
+                </TrackedProductLink>
+              </li>
+              <li><a href="https://www.worldmonitor.app/docs" target="_blank" rel="noopener noreferrer">Docs</a></li>
+            </>
+          )}
         </ul>
-        <TrackedProductLink
-          destination="pro"
-          href={proCtaUrl}
-          placement="header-primary"
-          campaign={attributionCampaign}
-          class="nav-cta"
-        >
-          {proCtaLabel}
-        </TrackedProductLink>
+        {isCommodityNode ? (
+          <a href={site.liveUrl} class="nav-cta">Open live intelligence</a>
+        ) : (
+          <TrackedProductLink
+            destination="pro"
+            href={proCtaUrl}
+            placement="header-primary"
+            campaign={attributionCampaign}
+            class="nav-cta"
+          >
+            {proCtaLabel}
+          </TrackedProductLink>
+        )}
       </nav>
     </header>
 
-    <main>
+    <main id="main-content">
       <slot />
     </main>
 
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <img src="/favico/favicon-32x32.png" alt="" width="28" height="28" class="footer-icon-img" />
+          <img src={site.markUrl} alt="" width="28" height="28" class="footer-icon-img" />
           <div class="footer-brand-text">
-            <span class="footer-name">WORLD MONITOR</span>
-            <span class="footer-sub">by Someone.ceo</span>
+            <span class="footer-name">{site.name}</span>
+            <span class="footer-sub">{isCommodityNode ? 'Commodity impact research' : 'by Someone.ceo'}</span>
           </div>
         </div>
         <div class="footer-links">
-          <a href="/blog/authors/elie-habib/">About</a>
-          <TrackedProductLink destination="dashboard" placement="footer-dashboard" campaign={attributionCampaign}>
-            Dashboard
-          </TrackedProductLink>
-          <TrackedProductLink destination="pro" placement="footer-pro" campaign={attributionCampaign}>
-            Pro
-          </TrackedProductLink>
-          <a href="https://www.worldmonitor.app/docs" target="_blank" rel="noopener noreferrer">Docs</a>
-          <a href="https://status.worldmonitor.app/" target="_blank" rel="noopener noreferrer">Status</a>
-          <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a href="https://discord.gg/re63kWKxaz" target="_blank" rel="noopener noreferrer">Discord</a>
-          <a href="https://x.com/worldmonitorai" target="_blank" rel="noopener noreferrer">X</a>
+          {isCommodityNode ? (
+            <>
+              <a href="/methodology/">Methodology</a>
+              <a href="/sources/">Sources</a>
+              <a href="/about/">About</a>
+              <a href="/privacy/">Privacy</a>
+              <a href="/source/">AGPL source</a>
+            </>
+          ) : (
+            <>
+              <a href="/blog/authors/elie-habib/">About</a>
+              <TrackedProductLink destination="dashboard" placement="footer-dashboard" campaign={attributionCampaign}>
+                Dashboard
+              </TrackedProductLink>
+              <a href="https://www.worldmonitor.app/docs" target="_blank" rel="noopener noreferrer">Docs</a>
+              <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </>
+          )}
         </div>
         <div class="footer-copy">
-          &copy; {new Date().getFullYear()} World Monitor
+          &copy; {new Date().getFullYear()} {site.name}. Data remains subject to its original source terms.
         </div>
       </div>
     </footer>

@@ -1,6 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { GLOSSARY_TERMS, GLOSSARY_CATEGORIES } from '../../data/glossary';
+import { isCommodityNode } from '../../lib/site-variant';
+
+if (isCommodityNode) return Astro.redirect('/');
 
 const sorted = [...GLOSSARY_TERMS].sort((a, b) => a.term.localeCompare(b.term));
 const byCategory = GLOSSARY_CATEGORIES.map((category) => ({
