@@ -42,10 +42,24 @@ describe('CommodityNode research content contract', () => {
     assert.match(fixture.summary, /not an observed event/i);
   });
 
-  it('keeps company and industry publication fail-closed until evidence exists', () => {
+  it('keeps company and industry publication fail-closed unless evidence exists', () => {
     const publishableJson = (directory) =>
       readdirSync(resolve(contentRoot, directory)).filter((file) => file.endsWith('.json'));
-    assert.deepEqual(publishableJson('companies'), []);
+    const companyFiles = publishableJson('companies');
+    assert.deepEqual(companyFiles, ['first-quantum-minerals.json']);
+    for (const file of companyFiles) {
+      const company = readJson(`companies/${file}`);
+      assert.equal(company.publicationState, 'published');
+      assert.equal(company.isFixture, false);
+      assert.equal(company.publishable, true);
+      assert.ok(company.evidence.length >= 2);
+      assert.ok(company.limitations.length >= 1);
+      assert.ok(company.assets.length >= 1);
+      for (const evidence of company.evidence) {
+        assert.match(evidence.url, /^https:\/\//);
+        assert.match(evidence.locator, /\S/);
+      }
+    }
     assert.deepEqual(publishableJson('industries'), []);
   });
 });

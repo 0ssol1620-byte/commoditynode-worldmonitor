@@ -86,6 +86,8 @@
     "commoditynode:editorial": "node scripts/check-commoditynode-editorial.mjs",
     "commoditynode:editorial:build": "tsx scripts/build-commoditynode-editorial-workbench.mts",
     "commoditynode:editorial:dev": "tsx scripts/serve-commoditynode-editorial.mts",
+    "commoditynode:health:build": "tsx scripts/build-commoditynode-health-dashboard.mts",
+    "commoditynode:health:dev": "tsx scripts/serve-commoditynode-health.mts",
     "commoditynode:database": "node scripts/check-commoditynode-database-schema.mjs && node --test tests/commoditynode-database-schema.test.mjs",
     "commoditynode:providers": "tsx --test tests/commoditynode-provider-adapters.test.mts",
     "commoditynode:graph": "tsx --test tests/commoditynode-impact-ontology.test.mts tests/commoditynode-impact-graph-service.test.mts tests/commoditynode-universe.test.mts",

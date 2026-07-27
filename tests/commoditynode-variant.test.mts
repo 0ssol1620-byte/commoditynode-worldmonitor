@@ -90,7 +90,7 @@ describe('CommodityNode additive variant contract', () => {
     const meta = VARIANT_META.commoditynode;
     assert.equal(meta.siteName, 'CommodityNode');
     assert.equal(meta.url, 'https://live.commoditynode.com/');
-    assert.doesNotMatch(meta.description, /\b(?:2M|500\+|190 countries|56 layers)\b/i);
+    assert.doesNotMatch(meta.description, /\b(?:2M|500\+|190 countries|57 layers)\b/i);
     assert.doesNotMatch(meta.title, /World Monitor/i);
   });
 

@@ -46,7 +46,7 @@ CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locat
 CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,complete
 CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,in_progress
 CNWM-047,3,Fail-soft,Replace global publication kill switch with dataset/module/page publication contracts.,P0,CNWM-036,complete
-CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,planned
+CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,complete
 CNWM-049,4,Map data,Create CommodityNode marker discriminants and typed render adapters.,P0,"CNWM-014,CNWM-041",complete
 CNWM-050,4,Layers,"Implement verified mines, plants, ports, pipelines, routes and events layers.",P0,CNWM-046,complete
 CNWM-051,4,Layer UX,Create grouped layer drawer with presets by commodity and event type.,P1,CNWM-048,complete
