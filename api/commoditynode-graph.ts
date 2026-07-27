@@ -7,8 +7,10 @@ import {
   getCommodityNodeSubgraph,
   resolveCommodityNodeGraphEntity,
 } from '../server/commoditynode/impact-graph-service';
+import { checkRateLimit } from '../server/_shared/rate-limit';
 
 const CACHE_CONTROL = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+const MAX_TEXT_PARAMETER_LENGTH = 160;
 
 function json(request: Request, value: unknown, status = 200): Response {
   return Response.json(value, {
@@ -35,8 +37,15 @@ export default async function handler(request: Request): Promise<Response> {
     return new Response(null, { status: 204, headers: getCorsHeaders(request) });
   }
   if (request.method !== 'GET') return json(request, { error: 'method_not_allowed' }, 405);
+  const rateLimited = await checkRateLimit(request, getCorsHeaders(request));
+  if (rateLimited) return rateLimited;
 
   const url = new URL(request.url);
+  for (const key of ['op', 'snapshot', 'q', 'root', 'target', 'id']) {
+    if ((url.searchParams.get(key)?.length ?? 0) > MAX_TEXT_PARAMETER_LENGTH) {
+      return json(request, { error: 'parameter_too_long', parameter: key }, 400);
+    }
+  }
   const operation = url.searchParams.get('op') ?? 'snapshot';
   const snapshotId = url.searchParams.get('snapshot') ?? undefined;
 

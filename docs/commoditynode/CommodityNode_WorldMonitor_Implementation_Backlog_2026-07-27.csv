@@ -104,11 +104,11 @@ CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictio
 CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,in_progress
 CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after migration.,P1,CNWM-094,planned
 CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned
-CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,planned
-CNWM-107,9,Security,"Review CORS, CSP, API keys, rate limits and secret boundaries for all domains.",P0,CNWM-019,planned
+CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,complete
+CNWM-107,9,Security,"Review CORS, CSP, API keys, rate limits and secret boundaries for all domains.",P0,CNWM-019,complete
 CNWM-108,9,Privacy,"Implement account export/deletion, retention and audit logging.",P1,CNWM-086,planned
 CNWM-109,9,Performance,Enforce separate research/live bundle and Core Web Vitals budgets.,P0,"CNWM-023,CNWM-055",complete
-CNWM-110,9,Accessibility,"Complete keyboard, screen-reader, contrast, motion and chart/table parity review.",P0,CNWM-081,in_progress
+CNWM-110,9,Accessibility,"Complete keyboard, screen-reader, contrast, motion and chart/table parity review.",P0,CNWM-081,complete
 CNWM-111,9,Reliability,"Run provider, Redis, DB, image and AI outage simulations.",P0,"CNWM-044,CNWM-056",complete
 CNWM-112,9,Upstream,Perform first upstream sync rehearsal and resolve conflicts using patch ledger.,P1,"CNWM-021,CNWM-022",complete
 CNWM-113,9,Release,Create immutable release tag and production source snapshot.,P0,CNWM-007,planned

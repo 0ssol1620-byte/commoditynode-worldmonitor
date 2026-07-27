@@ -11,6 +11,8 @@ import {
   WORLD_BANK_PROVIDER_ADAPTER,
 } from '../server/commoditynode/official-provider-adapters';
 import {
+  assertCommodityNodeProviderUrl,
+  fetchProviderJson,
   runCommodityNodeProviderAdapter,
   type CommodityNodeProviderContext,
 } from '../server/commoditynode/provider-contract';
@@ -34,6 +36,42 @@ function jsonFetch(payload: unknown, onUrl?: (url: URL) => void): typeof fetch {
 }
 
 describe('CommodityNode provider adapters', () => {
+  it('enforces HTTPS, exact provider origins, bounded redirects, and GET-only fetches', async () => {
+    for (const value of [
+      'http://api.eia.gov/v2/seriesid/PET.RWTC.D',
+      'https://api.eia.gov.evil.example/v2',
+      'https://127.0.0.1/internal',
+      'https://user:password@api.eia.gov/v2',
+      'https://api.eia.gov:444/v2',
+    ]) {
+      assert.throws(() => assertCommodityNodeProviderUrl(new URL(value)), /not allowed/);
+    }
+    assert.doesNotThrow(() =>
+      assertCommodityNodeProviderUrl(new URL('https://api.eia.gov/v2/seriesid/PET.RWTC.D')),
+    );
+
+    const redirectFetch = (async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: 'http://127.0.0.1/internal' },
+      })) as typeof fetch;
+    await assert.rejects(
+      () => fetchProviderJson(
+        redirectFetch,
+        new URL('https://api.eia.gov/v2/seriesid/PET.RWTC.D'),
+      ),
+      /not allowed/,
+    );
+    await assert.rejects(
+      () => fetchProviderJson(
+        jsonFetch({ ok: true }),
+        new URL('https://api.eia.gov/v2/seriesid/PET.RWTC.D'),
+        { method: 'POST' },
+      ),
+      /method POST is not allowed/,
+    );
+  });
+
   it('registers unique adapters and approved freshness windows', () => {
     assert.doesNotThrow(() => validateCommodityNodeProviderRegistry(
       COMMODITYNODE_PROVIDER_ADAPTERS,

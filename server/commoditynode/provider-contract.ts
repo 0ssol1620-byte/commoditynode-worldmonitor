@@ -45,6 +45,17 @@ export interface CommodityNodeProviderAdapter {
 }
 
 const ISO_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
+const PROVIDER_HOSTS = new Set([
+  'api.eia.gov',
+  'api.stlouisfed.org',
+  'api.worldbank.org',
+  'query1.finance.yahoo.com',
+  'quickstats.nass.usda.gov',
+  'www.sciencebase.gov',
+]);
+const MAX_PROVIDER_REDIRECTS = 3;
+const MAX_PROVIDER_RESPONSE_BYTES = 5 * 1024 * 1024;
+const PROVIDER_TIMEOUT_MS = 15_000;
 
 function addMilliseconds(timestamp: string, milliseconds: number): string {
   return new Date(Date.parse(timestamp) + milliseconds).toISOString();
@@ -140,16 +151,62 @@ export async function fetchProviderJson(
   url: URL,
   init: RequestInit = {},
 ): Promise<unknown> {
-  const response = await fetcher(url, {
-    ...init,
-    headers: {
-      accept: 'application/json',
-      'user-agent': 'CommodityNode/1.0 data-operations@commoditynode.com',
-      ...init.headers,
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`${url.origin}${url.pathname} returned HTTP ${response.status}`);
+  const method = (init.method ?? 'GET').toUpperCase();
+  if (method !== 'GET') {
+    throw new Error(`provider method ${method} is not allowed`);
   }
-  return await response.json();
+
+  let currentUrl = new URL(url);
+  for (let redirectCount = 0; redirectCount <= MAX_PROVIDER_REDIRECTS; redirectCount += 1) {
+    assertCommodityNodeProviderUrl(currentUrl);
+    const response = await fetcher(currentUrl, {
+      ...init,
+      method,
+      redirect: 'manual',
+      signal: init.signal ?? AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'CommodityNode/1.0 data-operations@commoditynode.com',
+        ...init.headers,
+      },
+    });
+
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (!location) throw new Error('provider redirect omitted location');
+      if (redirectCount === MAX_PROVIDER_REDIRECTS) {
+        throw new Error('provider redirect limit exceeded');
+      }
+      currentUrl = new URL(location, currentUrl);
+      continue;
+    }
+    if (!response.ok) {
+      throw new Error(
+        `${currentUrl.origin}${currentUrl.pathname} returned HTTP ${response.status}`,
+      );
+    }
+
+    const declaredLength = Number(response.headers.get('content-length'));
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_PROVIDER_RESPONSE_BYTES) {
+      throw new Error('provider response exceeds byte limit');
+    }
+    const body = await response.text();
+    if (new TextEncoder().encode(body).byteLength > MAX_PROVIDER_RESPONSE_BYTES) {
+      throw new Error('provider response exceeds byte limit');
+    }
+    return JSON.parse(body) as unknown;
+  }
+  throw new Error('provider redirect limit exceeded');
+}
+
+export function assertCommodityNodeProviderUrl(url: URL): void {
+  if (
+    url.protocol !== 'https:'
+    || (url.port !== '' && url.port !== '443')
+    || url.username !== ''
+    || url.password !== ''
+    || !PROVIDER_HOSTS.has(url.hostname.toLowerCase())
+  ) {
+    throw new Error(`provider origin ${url.origin} is not allowed`);
+  }
 }

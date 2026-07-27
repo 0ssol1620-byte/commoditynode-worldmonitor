@@ -98,6 +98,7 @@
     "commoditynode:licenses:check": "node scripts/generate-commoditynode-license-inventory.mjs --check",
     "commoditynode:performance": "node scripts/check-commoditynode-performance-budget.mjs",
     "commoditynode:resilience": "tsx scripts/run-commoditynode-outage-simulations.mts",
+    "commoditynode:security": "npm run security:vite-env-secrets -- --strict-local && npm run security:local-env-dumps && npm run lint:rate-limit-policies && tsx --test api/rss-proxy.test.mjs api/commoditynode-cors.test.mjs tests/commoditynode-provider-adapters.test.mts tests/commoditynode-security-boundaries.test.mts tests/csp-filter.test.mjs tests/deploy-config.test.mjs tests/notification-webhook-ssrf.test.mts tests/rate-limit.test.mts tests/sanitize.test.mts tests/sanitize-safe-html.test.mts tests/security-audit-baseline.test.mjs",
     "commoditynode:upstream:rehearse": "node scripts/rehearse-commoditynode-upstream-sync.mjs",
     "typecheck": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json && node scripts/audit-convex-string-calls.cjs",
@@ -113,6 +114,7 @@
     "test:e2e:energy": "cross-env VITE_VARIANT=energy playwright test",
     "test:e2e:happy": "cross-env VITE_VARIANT=happy playwright test",
     "test:e2e:commoditynode": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-smoke.spec.ts",
+    "test:e2e:commoditynode:a11y": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-accessibility.spec.ts",
     "test:e2e:runtime": "cross-env VITE_VARIANT=full playwright test e2e/runtime-fetch.spec.ts",
     "test:e2e:variant-smoke:full": "cross-env VITE_VARIANT=full playwright test e2e/variant-live-smoke.spec.ts",
     "test:e2e:variant-smoke:tech": "cross-env VITE_VARIANT=tech playwright test e2e/variant-live-smoke.spec.ts",
@@ -154,6 +156,7 @@
     "test:convex:watch": "vitest --config vitest.config.mts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@biomejs/biome": "^2.4.7",
     "@bufbuild/buf": "^1.66.0",
     "@edge-runtime/vm": "^5.0.0",
