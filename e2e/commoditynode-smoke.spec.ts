@@ -117,6 +117,51 @@ test.describe('CommodityNode live shell', () => {
     );
   });
 
+  test('search, deep links, and the evidence-aware detail drawer form one workflow', async ({
+    page,
+  }) => {
+    await page.goto('/?mapEntity=mine%3Acobre-panama', {
+      waitUntil: 'domcontentloaded',
+    });
+
+    const drawer = page.locator('.cn-map-detail-drawer');
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toHaveAttribute('data-kind', 'mine');
+    await expect(drawer.getByRole('heading', { name: 'Cobre Panama' })).toBeVisible();
+    await expect(drawer).toContainText('not live telemetry');
+    await expect(
+      drawer.getByRole('link', { name: 'Open commodity research' }),
+    ).toHaveAttribute('href', '/commodities/copper/');
+    await expect(
+      drawer.getByRole('link', { name: 'Open verified Event Pulse' }),
+    ).toHaveAttribute('href', '/events/cobre-panama-production-halt/');
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect.poll(() => new URL(page.url()).searchParams.has('mapEntity')).toBe(
+      false,
+    );
+
+    await page.locator('#searchBtn').click();
+    const input = page.locator('.search-input');
+    await expect(input).toHaveAttribute(
+      'placeholder',
+      'Search commodities, facilities, companies, events, or routes...',
+    );
+    await input.fill('Cobre Panama production halt');
+    const eventResult = page
+      .locator('.search-result-item')
+      .filter({ hasText: 'Cobre Panama production halt' })
+      .first();
+    await expect(eventResult).toContainText('Verified event');
+    await eventResult.click();
+    await expect(drawer).toHaveAttribute('data-kind', 'event');
+    await expect(drawer).toContainText('Three reviewed primary-source evidence records');
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('mapEntity'))
+      .toBe('event:event-cobre-panama-halt-2023');
+  });
+
   test('mobile shell stays on-brand, touch-safe, and within the viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -156,5 +201,32 @@ test.describe('CommodityNode live shell', () => {
     await expect(
       page.getByRole('button', { name: 'All 23', exact: true }),
     ).toHaveCSS('min-height', '44px');
+
+    await expect(page.locator('.cn-map-detail-drawer')).toBeAttached();
+    await page.evaluate(() => {
+      window.dispatchEvent(
+        new CustomEvent('commoditynode:map-selection', {
+          detail: {
+            entityId: 'gulf-europe-oil',
+            layerId: 'trade-routes-layer',
+          },
+        }),
+      );
+    });
+    const mobileDrawer = page.locator('.cn-map-detail-drawer');
+    await expect(mobileDrawer).toBeVisible();
+    await expect(mobileDrawer).toHaveAttribute('aria-modal', 'true');
+    await expect(mobileDrawer).toHaveCSS('bottom', '0px');
+    await expect(
+      mobileDrawer.getByRole('button', { name: 'Close map detail' }),
+    ).toHaveCSS('min-height', '44px');
+    await expect(mobileDrawer).toContainText('not live vessel telemetry');
+    await mobileDrawer
+      .getByRole('button', { name: 'Open in Impact Universe' })
+      .focus();
+    await page.keyboard.press('Tab');
+    await expect(
+      mobileDrawer.getByRole('button', { name: 'Close map detail' }),
+    ).toBeFocused();
   });
 });

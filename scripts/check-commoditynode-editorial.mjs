@@ -116,7 +116,11 @@ for (const file of readdirSync(contentDir).filter((name) => name.endsWith('.md')
   }
 
   const heroPath = String(data.heroImage ?? '').replace(/^\/+/, '');
-  if (!heroPath || !existsSync(resolve(root, 'blog-site', 'public', heroPath))) {
+  const localHeroPath = heroPath.replace(/^blog\//, '');
+  if (
+    !heroPath
+    || !existsSync(resolve(root, 'blog-site', 'public', localHeroPath))
+  ) {
     fail(file, 'committed hero image is missing');
   }
   if (!heroPath.includes(slug)) {

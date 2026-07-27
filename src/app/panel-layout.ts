@@ -370,6 +370,10 @@ export class PanelLayoutManager implements AppModule {
   private scheduledLoadAllIdle: number | null = null;
   private responsiveZoneListener: ResponsiveZoneListener | null = null;
   private readonly proActivationController: ProActivationController;
+  private commodityMapDetailDrawer:
+    | import('@/components/CommodityMapDetailDrawer').CommodityMapDetailDrawer
+    | null = null;
+  private boundCommodityMapCenterHandler: ((event: Event) => void) | null = null;
 
   constructor(ctx: AppContext, callbacks: PanelLayoutManagerCallbacks) {
     this.ctx = ctx;
@@ -702,6 +706,16 @@ export class PanelLayoutManager implements AppModule {
     this.unsubscribePaymentFailureBanner = null;
 
     this.proActivationController.destroy();
+
+    if (this.boundCommodityMapCenterHandler) {
+      window.removeEventListener(
+        'commoditynode:map-center-request',
+        this.boundCommodityMapCenterHandler,
+      );
+      this.boundCommodityMapCenterHandler = null;
+    }
+    this.commodityMapDetailDrawer?.destroy();
+    this.commodityMapDetailDrawer = null;
 
     // Reset checkout overlay so next layout init can register its callback
     destroyCheckoutOverlay();
@@ -2666,6 +2680,33 @@ export class PanelLayoutManager implements AppModule {
       layers: this.ctx.mapLayers,
       timeRange: '7d',
     }, preferGlobe);
+
+    if (SITE_VARIANT === 'commoditynode') {
+      const { CommodityMapDetailDrawer } = await import(
+        '@/components/CommodityMapDetailDrawer'
+      );
+      if (this.ctx.isDestroyed) return;
+      this.commodityMapDetailDrawer = new CommodityMapDetailDrawer(document.body);
+      this.boundCommodityMapCenterHandler = ((event: CustomEvent<{
+        latitude?: number;
+        longitude?: number;
+        layerId?: keyof MapLayers | null;
+      }>) => {
+        const { latitude, longitude, layerId } = event.detail ?? {};
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+          return;
+        }
+        if (layerId) {
+          this.ctx.map?.enableLayer(layerId);
+          this.ctx.mapLayers[layerId] = true;
+        }
+        this.ctx.map?.setCenter(latitude, longitude, 6);
+      }) as EventListener;
+      window.addEventListener(
+        'commoditynode:map-center-request',
+        this.boundCommodityMapCenterHandler,
+      );
+    }
 
     const eagerSupplyChainPanel = this.ctx.panels['supply-chain'] as SupplyChainPanel | undefined;
     if (eagerSupplyChainPanel) {

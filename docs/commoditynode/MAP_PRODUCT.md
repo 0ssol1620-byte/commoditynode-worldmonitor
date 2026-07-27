@@ -46,6 +46,49 @@ silently overwrite unrelated user settings. Applying a preset updates the
 visible layer controls, map view, persisted layer callback, and Impact
 Universe focus in one action.
 
+## Search and selection
+
+CommodityNode indexes five product-specific result classes:
+
+- commodities from the 23-node relationship taxonomy;
+- mines, processing plants, and commodity ports from the facility registry;
+- company headquarters plus the evidence-linked First Quantum record;
+- published, verified Event Pulse records;
+- reviewed reference trade routes.
+
+Selecting a result enables its supported layer, centers the map when
+coordinates exist, focuses the matching Impact Universe object, and opens the
+same detail surface used by direct map clicks. Search results never fabricate a
+location or a live operating state.
+
+## Detail drawer and deep links
+
+Every drawer record uses the closed contract in
+`src/config/commoditynode-selection.ts`: entity kind, namespaced identifier,
+coordinates, commodity relationship, layer, record status, source state, and
+only routes that exist in the research build.
+
+The desktop surface is a non-modal side drawer. At 720px and below it becomes
+an ARIA modal bottom sheet with a backdrop, 44px controls, bounded height, and
+overscroll containment. Escape and the close control restore focus to the
+invoking element.
+
+The `mapEntity` query parameter makes a selection reloadable and shareable,
+for example:
+
+```text
+/?mapEntity=mine:cobre-panama
+/?mapEntity=event:event-cobre-panama-halt-2023
+/?mapEntity=route:gulf-europe-oil
+```
+
+Published Copper, crude-oil, Gold, and Cocoa records link to their exact
+Commodity Hub routes. Other commodities link to the real research catalog
+until a reviewed detail page exists. The Cobre Panama mine, event, and First
+Quantum evidence record also link to the published Event Pulse. Registry
+records say that they are not live telemetry; the event record says that it is
+historical.
+
 ## Fallback behavior
 
 Desktop WebGL receives the full production, processing, port, pipeline, route,
@@ -65,5 +108,8 @@ npm run test:e2e:commoditynode
 ```
 
 The contract suite validates discriminants, namespaced identifiers, unique
-layer grouping, preset determinism, and enabled-layer behavior. Browser tests
-verify grouped fallback controls and a complete Copper preset interaction.
+layer grouping, preset determinism, search-category completeness, map-ID
+resolution, and route existence. Browser tests verify grouped fallback
+controls, a complete Copper preset interaction, search-to-drawer selection,
+deep-link restoration, focus-safe Escape close, evidence labels, and the
+mobile bottom sheet.

@@ -1069,6 +1069,7 @@ export default defineConfig(({ mode }) => {
             '**/RouteExplorer-*.js',
             '**/oref-locations-*.js',
             '**/military-surge-*.js',
+            '**/map-interaction-guard-*.js',
             '**/maplibre-*.css',
             '**/embed-*.css',
             '**/embed-url-*.css',
@@ -1109,7 +1110,7 @@ export default defineConfig(({ mode }) => {
             {
               urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) =>
                 sameOrigin
-                && /^(?:\/mapbox-gl-rtl-text\.min\.js|\/assets\/(?:maplibre|deck-stack|protomaps|GlobeMap|d3|topojson|h3-js|panels-(?:markets|energy|defense|news|economy|intel|risk)-|rpc-client-|hls-|sentry-|conflict-zone-|gdelt-intel-|layer-explanation-card-|UnifiedSettings-|Map-|MapContainer-|search-manager-|apt-groups-|RouteExplorer-|oref-locations-|military-surge-|[^/]+-data-)[^/]*\.(?:js|css))$/i.test(
+                && /^(?:\/mapbox-gl-rtl-text\.min\.js|\/assets\/(?:maplibre|deck-stack|protomaps|GlobeMap|d3|topojson|h3-js|panels-(?:markets|energy|defense|news|economy|intel|risk)-|rpc-client-|hls-|sentry-|conflict-zone-|gdelt-intel-|layer-explanation-card-|UnifiedSettings-|Map-|MapContainer-|search-manager-|apt-groups-|RouteExplorer-|oref-locations-|military-surge-|map-interaction-guard-|[^/]+-data-)[^/]*\.(?:js|css))$/i.test(
                   url.pathname,
                 ),
               handler: 'CacheFirst',

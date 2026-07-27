@@ -43,7 +43,7 @@ if (!existsSync(resolve(dist, 'sw.js'))) {
   const missing = [];
   let precacheBytes = 0;
   for (const url of urls) {
-    const path = resolve(dist, url.replaceAll('/', '\\'));
+    const path = resolve(dist, ...url.split('/').filter(Boolean));
     if (!existsSync(path)) {
       missing.push(url);
       continue;

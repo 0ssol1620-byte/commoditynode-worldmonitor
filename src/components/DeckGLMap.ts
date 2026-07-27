@@ -111,6 +111,7 @@ import { STARTUP_HUBS, ACCELERATORS, TECH_HQS, CLOUD_REGIONS } from '@/config/te
 import { AI_DATA_CENTERS } from '@/config/ai-datacenters';
 import { UNDERSEA_CABLES, NUCLEAR_FACILITIES, ECONOMIC_CENTERS, SPACEPORTS, CRITICAL_MINERALS, SANCTIONED_COUNTRIES_ALPHA2 } from '@/config/geo-map';
 import { getCommodityUniverseNodeIdForLabel } from '@/config/commoditynode-universe';
+import { resolveCommodityNodeSelection } from '@/config/commoditynode-selection';
 import {
   applyCommodityNodeMapPreset,
   COMMODITYNODE_LAYER_GROUPS,
@@ -5020,13 +5021,18 @@ export class DeckGLMap {
 
     if (
       SITE_VARIANT === 'commoditynode'
-      && ['mining-sites-layer', 'processing-plants-layer', 'commodity-ports-layer'].includes(
-        layerId,
-      )
+      && [
+        'mining-sites-layer',
+        'processing-plants-layer',
+        'commodity-ports-layer',
+        'trade-routes-layer',
+      ].includes(layerId)
     ) {
       const object = info.object as {
         id?: string;
+        routeId?: string;
         name?: string;
+        routeName?: string;
         mineral?: string;
         materials?: string[];
         commodities?: string[];
@@ -5036,16 +5042,21 @@ export class DeckGLMap {
       const commodityLabel =
         object.mineral ?? object.materials?.[0] ?? object.commodities?.[0] ?? null;
       const commodityId = getCommodityUniverseNodeIdForLabel(commodityLabel);
-      if (commodityId) {
+      const entityId = object.routeId ?? object.id ?? null;
+      const selection = resolveCommodityNodeSelection(entityId, layerId);
+      if (selection || commodityId) {
         window.dispatchEvent(
           new CustomEvent('commoditynode:map-selection', {
             detail: {
-              commodityId,
-              entityId: object.id ?? null,
-              entityName: object.name ?? null,
+              commodityId: selection?.commodityId ?? commodityId,
+              entityId: selection?.entityId ?? entityId,
+              entityName:
+                selection?.entityName ?? object.routeName ?? object.name ?? null,
               layerId,
-              latitude: object.lat ?? null,
-              longitude: object.lon ?? null,
+              latitude: selection?.latitude ?? object.lat ?? null,
+              longitude: selection?.longitude ?? object.lon ?? null,
+              selection,
+              source: 'map',
             },
           }),
         );

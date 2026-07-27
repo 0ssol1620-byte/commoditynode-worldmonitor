@@ -290,3 +290,259 @@
     min-height: 44px;
   }
 }
+
+[data-variant='commoditynode'] .cn-map-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1199;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: rgb(1 7 10 / 68%);
+  border: 0;
+  border-radius: 0;
+  cursor: default;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer {
+  position: fixed;
+  top: 64px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 32px));
+  overflow: auto;
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: var(--cn-radius-panel);
+  box-shadow: 0 18px 44px rgb(0 0 0 / 34%);
+  animation: cn-map-detail-enter var(--cn-motion-medium) var(--cn-motion-ease-out);
+  overscroll-behavior: contain;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer[hidden],
+[data-variant='commoditynode'] .cn-map-detail-backdrop[hidden] {
+  display: none;
+}
+
+@keyframes cn-map-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+[data-variant='commoditynode'] .cn-map-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cn-space-4);
+  padding: 20px;
+  background: var(--cn-color-canvas-alt);
+  border-bottom: 1px solid var(--cn-color-border);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-header > div {
+  min-width: 0;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-type {
+  margin: 0 0 6px;
+  color: var(--cn-color-signal-strong);
+  font: 650 10px var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-title {
+  margin: 0;
+  color: var(--cn-color-text);
+  font: 720 22px/1.18 var(--cn-font-ui);
+  letter-spacing: -.025em;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-subtitle {
+  margin: 7px 0 0;
+  color: var(--cn-color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-close {
+  flex: 0 0 auto;
+  min-width: 56px;
+  min-height: 40px;
+  padding: 0 10px;
+  color: var(--cn-color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 650 10px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts {
+  display: grid;
+  margin: 0;
+  padding: 8px 20px;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts > div {
+  display: grid;
+  grid-template-columns: minmax(108px, .8fr) minmax(0, 1.2fr);
+  gap: 12px;
+  padding-block: 11px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dt,
+[data-variant='commoditynode'] .cn-map-detail-facts dd {
+  margin: 0;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dt {
+  color: var(--cn-color-text-faint);
+  font: 600 10px var(--cn-font-data);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dd {
+  color: var(--cn-color-text-secondary);
+  font: 600 11px/1.45 var(--cn-font-data);
+  text-align: right;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-description {
+  margin: 0;
+  padding: 14px 20px 18px;
+  color: var(--cn-color-text-secondary);
+  font-size: 13px;
+  line-height: 1.62;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance {
+  margin: 0 20px 18px;
+  padding: 14px;
+  background: var(--cn-color-canvas-alt);
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-surface);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance h3 {
+  margin: 0 0 6px;
+  color: var(--cn-color-text);
+  font: 680 11px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance p {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer[data-source-status='verified_historical_event']
+  .cn-map-detail-provenance {
+  border-color: var(--cn-color-signal-muted);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding: 0 20px 20px;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions a,
+[data-variant='commoditynode'] .cn-map-detail-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  color: var(--cn-color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 680 11px var(--cn-font-ui);
+  text-decoration: none;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-primary {
+  color: var(--cn-color-canvas);
+  background: var(--cn-color-signal-strong);
+  border-color: var(--cn-color-signal-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-map-detail-close:hover,
+  [data-variant='commoditynode'] .cn-map-detail-actions button:hover,
+  [data-variant='commoditynode'] .cn-map-detail-actions a:hover {
+    color: var(--cn-color-text);
+    border-color: var(--cn-color-border-strong);
+  }
+}
+
+@media (max-width: 720px) {
+  html.cn-map-detail-sheet-open {
+    overflow: hidden;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-drawer {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: min(78dvh, 680px);
+    border-width: 1px 0 0;
+    border-radius: 18px 18px 0 0;
+    animation-name: cn-map-detail-sheet-enter;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-drawer::before {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: block;
+    width: 38px;
+    height: 4px;
+    margin: 8px auto -12px;
+    background: var(--cn-color-border-strong);
+    border-radius: 2px;
+    content: '';
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-header {
+    padding-top: 24px;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-close,
+  [data-variant='commoditynode'] .cn-map-detail-actions a,
+  [data-variant='commoditynode'] .cn-map-detail-actions button {
+    min-height: 44px;
+  }
+}
+
+@keyframes cn-map-detail-sheet-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
