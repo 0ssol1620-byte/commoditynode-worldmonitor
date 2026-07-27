@@ -17,18 +17,33 @@ function git(...args) {
   }).trim();
 }
 
+function tryGit(...args) {
+  try {
+    return git(...args);
+  } catch {
+    return null;
+  }
+}
+
+const repositoryHead = tryGit('rev-parse', 'HEAD');
+const suppliedBuildSha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMODITYNODE_BUILD_SHA;
 const commitSha = (
-  process.env.VERCEL_GIT_COMMIT_SHA
-  || process.env.COMMODITYNODE_BUILD_SHA
-  || git('rev-parse', 'HEAD')
+  suppliedBuildSha
+  || repositoryHead
+  || ''
 ).trim();
 
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
   throw new Error(`Invalid CommodityNode build SHA: ${commitSha}`);
 }
 
-if ((process.env.CI || process.env.VERCEL) && git('status', '--porcelain', '--untracked-files=no')) {
-  throw new Error('Refusing a production provenance record from a dirty tracked worktree.');
+if (process.env.CI || process.env.VERCEL) {
+  if (repositoryHead && git('status', '--porcelain', '--untracked-files=no')) {
+    throw new Error('Refusing a production provenance record from a dirty tracked worktree.');
+  }
+  if (!repositoryHead && !suppliedBuildSha) {
+    throw new Error('A verified build SHA is required when Git metadata is unavailable.');
+  }
 }
 
 const buildDate = process.env.SOURCE_DATE_EPOCH

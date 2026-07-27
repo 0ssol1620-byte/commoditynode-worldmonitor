@@ -14,7 +14,8 @@ the upstream World Monitor deployment.
 Deploy the live surface with:
 
 ```powershell
-vercel --local-config vercel.commoditynode.json
+$commitSha = git rev-parse HEAD
+vercel --local-config vercel.commoditynode.json --build-env "COMMODITYNODE_BUILD_SHA=$commitSha"
 ```
 
 Production promotion is intentionally separate:
