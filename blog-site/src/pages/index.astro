@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import LiveMapTeaser from '../components/LiveMapTeaser.astro';
 import { getCollection } from 'astro:content';
 import { coverWebpSources } from '../lib/cover-webp';
 import {
@@ -118,6 +119,8 @@ const jsonLd = {
   </div>
   {isCommodityNode && (
     <>
+      <LiveMapTeaser liveUrl={site.liveUrl} />
+
       <section class="home-events" aria-labelledby="home-events-title">
         <div class="home-section-heading">
           <div>

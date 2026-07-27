@@ -1,0 +1,103 @@
+---
+interface Props {
+  liveUrl: string;
+}
+
+const { liveUrl } = Astro.props;
+---
+
+<section class="home-live-teaser" aria-labelledby="live-map-teaser-title" data-live-map-teaser>
+  <header>
+    <div>
+      <p class="section-label">Live workspace</p>
+      <h2 id="live-map-teaser-title">Move from a reviewed claim to the operating map.</h2>
+    </div>
+    <p>
+      The research surface explains what is known. The live workspace adds spatial context,
+      source state, and linked entities without turning an unavailable feed into a fact.
+    </p>
+  </header>
+
+  <div class="live-teaser-frame" data-live-frame data-state="preview">
+    <div class="live-teaser-preview" aria-hidden="true">
+      <div class="preview-grid"></div>
+      <div class="preview-route route-a"></div>
+      <div class="preview-route route-b"></div>
+      <span class="preview-node node-mine"></span>
+      <span class="preview-node node-port"></span>
+      <span class="preview-node node-route"></span>
+      <span class="preview-node node-market"></span>
+      <div class="preview-legend">
+        <span>Reviewed asset</span>
+        <span>Verified event</span>
+        <span>Impact path</span>
+      </div>
+      <p>Interface preview · not a live data claim</p>
+    </div>
+    <iframe
+      title="CommodityNode live commodity intelligence preview"
+      data-src={liveUrl}
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      sandbox="allow-scripts allow-same-origin allow-popups"
+      tabindex="-1"
+    ></iframe>
+    <div class="live-teaser-rail">
+      <div>
+        <span class="live-teaser-state" data-live-state>Preview</span>
+        <p>Interactive loading is deferred on small screens and data-saving connections.</p>
+      </div>
+      <a class="primary-action" href={liveUrl}>Open the live workspace</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const teasers = document.querySelectorAll<HTMLElement>('[data-live-map-teaser]');
+
+  for (const teaser of teasers) {
+    const frame = teaser.querySelector<HTMLElement>('[data-live-frame]');
+    const iframe = teaser.querySelector<HTMLIFrameElement>('iframe[data-src]');
+    const state = teaser.querySelector<HTMLElement>('[data-live-state]');
+    if (!frame || !iframe || !state) continue;
+
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean };
+      }
+    ).connection;
+    const shouldDeferPermanently =
+      window.matchMedia('(max-width: 760px)').matches
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      || connection?.saveData === true;
+
+    if (shouldDeferPermanently) {
+      frame.dataset.state = 'preview';
+      state.textContent = 'Light preview';
+      continue;
+    }
+
+    const loadFrame = () => {
+      const source = iframe.dataset.src;
+      if (!source || iframe.src) return;
+      frame.dataset.state = 'loading';
+      state.textContent = 'Loading live view';
+      iframe.addEventListener('load', () => {
+        frame.dataset.state = 'ready';
+        state.textContent = 'Live workspace';
+      }, { once: true });
+      iframe.src = source;
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        loadFrame();
+      }, { rootMargin: '320px 0px' });
+      observer.observe(teaser);
+    } else {
+      loadFrame();
+    }
+  }
+</script>

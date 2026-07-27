@@ -18,6 +18,15 @@ describe('CommodityNode research build', () => {
     assert.match(html, /<html lang="en" data-site="commoditynode">/);
     assert.match(html, /<link rel="canonical" href="https:\/\/commoditynode\.com\/">/);
     assert.match(html, /Trace commodity shocks from source event to market exposure\./);
+    assert.match(html, /data-live-map-teaser/);
+    assert.match(html, /data-src="https:\/\/live\.commoditynode\.com"/);
+    assert.doesNotMatch(
+      html,
+      /<iframe[^>]+\ssrc="https:\/\/live\.commoditynode\.com\//,
+      'the live application must not load during the research page initial render',
+    );
+    assert.match(html, /IntersectionObserver/);
+    assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication/);
     assert.match(html, /href="https:\/\/live\.commoditynode\.com"/);
     assert.match(html, /id="main-content"/);
     assert.doesNotMatch(html, /@worldmonitorai|abacus\.worldmonitor|>WORLD MONITOR<|>World Monitor</);

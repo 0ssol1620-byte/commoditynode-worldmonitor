@@ -25,7 +25,7 @@ CNWM-023,1,Upstream sync,Create upstream-main mirror branch and automated sync P
 CNWM-024,1,Patch ledger,Track direct modifications to upstream hot files and conflict owners.,P1,CNWM-021,complete
 CNWM-025,2,Research surface,Expand the existing Astro blog-site into the CommodityNode apex research product.,P0,CNWM-020,complete
 CNWM-026,2,Content schemas,"Define collections for commodities, events, research, companies, industries, authors and sources.",P0,CNWM-023,complete
-CNWM-027,2,Home,Build the editorial home with a lazy live-map teaser and no ads.,P1,CNWM-023,in_progress
+CNWM-027,2,Home,Build the editorial home with a lazy live-map teaser and no ads.,P1,CNWM-023,complete
 CNWM-028,2,Directory,Build commodity directory with benchmark/proxy semantics and coverage states.,P1,CNWM-024,complete
 CNWM-029,2,Commodity hub,Build reusable Commodity Hub template.,P0,CNWM-024,complete
 CNWM-030,2,Event Pulse,Build Event Pulse index and detail templates.,P1,CNWM-024,complete
