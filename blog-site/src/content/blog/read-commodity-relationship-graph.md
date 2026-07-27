@@ -53,14 +53,14 @@ The ranked list carries the complete model. The canvas remains an optional way t
 
 ## Frequently Asked Questions
 
-### Does a connection imply causation?
+**Does a connection imply causation?**
 
 No. The edge label states the documented relationship. A correlation edge describes co-movement during a stated window; it does not become a physical or causal link.
 
-### Why does confidence fall across longer paths?
+**Why does confidence fall across longer paths?**
 
 Each additional edge introduces another assumption, source, and reporting delay. CommodityNode exposes those steps and discounts the combined path instead of presenting a multi-hop inference as a direct fact.
 
-### Can the table and graph disagree?
+**Can the table and graph disagree?**
 
 They should not. Both views use the same nodes, edges, evidence, and confidence. The table is the accessible reference; the graph is a spatial way to explore it.

@@ -51,14 +51,14 @@ Showing both timestamps keeps an old observation from borrowing authority from a
 
 ## Frequently Asked Questions
 
-### Is publication time the same as collection time?
+**Is publication time the same as collection time?**
 
 No. Publication time belongs to the source. Collection time records when CommodityNode retrieved the record. A delayed collection does not change when the source first released the data.
 
-### Which timestamp should appear first?
+**Which timestamp should appear first?**
 
 Use observation time when the question is about the state of the market during a defined period. Use source time when the question is about what information was available at a particular moment. Material revisions should show both.
 
-### Can a recent update still be stale?
+**Can a recent update still be stale?**
 
 Yes. A record published today may describe an older reporting period. Recency of publication does not establish timeliness of the observation.
