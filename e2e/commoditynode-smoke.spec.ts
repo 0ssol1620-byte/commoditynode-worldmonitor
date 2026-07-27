@@ -14,7 +14,7 @@ test.describe('CommodityNode live shell', () => {
       await expect(page.locator(`[data-panel="${panel}"]`)).toBeAttached();
     }
 
-    await expect(page.locator('[data-panel="impact-universe"] [data-universe-node]')).toHaveCount(23);
+    await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
     await expect(page.locator('[data-panel="impact-universe"]')).not.toContainText(/\bRL\b/);
 
     for (const panel of ['airline-intel', 'world-clock', 'polymarket', 'military-correlation']) {

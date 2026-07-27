@@ -176,7 +176,7 @@ export const DEFERRED_PANEL_NATURAL_FOOTPRINTS: Readonly<Record<string, Deferred
   'fuel-shortages': { rowSpan: 2 },
   'gdelt-intel': { rowSpan: 2 },
   'internet-disruptions': { rowSpan: 2 },
-  'impact-universe': { rowSpan: 3, className: 'panel-wide' },
+  'impact-universe': { rowSpan: 4, className: 'panel-wide' },
   'live-news': { className: 'panel-wide' },
   'live-webcams': { className: 'panel-wide' },
   'oil-inventories': { rowSpan: 2 },

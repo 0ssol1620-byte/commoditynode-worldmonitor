@@ -66,7 +66,7 @@ export class ImpactUniversePanel extends Panel {
       id: 'impact-universe',
       title: 'Impact Universe',
       className: 'panel-wide cn-universe-panel',
-      defaultRowSpan: 3,
+      defaultRowSpan: 4,
       infoTooltip:
         'All tracked commodity instruments appear as equal nodes. Lines identify a named analytical relationship, not a forecast. ETF proxies are labeled separately from futures benchmarks.',
     });
