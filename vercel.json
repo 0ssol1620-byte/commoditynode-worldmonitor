@@ -41,6 +41,8 @@
     { "source": "/editorial-policy/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/editorial-policy/:path*" },
     { "source": "/corrections/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/corrections/:path*" },
     { "source": "/contact/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/contact/:path*" },
+    { "source": "/search/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/search/:path*" },
+    { "source": "/search-index.json", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/search-index.json" },
     { "source": "/methodology/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/methodology/:path*" },
     { "source": "/sources/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/sources/:path*" },
     { "source": "/about/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/about/:path*" },

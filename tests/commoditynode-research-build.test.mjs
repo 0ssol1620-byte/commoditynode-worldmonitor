@@ -35,6 +35,7 @@ describe('CommodityNode research build', () => {
     assert.match(sitemap, /https:\/\/commoditynode\.com\/methodology\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/commodities\/copper\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/editorial-policy\//);
+    assert.match(sitemap, /https:\/\/commoditynode\.com\/search\//);
     assert.match(sitemap, /commodity-data-needs-two-timestamps/);
     assert.doesNotMatch(sitemap, /glossary|authors|worldmonitor/);
     assert.match(robots, /Sitemap: https:\/\/commoditynode\.com\/sitemap-index\.xml/);
@@ -72,11 +73,17 @@ describe('CommodityNode research build', () => {
       'editorial-policy',
       'corrections',
       'contact',
+      'search',
       'about',
       'privacy',
     ]) {
       assert.ok(existsSync(resolve(researchRoot, page, 'index.html')), `${page} page is missing`);
     }
+    const searchIndex = JSON.parse(read('search-index.json'));
+    assert.equal(searchIndex.version, 1);
+    assert.equal(searchIndex.records.filter((record) => record.type === 'commodity').length, 4);
+    assert.equal(searchIndex.records.filter((record) => record.type === 'research').length, 3);
+    assert.equal(searchIndex.records.some((record) => /fixture/i.test(record.title)), false);
     for (const commodity of ['copper', 'crude-oil', 'gold', 'cocoa']) {
       const html = read(`commodities/${commodity}/index.html`);
       assert.match(html, /Benchmark contract/i);

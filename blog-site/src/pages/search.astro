@@ -1,0 +1,144 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/search/');
+---
+
+<Base
+  title="Search"
+  metaTitle="Search Commodity Research | CommodityNode"
+  description="Search published CommodityNode commodity definitions, research, methodology, sources, and corrections."
+  canonicalUrl={canonicalUrl}
+>
+  <section class="search-page" data-search-root>
+    <header>
+      <p class="section-label">Published records only</p>
+      <h1>Search CommodityNode</h1>
+      <p>
+        Results include reviewed commodity hubs, published research, and public policies.
+        Draft events, fixtures, private records, and rejected graph edges are excluded.
+      </p>
+    </header>
+
+    <form class="site-search" role="search" data-search-form>
+      <label for="site-search-query">Commodity, benchmark, region, source, or topic</label>
+      <div>
+        <input
+          id="site-search-query"
+          name="q"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Try copper, HG=F, chokepoint, or timestamps"
+          data-search-input
+        />
+        <button type="submit">Search</button>
+      </div>
+    </form>
+
+    <div class="search-status" role="status" aria-live="polite" data-search-status>
+      Enter at least two characters.
+    </div>
+    <ol class="search-results" data-search-results></ol>
+    <noscript>
+      <p class="search-noscript">
+        Search needs JavaScript. Browse the <a href="/commodities/">commodity directory</a> or
+        <a href="/">research index</a> instead.
+      </p>
+    </noscript>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const root = document.querySelector('[data-search-root]');
+      const form = root?.querySelector('[data-search-form]');
+      const input = root?.querySelector('[data-search-input]');
+      const status = root?.querySelector('[data-search-status]');
+      const results = root?.querySelector('[data-search-results]');
+      if (!(form instanceof HTMLFormElement)
+        || !(input instanceof HTMLInputElement)
+        || !(status instanceof HTMLElement)
+        || !(results instanceof HTMLOListElement)) return;
+
+      let records = [];
+      const normalize = (value) => String(value || '')
+        .normalize('NFKD')
+        .toLowerCase()
+        .replace(/[^a-z0-9=.^\s-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const searchable = (record) => normalize(
+        [record.title, record.description, ...(record.terms || [])].join(' '),
+      );
+
+      const render = (query, replaceHistory = true) => {
+        const normalized = normalize(query);
+        results.replaceChildren();
+        if (replaceHistory) {
+          const url = new URL(window.location.href);
+          if (query) url.searchParams.set('q', query);
+          else url.searchParams.delete('q');
+          window.history.replaceState(null, '', url);
+        }
+        if (normalized.length < 2) {
+          status.textContent = 'Enter at least two characters.';
+          return;
+        }
+        const terms = normalized.split(' ');
+        const matches = records
+          .map((record) => {
+            const haystack = searchable(record);
+            if (!terms.every((term) => haystack.includes(term))) return null;
+            const title = normalize(record.title);
+            const score = terms.reduce(
+              (total, term) => total + (title === term ? 12 : title.startsWith(term) ? 8 : title.includes(term) ? 4 : 1),
+              0,
+            );
+            return { record, score };
+          })
+          .filter(Boolean)
+          .sort((a, b) => b.score - a.score || a.record.title.localeCompare(b.record.title))
+          .slice(0, 20);
+
+        status.textContent = `${matches.length} published result${matches.length === 1 ? '' : 's'} for “${query}”.`;
+        for (const match of matches) {
+          const item = document.createElement('li');
+          const type = document.createElement('span');
+          type.className = 'search-result-type';
+          type.textContent = match.record.type;
+          const link = document.createElement('a');
+          link.href = match.record.url;
+          link.textContent = match.record.title;
+          const description = document.createElement('p');
+          description.textContent = match.record.description;
+          item.append(type, link, description);
+          results.append(item);
+        }
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        render(input.value);
+      });
+      input.addEventListener('input', () => render(input.value));
+
+      fetch('/search-index.json')
+        .then((response) => {
+          if (!response.ok) throw new Error('Search index unavailable');
+          return response.json();
+        })
+        .then((payload) => {
+          records = Array.isArray(payload.records) ? payload.records : [];
+          const initial = new URL(window.location.href).searchParams.get('q') || '';
+          input.value = initial;
+          if (initial) render(initial, false);
+        })
+        .catch(() => {
+          status.textContent = 'Search is temporarily unavailable. Use the commodity or research index.';
+        });
+    })();
+  </script>
+</Base>
