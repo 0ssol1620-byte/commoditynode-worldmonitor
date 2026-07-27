@@ -33,6 +33,8 @@ describe('CommodityNode route index and advertising policy', () => {
       ['/source/', 'noindex, follow'],
       ['/live/', 'noindex, nofollow'],
       ['/api/health', 'noindex, nofollow'],
+      ['/reports/unverified/', 'noindex, nofollow'],
+      ['/tools/retired/', 'noindex, nofollow'],
       ['/unreviewed-shell/', 'noindex, nofollow'],
     ]);
     for (const [path, robots] of expectations) {

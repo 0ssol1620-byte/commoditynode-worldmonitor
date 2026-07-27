@@ -34,7 +34,7 @@ CNWM-032,2,Companies,Build company/asset exposure pages only for evidence-backed
 CNWM-033,2,Trust pages,"Build Methodology, Sources, Editorial Policy, Corrections, About, Contact and legal pages.",P0,CNWM-023,complete
 CNWM-034,2,Source page,Integrate AGPL source offer into both footer and dedicated source page.,P0,CNWM-005,complete
 CNWM-035,2,Search,Implement static/content search that excludes drafts and private records.,P2,CNWM-024,complete
-CNWM-036,2,Legacy redirects,Implement route dispositions for reports/tools/legacy SaaS routes.,P1,CNWM-010,planned
+CNWM-036,2,Legacy redirects,Implement route dispositions for reports/tools/legacy SaaS routes.,P1,CNWM-010,complete
 CNWM-037,3,Database,"Provision PostgreSQL as durable source of truth for registry, claims, graph and editorial workflow.",P0,CNWM-020,in_progress
 CNWM-038,3,Registry,"Implement DataSourceRegistry with terms, rights, cadence, attribution and owner.",P0,CNWM-035,complete
 CNWM-039,3,Market contract,Implement MarketInstrument/BenchmarkContract schemas.,P0,CNWM-035,complete

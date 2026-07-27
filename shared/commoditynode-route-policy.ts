@@ -12,6 +12,7 @@ export type CommodityNodeRouteType =
   | 'search'
   | 'source_offer'
   | 'live_application'
+  | 'legacy_gone'
   | 'api'
   | 'unknown';
 
@@ -195,6 +196,15 @@ export function resolveCommodityNodeRoutePolicy(
       follow: false,
       adEligible: false,
       reason: 'Interactive application shell; research pages carry the crawlable explanation.',
+    };
+  }
+  if (/^\/(?:reports|intelligence-lab|simulator|stress-test|pricing|enterprise|pro|signals|calendar|disruptions|tags|tools)(?:\/|$)/.test(path)) {
+    return {
+      routeType: 'legacy_gone',
+      indexable: false,
+      follow: false,
+      adEligible: false,
+      reason: 'Retired or unshipped legacy surface with no reviewed equivalent.',
     };
   }
   return {
