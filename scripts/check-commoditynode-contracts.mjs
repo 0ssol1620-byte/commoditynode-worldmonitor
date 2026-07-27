@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -15,6 +16,19 @@ function git(...args) {
   }).trim();
 }
 
+function tryGit(...args) {
+  try {
+    return git(...args);
+  } catch {
+    return null;
+  }
+}
+
+function gitBlobHash(bytes) {
+  const header = Buffer.from(`blob ${bytes.length}\0`);
+  return createHash('sha1').update(header).update(bytes).digest('hex');
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -22,12 +36,15 @@ function assert(condition, message) {
 const buildInfo = JSON.parse(
   readFileSync(resolve(ROOT, 'public/.well-known/commoditynode-build.json'), 'utf8'),
 );
+const repositoryHead = tryGit('rev-parse', 'HEAD');
 const expectedSha = (
   process.env.VERCEL_GIT_COMMIT_SHA
   || process.env.COMMODITYNODE_BUILD_SHA
-  || git('rev-parse', 'HEAD')
+  || repositoryHead
+  || ''
 ).trim();
 
+assert(/^[0-9a-f]{40}$/i.test(expectedSha), 'A verified 40-character build SHA is required.');
 assert(buildInfo.variant === 'commoditynode', 'Build variant must be commoditynode.');
 assert(buildInfo.commitSha === expectedSha, 'Build-info commit does not match the deployed/checked-out SHA.');
 assert(buildInfo.repository === REPOSITORY, 'Build-info repository is not the public fork.');
@@ -35,9 +52,16 @@ assert(buildInfo.sourceUrl === `${REPOSITORY}/tree/${expectedSha}`, 'Source URL 
 assert(buildInfo.sourceArchiveUrl === `${REPOSITORY}/archive/${expectedSha}.zip`, 'Source archive does not match the build SHA.');
 assert(buildInfo.upstream?.baseSha === UPSTREAM_BASE_SHA, 'Frozen upstream base drifted.');
 
-const upstreamLicenseBlob = git('rev-parse', `${UPSTREAM_BASE_SHA}:LICENSE`);
-assert(upstreamLicenseBlob === UPSTREAM_LICENSE_BLOB, 'Recorded upstream LICENSE blob no longer matches the frozen base.');
-execFileSync('git', ['diff', '--quiet', UPSTREAM_BASE_SHA, '--', 'LICENSE'], { cwd: ROOT });
+const licenseBytes = readFileSync(resolve(ROOT, 'LICENSE'));
+assert(
+  gitBlobHash(licenseBytes) === UPSTREAM_LICENSE_BLOB,
+  'LICENSE bytes no longer match the frozen upstream blob.',
+);
+if (repositoryHead) {
+  const upstreamLicenseBlob = git('rev-parse', `${UPSTREAM_BASE_SHA}:LICENSE`);
+  assert(upstreamLicenseBlob === UPSTREAM_LICENSE_BLOB, 'Recorded upstream LICENSE blob no longer matches the frozen base.');
+  execFileSync('git', ['diff', '--quiet', UPSTREAM_BASE_SHA, '--', 'LICENSE'], { cwd: ROOT });
+}
 
 const notice = readFileSync(resolve(ROOT, 'NOTICE.md'), 'utf8');
 const sourceOffer = readFileSync(resolve(ROOT, 'SOURCE-OFFER.md'), 'utf8');
