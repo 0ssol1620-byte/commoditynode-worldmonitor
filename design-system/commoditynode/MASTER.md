@@ -1,227 +1,181 @@
-# Design System Master File
+# CommodityNode Design System
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+This file defines the visual and interaction contract for CommodityNode Research and CommodityNode Live. Page overrides may refine layout, but they cannot replace accessibility, evidence, typography, motion, or provenance rules.
 
----
+## Product character
 
-**Project:** CommodityNode
-**Generated:** 2026-07-27 22:27:17
-**Category:** Analytics Dashboard
-**Design Dials:** Variance 4/10 (Balanced / Modern) | Motion 3/10 (Subtle) | Density 9/10 (Dense / Dashboard)
+CommodityNode is an evidence-linked commodity research product. It should feel calm under pressure, dense without being cramped, and precise without resembling a terminal. Decoration is allowed only when it explains a relationship, location, change, or source.
 
----
+Three operating principles:
 
-## Global Rules
+1. Evidence precedes emphasis.
+2. The primary visual answer is paired with a readable text or table answer.
+3. Motion explains change; it does not manufacture urgency.
 
-### Color Palette
+## Shared source
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#0F172A` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#1E293B` | `--color-secondary` |
-| Accent/CTA | `#22C55E` | `--color-accent` |
-| Background | `#020617` | `--color-background` |
-| Foreground | `#F8FAFC` | `--color-foreground` |
-| Muted | `#1A1E2F` | `--color-muted` |
-| Border | `#334155` | `--color-border` |
-| Destructive | `#EF4444` | `--color-destructive` |
-| Ring | `#0F172A` | `--color-ring` |
+`shared/commoditynode-design-tokens.json` is the source of truth. Run `npm run commoditynode:tokens` to generate the CSS consumed by the Vite live dashboard and the Astro research surface.
 
-**Color Notes:** Dark bg + green positive indicators
+Do not hand-edit:
 
-### Typography
+- `src/styles/commoditynode-tokens.generated.css`
+- `blog-site/src/styles/commoditynode-tokens.generated.css`
 
-- **Heading Font:** Fira Code
-- **Body Font:** Fira Sans
-- **Mood:** dashboard, data, analytics, code, technical, precise
-- **Google Fonts:** [Fira Code + Fira Sans](https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap)
+## Typography
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
-```
+| Role | Typeface | Use |
+| --- | --- | --- |
+| Interface and research | Source Sans 3 | Navigation, headings, paragraphs, labels, tables |
+| Aligned data | IBM Plex Mono | Prices, timestamps, units, identifiers, short codes |
 
-### Spacing Variables
+Source Sans 3 was chosen for readable long-form research, compact labels, and clear tabular numerals. IBM Plex Mono is not general UI chrome. Headings, buttons, menus, empty states, and prose remain in Source Sans 3.
 
-*Density: 9/10 — Dense / Dashboard*
+Type hierarchy:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `2px` / `0.125rem` | Tight gaps |
-| `--space-sm` | `4px` / `0.25rem` | Icon gaps, inline spacing |
-| `--space-md` | `8px` / `0.5rem` | Standard padding |
-| `--space-lg` | `12px` / `0.75rem` | Section padding |
-| `--space-xl` | `16px` / `1rem` | Large gaps |
-| `--space-2xl` | `24px` / `1.5rem` | Section margins |
-| `--space-3xl` | `32px` / `2rem` | Hero padding |
+| Token | Size | Line height | Typical use |
+| --- | --- | --- | --- |
+| Display | `clamp(2.25rem, 5vw, 4.5rem)` | 1.02 | Research landing statement only |
+| Page title | `clamp(1.75rem, 3vw, 2.75rem)` | 1.08 | Commodity Hub, Event Pulse |
+| Section title | `1.375rem` | 1.2 | Major analytical region |
+| Panel title | `0.875rem` | 1.25 | Dashboard panel and drawer title |
+| Body | `1rem` | 1.55 | Research and explanations |
+| Compact body | `0.875rem` | 1.45 | Dense panel rows |
+| Metadata | `0.75rem` | 1.4 | Source, timestamp, unit, coverage |
 
-### Shadow Depths
+Use sentence case. Uppercase is reserved for actual abbreviations and short instrument codes.
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+## Color and state
 
----
+The default live surface is dark. Research supports light and dark modes. Both themes come from the shared token source.
 
-## Component Specs
+- Teal is the product signal, selection, and focus color.
+- Ochre means attention or watch; it is not decoration.
+- Muted red means adverse or unavailable.
+- Blue is reserved for informational or linked-source context.
+- Positive and negative market values must include signs, labels, or shapes. Color is never the only carrier.
 
-### Buttons
+Surfaces are flat. Use solid fills and a hairline border. Do not use glass blur, atmospheric gradients, tinted glow, colored shadows, or translucent cards as the default depth system.
 
-```css
-/* Primary Button */
-.btn-primary {
-  background: #22C55E;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+## Spacing and shape
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
+Use the 4px base scale from the shared token file. Relationships determine spacing:
 
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #0F172A;
-  border: 2px solid #0F172A;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
+- 4–8px inside a compact data group
+- 12–16px between related groups
+- 24–32px between analytical sections
+- 48–64px between research page chapters
 
-### Cards
+Radii are intentionally small:
 
-```css
-.card {
-  background: #020617;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+- Controls: 3px
+- Surfaces: 4px
+- Overlays: 6px
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
+Nested corners use a smaller radius than their parent. A border and its radius belong to the same element.
 
-### Inputs
+## Information architecture
 
-```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 200ms ease;
-}
+### Research
 
-.input:focus {
-  border-color: #0F172A;
-  outline: none;
-  box-shadow: 0 0 0 3px #0F172A20;
-}
-```
+1. Current material event or research question
+2. What changed, with date and source
+3. Affected commodity, geography, physical asset, route, company, and industry
+4. Evidence and invalidation conditions
+5. Related live map or Impact Universe view
+6. Methodology, author, reviewer, corrections, and disclosure
 
-### Modals
+### Live
 
-```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
+1. Commodity impact map
+2. Event Pulse
+3. Benchmark and proxy tape
+4. Physical supply chain
+5. Route and chokepoint risk
+6. Market implications
+7. Saved monitors
 
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-}
-```
+Do not expose upstream account, Pro, community, or unrelated geopolitical product navigation in the CommodityNode variant.
 
----
+## Data visualizations
 
-## Style Guidelines
+Every visualization includes:
 
-**Style:** Modern Dark (Cinema Mobile)
+- A descriptive title that states the analytical question
+- `asOf`, source, coverage, freshness, and unavailable state
+- Visible units and scale
+- Keyboard-accessible selection
+- A table or structured list with equivalent information
+- A non-color indicator for status or category
+- A reduced-motion behavior
 
-**Keywords:** dark mode, cinematic, ambient light, glassmorphism, deep black, indigo, glow, blur, atmospheric, reanimated, haptic, premium, layered, frosted glass, linear gradient
+Impact Universe limits the initial view to a decision-bearing subgraph. Use clustering and progressive expansion above 100 visible nodes. Canvas or WebGL is appropriate above 100 nodes; more than 500 visible nodes requires aggregation before rendering.
 
-**Best For:** Developer tools, pro productivity apps, fintech/trading dashboards, media/streaming platforms, AI tool interfaces, high-end gaming companion apps
+The graph is not a decorative solar system. Commodity, facility, route, company, industry, event, and evidence nodes have distinct shapes and explicit labels. Every edge opens evidence, confidence, validity, and invalidation details.
 
-**Key Effects:** Expo.out Bezier(0.16,1,0.3,1) easing; spring modals (damping:20 stiffness:90); haptic-linked press (Impact Light/Medium); animated ambient light blobs (Reanimated translateX/Y slow oscillation); BlurView glassmorphism headers/nav (intensity 20); scale press 0.97 → 1.0; avoid pure #000000 (OLED smear)
+## Icons
 
-### Page Pattern
+Use a single outline SVG family with a 1.75px stroke. Standard sizes are 16, 20, and 24px. Map symbols may use filled geometric marks when shape encodes a layer.
 
-**Pattern Name:** Real-Time / Operations Landing
-
-- **Conversion Strategy:** For ops/security/iot products. Demo or sandbox link. Trust signals.
-- **CTA Placement:** Primary CTA in nav + After metrics
-- **Section Order:** 1. Hero (product + live preview or status), 2. Key metrics/indicators, 3. How it works, 4. CTA (Start trial / Contact)
-
----
+Do not use emoji for navigation, commodity types, facility types, status, weather, markets, or alerts. Copyright symbols in attribution and user-authored content are not icons.
 
 ## Motion
 
-**Scroll Reveal** (Subtle) — Trigger: scroll (viewport enter) | Duration: 300-400ms | Easing: `power1.out`
+| Interaction | Duration | Easing |
+| --- | --- | --- |
+| Press feedback | 120ms | strong ease-out |
+| Hover or focus color | 120–180ms | ease |
+| Tooltip or popover | 150–180ms | strong ease-out |
+| Drawer or modal | 180–240ms | strong ease-out |
+| Map or graph focus change | 180–240ms | ease-in-out |
 
-```js
-gsap.from(el, { opacity: 0, y: 12, duration: 0.35, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' } });
-```
+Frequent keyboard actions are immediate. Hover never scales or lifts a card. Buttons may use `scale(0.98)` while actively pressed if it does not alter layout. Transition only explicit properties; never use `transition: all`.
 
-**Framework notes:** Requires the ScrollTrigger plugin registered once via gsap.registerPlugin(ScrollTrigger)
+Event ripples are bounded, stop after communicating the event, and do not loop indefinitely. Reduced motion removes positional movement and freezes auto-rotation while preserving concise opacity feedback.
 
-- ✅ Keep the y offset small (8-16px) so it reads as a fade, not a slide
-- ❌ Don't reveal below-the-fold content needed for SEO/crawlers as invisible-by-default without a no-JS fallback
-- ⚡ toggleActions 'play none none reverse' avoids re-triggering on every scroll direction change
+## Interaction
 
----
+- Minimum target: 44×44 CSS pixels
+- Focus: 2px signal outline with 2px offset
+- Hover rules only apply under `(hover: hover) and (pointer: fine)`
+- Loading feedback begins for operations expected to exceed 300ms
+- Buttons become disabled while submitting
+- Escape closes overlays and returns focus to the trigger
+- Deep links preserve the selected commodity, event, map object, graph object, and time range
 
-## Anti-Patterns (Do NOT Use)
+## Responsive behavior
 
-- ❌ Ornate design
-- ❌ No filtering
+Verify at 375, 768, 1024, and 1440px and in phone landscape.
 
-### Additional Forbidden Patterns
+- Mobile defaults to fewer layers and a flat map.
+- Selection details use a bottom sheet with safe-area padding.
+- The graph becomes a ranked path list on narrow screens; users may opt into the visual graph.
+- No horizontal page scrolling.
+- Tables may scroll inside a labelled region and keep the first column or header visible when useful.
 
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
+## Copy
 
----
+Use concrete nouns, dates, units, and consequences. Avoid AI marketing phrases, rhetorical triads, “not just X,” “unlock,” “seamless,” “next-level,” and claims without evidence.
 
-## Pre-Delivery Checklist
+Preferred:
 
-Before delivering any UI code, verify:
+> Copper concentrate exports through the port were interrupted on 27 July. Two primary sources confirm the closure; downstream smelter exposure remains unverified.
 
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+Avoid:
+
+> Unlock next-level intelligence and seamlessly navigate the future of commodities.
+
+## Release checklist
+
+- No emoji used as product or structural icons
+- No upstream product identity outside explicit attribution
+- No duplicate or conflicting canonical, robots, or structured-data directives
+- All interactive targets at least 44×44px
+- Visible keyboard focus and logical focus order
+- Dark and light contrast checked independently
+- Reduced motion and 200% text zoom verified
+- Visualizations have table/list parity
+- Every public data claim exposes source and freshness
+- 375, 768, 1024, and 1440px layouts captured
+- No horizontal page scroll or fixed-header occlusion
+- No glass blur, decorative glow, pill spam, or `transition: all`
+- Core Web Vitals and JavaScript budgets pass before production promotion

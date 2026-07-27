@@ -1,36 +1,42 @@
+@import './commoditynode-tokens.generated.css';
+@import '@fontsource-variable/source-sans-3';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
 /*
  * CommodityNode theme
  * Unlayered by design so it wins over the upstream base cascade without
  * increasing selector specificity across the shared dashboard.
  */
 :root[data-variant='commoditynode'] {
-  --bg: #061015;
-  --bg-secondary: #08141a;
-  --surface: #0b171d;
-  --surface-hover: #102128;
-  --surface-active: #132930;
-  --border: #21404a;
-  --border-strong: #35606b;
-  --border-subtle: #142c34;
-  --text: #e8eef1;
-  --text-secondary: #c4d0d5;
-  --text-dim: #91a5ad;
-  --text-muted: #71868e;
-  --text-faint: #5f737b;
-  --accent: #66ded3;
-  --green: #39d0c3;
-  --green-dim: #1d817a;
-  --yellow: #f3b54a;
-  --red: #e35d6a;
-  --panel-bg: #0b171d;
-  --panel-border: #21404a;
-  --map-bg: #040d12;
-  --map-grid: #102b33;
-  --map-country: #0b2027;
-  --map-stroke: #31626c;
-  --font-body-base: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
-  --dashboard-grid-gap: 8px;
+  --bg: var(--cn-color-canvas);
+  --bg-secondary: var(--cn-color-canvas-alt);
+  --surface: var(--cn-color-surface);
+  --surface-hover: var(--cn-color-surface-raised);
+  --surface-active: var(--cn-color-surface-selected);
+  --border: var(--cn-color-border);
+  --border-strong: var(--cn-color-border-strong);
+  --border-subtle: var(--cn-color-border-subtle);
+  --text: var(--cn-color-text);
+  --text-secondary: var(--cn-color-text-secondary);
+  --text-dim: var(--cn-color-text-muted);
+  --text-muted: var(--cn-color-text-faint);
+  --text-faint: var(--cn-color-text-faint);
+  --accent: var(--cn-color-signal-strong);
+  --green: var(--cn-color-signal);
+  --green-dim: var(--cn-color-signal-muted);
+  --yellow: var(--cn-color-attention);
+  --red: var(--cn-color-danger);
+  --panel-bg: var(--cn-color-surface);
+  --panel-border: var(--cn-color-border);
+  --map-bg: var(--cn-color-map-canvas);
+  --map-grid: var(--cn-color-border-subtle);
+  --map-country: var(--cn-color-map-land);
+  --map-stroke: var(--cn-color-map-stroke);
+  --font-body-base: var(--cn-font-ui);
+  --font-body: var(--cn-font-ui);
+  --font-mono: var(--cn-font-data);
+  --dashboard-grid-gap: var(--cn-space-2);
 }
 
 [data-variant='commoditynode'] body {
@@ -42,8 +48,8 @@
   min-height: 48px;
   height: auto;
   padding-inline: 14px;
-  background: #071319;
-  border-bottom-color: #2b505b;
+  background: var(--cn-color-canvas-alt);
+  border-bottom-color: var(--cn-color-border);
 }
 
 [data-variant='commoditynode'] .logo {
@@ -61,16 +67,18 @@
 [data-variant='commoditynode'] .variant-switcher {
   min-height: 30px;
   padding: 0 3px;
-  border-color: #294c56;
+  border-color: var(--cn-color-border);
   background: transparent;
-  border-radius: 3px;
+  border-radius: var(--cn-radius-control);
 }
 
 [data-variant='commoditynode'] .variant-option {
   min-height: 24px;
   padding-inline: 8px;
-  border-radius: 2px;
-  transition: color 140ms ease, background-color 140ms ease;
+  border-radius: var(--cn-radius-control);
+  transition:
+    color var(--cn-motion-fast) var(--cn-motion-ease-out),
+    background-color var(--cn-motion-fast) var(--cn-motion-ease-out);
 }
 
 [data-variant='commoditynode'] .variant-option .variant-label,
@@ -80,12 +88,12 @@
 }
 
 [data-variant='commoditynode'] .variant-option.active {
-  color: #a1f2ea;
-  background: #103034;
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
 }
 
 [data-variant='commoditynode'] .status-dot {
-  background: #39d0c3;
+  background: var(--cn-color-signal);
   box-shadow: none;
 }
 
@@ -97,18 +105,18 @@
 }
 
 [data-variant='commoditynode'] .panel {
-  border-radius: 3px;
+  border-radius: var(--cn-radius-surface);
 }
 
 [data-variant='commoditynode'] .panel-header {
   min-height: 36px;
   padding-inline: 12px;
-  background: #0d1b21;
-  border-bottom-color: #1d3942;
+  background: var(--cn-color-canvas-alt);
+  border-bottom-color: var(--cn-color-border-subtle);
 }
 
 [data-variant='commoditynode'] .panel-title {
-  color: #dce8ec;
+  color: var(--cn-color-text);
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 720;
@@ -126,18 +134,18 @@
 [data-variant='commoditynode'] a:focus-visible,
 [data-variant='commoditynode'] select:focus-visible,
 [data-variant='commoditynode'] input:focus-visible {
-  outline: 2px solid #66ded3;
+  outline: 2px solid var(--cn-color-signal-strong);
   outline-offset: 2px;
 }
 
 [data-variant='commoditynode'] .site-footer {
   gap: 20px;
-  background: #071319;
-  border-top-color: #2b505b;
+  background: var(--cn-color-canvas-alt);
+  border-top-color: var(--cn-color-border);
 }
 
 [data-variant='commoditynode'] .site-footer-icon {
-  border-radius: 6px;
+  border-radius: var(--cn-radius-overlay);
 }
 
 [data-variant='commoditynode'] .site-footer-sub {
@@ -147,11 +155,18 @@
 }
 
 [data-variant='commoditynode'] .site-footer a {
-  color: #a9bcc3;
+  color: var(--cn-color-text-muted);
 }
 
-[data-variant='commoditynode'] .site-footer a:hover {
-  color: #66ded3;
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .site-footer a:hover {
+    color: var(--cn-color-signal-strong);
+  }
+}
+
+[data-variant='commoditynode'] button:active,
+[data-variant='commoditynode'] a:active {
+  transform: translateY(1px);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -68,9 +68,48 @@ if (repositoryHead) {
 const notice = readFileSync(resolve(ROOT, 'NOTICE.md'), 'utf8');
 const sourceOffer = readFileSync(resolve(ROOT, 'SOURCE-OFFER.md'), 'utf8');
 const sourcePage = readFileSync(resolve(ROOT, 'public/source/index.html'), 'utf8');
+const designTokens = readFileSync(
+  resolve(ROOT, 'shared/commoditynode-design-tokens.json'),
+  'utf8',
+);
+const spaTokens = readFileSync(
+  resolve(ROOT, 'src/styles/commoditynode-tokens.generated.css'),
+  'utf8',
+);
+const researchTokens = readFileSync(
+  resolve(ROOT, 'blog-site/src/styles/commoditynode-tokens.generated.css'),
+  'utf8',
+);
+const sharedBrand = readFileSync(resolve(ROOT, 'shared/commoditynode-brand.json'), 'utf8');
+const scriptBrand = readFileSync(
+  resolve(ROOT, 'scripts/shared/commoditynode-brand.json'),
+  'utf8',
+);
 assert(notice.includes(UPSTREAM_BASE_SHA), 'NOTICE.md must record the frozen upstream SHA.');
 assert(sourceOffer.includes('/.well-known/commoditynode-build.json'), 'SOURCE-OFFER.md must expose build provenance.');
 assert(sourcePage.includes('/.well-known/commoditynode-build.json'), 'The public source page must resolve deployed build provenance.');
 assert(sourcePage.includes('Source Code'), 'The public source page must prominently identify source access.');
+assert(spaTokens === researchTokens, 'SPA and research-site generated design tokens drifted.');
+assert(
+  spaTokens.includes('Generated from shared/commoditynode-design-tokens.json'),
+  'Generated CSS must identify its canonical token source.',
+);
+assert(
+  spaTokens.includes('--cn-font-ui: "Source Sans 3 Variable"'),
+  'Generated CSS must include the approved UI typeface.',
+);
+assert(
+  spaTokens.includes('--cn-color-signal-muted:'),
+  'Generated CSS must include the subdued signal tier.',
+);
+assert(
+  !spaTokens.includes('transition: all') && !spaTokens.includes('backdrop-filter'),
+  'Generated tokens must remain free of catch-all motion and glass effects.',
+);
+assert(sharedBrand === scriptBrand, 'CommodityNode brand mirrors drifted.');
+assert(
+  designTokens.includes('"product": "CommodityNode"'),
+  'Design-token source must identify the CommodityNode product.',
+);
 
-console.log('[commoditynode] license, attribution, variant, and deployed-source contracts pass');
+console.log('[commoditynode] license, attribution, design-token, variant, and deployed-source contracts pass');

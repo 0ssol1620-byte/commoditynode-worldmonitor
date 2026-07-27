@@ -1,0 +1,80 @@
+/*
+ * Generated from shared/commoditynode-design-tokens.json.
+ * Run: npm run commoditynode:tokens
+ */
+:root {
+  --cn-font-ui: "Source Sans 3 Variable", "Source Sans 3", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --cn-font-data: "IBM Plex Mono", "SFMono-Regular", Consolas, ui-monospace, monospace;
+  --cn-font-weight-regular: 400;
+  --cn-font-weight-medium: 520;
+  --cn-font-weight-semibold: 640;
+  --cn-font-weight-bold: 720;
+  --cn-space-1: 4px;
+  --cn-space-2: 8px;
+  --cn-space-3: 12px;
+  --cn-space-4: 16px;
+  --cn-space-6: 24px;
+  --cn-space-8: 32px;
+  --cn-space-12: 48px;
+  --cn-space-16: 64px;
+  --cn-radius-control: 3px;
+  --cn-radius-surface: 4px;
+  --cn-radius-overlay: 6px;
+  --cn-motion-fast: 120ms;
+  --cn-motion-standard: 180ms;
+  --cn-motion-overlay: 240ms;
+  --cn-motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --cn-motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --cn-z-base: 0;
+  --cn-z-sticky: 20;
+  --cn-z-drawer: 40;
+  --cn-z-popover: 60;
+  --cn-z-modal: 80;
+  --cn-z-toast: 100;
+  --cn-color-canvas: #071116;
+  --cn-color-canvas-alt: #09151a;
+  --cn-color-surface: #0d1a20;
+  --cn-color-surface-raised: #12232a;
+  --cn-color-surface-selected: #163037;
+  --cn-color-border-subtle: #173038;
+  --cn-color-border: #27454e;
+  --cn-color-border-strong: #3a626b;
+  --cn-color-text: #edf3f4;
+  --cn-color-text-secondary: #c7d4d8;
+  --cn-color-text-muted: #93a8ae;
+  --cn-color-text-faint: #71878e;
+  --cn-color-signal: #55c9bf;
+  --cn-color-signal-muted: #246b66;
+  --cn-color-signal-strong: #83e1d9;
+  --cn-color-attention: #d5aa5b;
+  --cn-color-danger: #dc6f7a;
+  --cn-color-info: #7fa8c7;
+  --cn-color-map-canvas: #050d11;
+  --cn-color-map-land: #102329;
+  --cn-color-map-stroke: #3b6872;
+}
+
+:root[data-theme='light'],
+:root[data-cn-theme='light'] {
+  --cn-color-canvas: #f3f6f5;
+  --cn-color-canvas-alt: #eaf0ef;
+  --cn-color-surface: #ffffff;
+  --cn-color-surface-raised: #f8faf9;
+  --cn-color-surface-selected: #e2f1ef;
+  --cn-color-border-subtle: #dce5e4;
+  --cn-color-border: #c4d2d2;
+  --cn-color-border-strong: #8fa7aa;
+  --cn-color-text: #132126;
+  --cn-color-text-secondary: #34484f;
+  --cn-color-text-muted: #566d74;
+  --cn-color-text-faint: #6f8288;
+  --cn-color-signal: #167c74;
+  --cn-color-signal-muted: #b8dcd8;
+  --cn-color-signal-strong: #0d625c;
+  --cn-color-attention: #8a641d;
+  --cn-color-danger: #a63f4d;
+  --cn-color-info: #356c93;
+  --cn-color-map-canvas: #dfe9e8;
+  --cn-color-map-land: #c9d9d7;
+  --cn-color-map-stroke: #6b8d91;
+}

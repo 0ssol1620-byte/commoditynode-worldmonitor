@@ -293,6 +293,18 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
       }
 
       if (activeVariant === 'commoditynode') {
+        const commodityNodeNoScript = `<noscript>
+      <main id="dashboard-noscript" class="dashboard-noscript">
+        <h2>CommodityNode Live requires JavaScript</h2>
+        <p>The interactive commodity map and live evidence panels run in the browser. The research site and corresponding AGPL source remain available without the application.</p>
+        <nav aria-label="CommodityNode references">
+          <ul>
+            <li><a href="https://commoditynode.com/">CommodityNode Research</a></li>
+            <li><a href="/source/">Corresponding source and build provenance</a></li>
+          </ul>
+        </nav>
+      </main>
+    </noscript>`;
         const commodityNodeJsonLd = {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
@@ -323,12 +335,29 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
           .replace(/<link rel="icon"[^>]*>/g, '<link rel="icon" type="image/svg+xml" href="/commoditynode-mark.svg" />')
           .replace(/<link rel="apple-touch-icon"[^>]*>/g, '<link rel="apple-touch-icon" href="/commoditynode-mark.svg" />')
           .replace(/(<h1 class="app-heading">)[^<]*(<\/h1>)/, `$1${activeMeta.title}$2`)
-          .replace('</head>', '    <meta name="robots" content="noindex, follow, max-image-preview:large" />\n  </head>')
+          .replace(/<meta name="robots" content="[^"]*" \/>/, '<meta name="robots" content="noindex, follow, max-image-preview:large" />')
           .replace(/<meta property="og:image:alt" content="[^"]*" \/>/, '<meta property="og:image:alt" content="CommodityNode live commodity impact map and market intelligence dashboard" />')
-          .replace(/World Monitor’s interactive map, panels, alerts, and live analysis run in the browser\./, 'CommodityNode’s interactive map, panels, alerts, and live analysis run in the browser.')
-          .replace(/>World Monitor homepage</, '>CommodityNode research homepage<')
-          .replace(/aria-label="World Monitor references"/, 'aria-label="CommodityNode references"')
+          .replace(/<noscript>\s*<main id="dashboard-noscript"[\s\S]*?<\/main>\s*<\/noscript>/, commodityNodeNoScript)
           .replace(/(<div class="skeleton-brand"><span class="skeleton-brand-mark" aria-hidden="true"><\/span><span>)World Monitor(<\/span><\/div>)/, '$1CommodityNode$2')
+          .replace(/aria-label="World Monitor dashboard loading"/, 'aria-label="CommodityNode commodity intelligence loading"')
+          .replace('Dashboard shell loading', 'Loading current data')
+          .replace('<span class="skeleton-chip">Global</span>', '<span class="skeleton-chip">Global commodities</span>')
+          .replace('<span class="skeleton-chip live">Live</span>', '<span class="skeleton-chip live">Current</span>')
+          .replace('<span class="skeleton-section-label">Dashboard</span>', '<span class="skeleton-section-label">Commodity impact map</span>')
+          .replace('Preparing map and panels', 'Loading sources and market context')
+          .replace('Preparing dashboard', 'Current market context')
+          .replace('Dashboard is loading', 'Commodity intelligence is loading')
+          .replace('Map layers, panels, alerts, and analysis will appear here as soon as the app finishes loading.', 'Benchmarks, physical assets, routes, material events, and evidence panels will appear when the current data contracts are ready.')
+          .replace('<span class="skeleton-chip">Map</span>', '<span class="skeleton-chip">Benchmarks</span>')
+          .replace('<span class="skeleton-chip">Panels</span>', '<span class="skeleton-chip">Physical assets</span>')
+          .replace('<span class="skeleton-chip">Alerts</span>', '<span class="skeleton-chip">Routes</span>')
+          .replace('<span class="skeleton-chip">Analysis</span>', '<span class="skeleton-chip">Events</span>')
+          .replace('<h3 class="skeleton-panel-title">Primary View</h3>', '<h3 class="skeleton-panel-title">Event Pulse</h3>')
+          .replace('<h3 class="skeleton-panel-title">Map Layers</h3>', '<h3 class="skeleton-panel-title">Benchmark Tape</h3>')
+          .replace('<h3 class="skeleton-panel-title">Signal Panels</h3>', '<h3 class="skeleton-panel-title">Supply Chain</h3>')
+          .replace('<h3 class="skeleton-panel-title">Context</h3>', '<h3 class="skeleton-panel-title">Route Risk</h3>')
+          .replace('<h3 class="skeleton-panel-title">Analysis</h3>', '<h3 class="skeleton-panel-title">Market Implications</h3>')
+          .replace('<h3 class="skeleton-panel-title">Updates</h3>', '<h3 class="skeleton-panel-title">Monitors</h3>')
           .replace(/\.skeleton-brand-mark::after\{content:"W"\}/, '.skeleton-brand-mark::after{content:"C"}')
           .replace(/if\(window\.self===window\.top&&!dismissed\)document\.documentElement\.classList\.add\('wm-pro-banner-reserved'\);/, '');
       }
