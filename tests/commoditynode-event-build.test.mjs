@@ -22,6 +22,11 @@ describe('CommodityNode Event Pulse build', () => {
     assert.match(detail, /Supreme Court declares Law 406 unconstitutional/);
     assert.match(detail, /Observed supply interruption; price effect not isolated/);
     assert.match(detail, /cne_b697d84d/);
+    assert.match(detail, /cobre-panama-supply-path-1200\.avif/);
+    assert.match(detail, /cobre-panama-supply-path-1200\.webp/);
+    assert.match(detail, /cobre-panama-supply-path-1200\.jpg/);
+    assert.match(detail, /Illustrative visualization generated for CommodityNode/);
+    assert.match(detail, /"primaryImageOfPage":\{"@type":"ImageObject"/);
     assert.match(detail, /<meta name="robots" content="index, follow/);
     assert.match(detail, /"@type":"NewsArticle"/);
     assert.match(detail, /"citation":\[/);
@@ -29,13 +34,19 @@ describe('CommodityNode Event Pulse build', () => {
   });
 
   it('never emits a route for reviewed fixture content', async () => {
-    const [sitemap, llms, rss] = await Promise.all([
+    const [sitemap, imageSitemap, robots, llms, rss] = await Promise.all([
       readDist('sitemap-0.xml'),
+      readDist('image-sitemap.xml'),
+      readDist('robots.txt'),
       readDist('llms.txt'),
       readDist('rss.xml'),
     ]);
     assert.match(sitemap, /events\/cobre-panama-production-halt\//);
     assert.doesNotMatch(sitemap, /example-copper-disruption/);
+    assert.match(imageSitemap, /cobre-panama-supply-path-1200\.jpg/);
+    assert.match(imageSitemap, /Illustrative oblique view of an open-pit copper mine/);
+    assert.doesNotMatch(imageSitemap, /example-copper-disruption/);
+    assert.match(robots, /Sitemap: https:\/\/commoditynode\.com\/image-sitemap\.xml/);
     assert.match(llms, /## Event Pulses/);
     assert.match(llms, /events\/cobre-panama-production-halt\//);
     assert.match(rss, /events\/cobre-panama-production-halt\//);

@@ -48,6 +48,7 @@ describe('CommodityNode Vercel routing', () => {
       '/robots.txt',
       '/sitemap-index.xml',
       '/sitemap-0.xml',
+      '/image-sitemap.xml',
       '/_astro/:path*',
       '/images/:path*',
       '/og/:path*',

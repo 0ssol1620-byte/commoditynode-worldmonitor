@@ -181,6 +181,11 @@
   ],
   "author": "CommodityNode Editorial",
   "authorUrl": "https://commoditynode.com/authors/commoditynode-editorial/",
+  "visual": {
+    "assetId": "visual-cobre-panama-supply-path-v1",
+    "alt": "Illustrative oblique view of an open-pit copper mine, processing plant, concentrate corridor, coastal port, and cargo vessel connected by restrained path lines.",
+    "disclosure": "Illustrative visualization generated for CommodityNode. It is not a photograph of Cobre Panama, Punta Rincón port, or the 2023 event."
+  },
   "reviewedBy": "CommodityNode Editorial",
   "reviewedAt": "2026-07-28"
 }

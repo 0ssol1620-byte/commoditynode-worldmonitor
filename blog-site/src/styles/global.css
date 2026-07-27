@@ -1528,6 +1528,64 @@ button:focus-visible {
   font-family: var(--site-font-data);
 }
 
+.event-visual {
+  position: relative;
+  margin: 0 0 48px;
+  overflow: hidden;
+  border: 1px solid var(--site-border);
+  background-color: var(--site-canvas-alt);
+  background-image: var(--event-visual-placeholder);
+  background-position: center;
+  background-size: cover;
+}
+
+.event-visual picture,
+.event-visual img {
+  display: block;
+  width: 100%;
+}
+
+.event-visual img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.event-visual-overlay {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: grid;
+  padding: 10px 12px;
+  gap: 3px;
+  border: 1px solid var(--site-border-strong);
+  background: color-mix(in srgb, var(--site-canvas) 88%, transparent);
+}
+
+.event-visual-overlay span {
+  color: var(--site-signal-strong);
+  font-family: var(--site-font-data);
+  font-size: .625rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.event-visual-overlay strong {
+  color: var(--site-text);
+  font-size: .8125rem;
+}
+
+.event-visual figcaption {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  max-width: 520px;
+  padding: 9px 11px;
+  border: 1px solid var(--site-border-strong);
+  background: color-mix(in srgb, var(--site-canvas) 88%, transparent);
+  color: var(--site-text-secondary);
+  font-size: .75rem;
+}
+
 .event-signal-board {
   padding: 34px;
   border: 1px solid var(--site-border);
@@ -2102,6 +2160,21 @@ button:focus-visible {
 
   .event-detail-dates {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .event-visual-overlay {
+    top: 10px;
+    left: 10px;
+    padding: 8px 9px;
+  }
+
+  .event-visual figcaption {
+    position: static;
+    max-width: none;
+    padding: 12px;
+    border: 0;
+    border-top: 1px solid var(--site-border);
+    background: var(--site-canvas-alt);
   }
 
   .event-signal-board {

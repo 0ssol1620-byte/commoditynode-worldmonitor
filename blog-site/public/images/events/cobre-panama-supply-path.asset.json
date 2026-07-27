@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "assetId": "visual-cobre-panama-supply-path-v1",
+  "eventId": "cobre-panama-production-halt",
+  "source": {
+    "path": "/assets/commoditynode/media-source/cobre-panama-supply-path.png",
+    "filename": "cobre-panama-supply-path.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "fbc09894034e3cad64a8e8c8aae63c6291bd731c264f7ba8e2bb1b71ad7b5263"
+  },
+  "generation": {
+    "provider": "OpenAI",
+    "model": "openai-built-in-image-generation",
+    "modelVersion": null,
+    "modelDisclosure": "The built-in generation tool did not expose a model version.",
+    "generatedAt": "2026-07-28",
+    "briefPath": "/shared/commoditynode-visual-briefs/cobre-panama-supply-path.json",
+    "briefSha256": "d28171b6a47a54df1142abff6d71ce6750d046681fd83fbb6c064f961f4e3458",
+    "referenceAssets": []
+  },
+  "rights": {
+    "status": "generated_output_project_use",
+    "publicDisplay": true,
+    "referenceInputRights": "not_applicable_no_reference_images",
+    "note": "Generated for CommodityNode without external reference images; use remains subject to applicable OpenAI terms."
+  },
+  "review": {
+    "reviewer": "CommodityNode Editorial",
+    "reviewedAt": "2026-07-28",
+    "textFree": true,
+    "noReadableLogos": true,
+    "noActualSceneClaim": true,
+    "disclosure": "Illustrative visualization generated for CommodityNode. It is not a photograph of Cobre Panama, Punta Rincón port, or the 2023 event."
+  },
+  "variants": [
+    {
+      "format": "avif",
+      "width": 640,
+      "height": 360,
+      "bytes": 28914,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-640.avif",
+      "publicUrl": "/images/events/cobre-panama-supply-path-640.avif"
+    },
+    {
+      "format": "webp",
+      "width": 640,
+      "height": 360,
+      "bytes": 37458,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-640.webp",
+      "publicUrl": "/images/events/cobre-panama-supply-path-640.webp"
+    },
+    {
+      "format": "jpeg",
+      "width": 640,
+      "height": 360,
+      "bytes": 42741,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-640.jpg",
+      "publicUrl": "/images/events/cobre-panama-supply-path-640.jpg"
+    },
+    {
+      "format": "avif",
+      "width": 1200,
+      "height": 675,
+      "bytes": 99274,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-1200.avif",
+      "publicUrl": "/images/events/cobre-panama-supply-path-1200.avif"
+    },
+    {
+      "format": "webp",
+      "width": 1200,
+      "height": 675,
+      "bytes": 136548,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-1200.webp",
+      "publicUrl": "/images/events/cobre-panama-supply-path-1200.webp"
+    },
+    {
+      "format": "jpeg",
+      "width": 1200,
+      "height": 675,
+      "bytes": 161644,
+      "path": "/blog-site/public/images/events/cobre-panama-supply-path-1200.jpg",
+      "publicUrl": "/images/events/cobre-panama-supply-path-1200.jpg"
+    }
+  ],
+  "blurPlaceholder": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQBACdASogABIAPwl4sVErp6SisBgIAXAhCWcAxNgPqHdqYeYxn3vMAAD+eIKYf2hhXQ86lDMvA/ongAUPgToUNuNIVdof8htz83BUEfSP2yd6Xhdn6xMjkmAAAA=="
+}

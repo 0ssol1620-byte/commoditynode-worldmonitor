@@ -145,6 +145,11 @@ const events = defineCollection({
     unknowns: z.array(z.string()).min(1),
     author: z.string(),
     authorUrl: z.string().url(),
+    visual: z.object({
+      assetId: z.string(),
+      alt: z.string().min(60),
+      disclosure: z.string().min(40),
+    }).optional(),
     reviewedBy: z.string().optional(),
     reviewedAt: z.coerce.date().optional(),
   }),

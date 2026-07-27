@@ -65,12 +65,12 @@ CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity
 CNWM-064,5,Corroboration,Require source diversity and primary evidence for high-materiality events.,P0,CNWM-061,complete
 CNWM-065,5,Editorial queue,"Build private review UI for event facts, claims, entities and graph candidates.",P0,"CNWM-061,CNWM-042",planned
 CNWM-066,5,Event publication,Publish approved Event Pulse records to Astro content/data build.,P1,CNWM-063,complete
-CNWM-067,5,Visual brief,Generate structured AI editorial visual brief from approved event facts.,P1,CNWM-063,planned
-CNWM-068,5,Reference rights,"Allow input/reference images only when owned, licensed or public-domain and registered.",P0,CNWM-066,planned
-CNWM-069,5,Image generation,Generate text-free editorial visuals and variants.,P2,CNWM-067,planned
-CNWM-070,5,UI overlay,"Render facts, dates, labels, logos and values as HTML/SVG over imagery.",P1,CNWM-068,planned
-CNWM-071,5,Image optimization,"Create AVIF/WebP/JPEG fallbacks, srcset, dimensions and blur placeholders.",P1,CNWM-068,planned
-CNWM-072,5,Media audit,"Store generation model, brief hash, references, rights, reviewer and disclosure.",P1,CNWM-068,planned
+CNWM-067,5,Visual brief,Generate structured AI editorial visual brief from approved event facts.,P1,CNWM-063,complete
+CNWM-068,5,Reference rights,"Allow input/reference images only when owned, licensed or public-domain and registered.",P0,CNWM-066,complete
+CNWM-069,5,Image generation,Generate text-free editorial visuals and variants.,P2,CNWM-067,complete
+CNWM-070,5,UI overlay,"Render facts, dates, labels, logos and values as HTML/SVG over imagery.",P1,CNWM-068,complete
+CNWM-071,5,Image optimization,"Create AVIF/WebP/JPEG fallbacks, srcset, dimensions and blur placeholders.",P1,CNWM-068,complete
+CNWM-072,5,Media audit,"Store generation model, brief hash, references, rights, reviewer and disclosure.",P1,CNWM-068,complete
 CNWM-073,6,Ontology schema,"Implement Entity, Edge, Evidence, Event and GraphSnapshot schemas.",P0,"CNWM-035,CNWM-042",complete
 CNWM-074,6,Entity resolution,"Resolve company, mine, plant, port, commodity and country aliases.",P1,CNWM-071,planned
 CNWM-075,6,Edge workflow,Create candidate → reviewed → published → superseded/rejected lifecycle.,P0,CNWM-071,complete
@@ -96,7 +96,7 @@ CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API 
 CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,complete
 CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,complete
 CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,planned
-CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,planned
+CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,complete
 CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,complete
 CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete
 CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,planned

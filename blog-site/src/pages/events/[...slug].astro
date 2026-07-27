@@ -6,6 +6,10 @@ import {
   isPublishedCommodityEvent,
 } from '../../lib/published-events';
 import {
+  commodityEventMediaSrcset,
+  getCommodityEventMedia,
+} from '../../lib/event-media';
+import {
   commodityNodeRobotsContent,
   resolveCommodityNodeRoutePolicy,
 } from '../../../../shared/commoditynode-route-policy';
@@ -39,6 +43,26 @@ const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
   day: 'numeric',
 });
 const claimLabel = (type: string) => type.replaceAll('_', ' ');
+const eventMedia = event.data.visual ? getCommodityEventMedia(event.id) : undefined;
+if (
+  event.data.visual
+  && (
+    !eventMedia
+    || eventMedia.assetId !== event.data.visual.assetId
+    || eventMedia.review.disclosure !== event.data.visual.disclosure
+  )
+) {
+  throw new Error(`Event visual registry mismatch for ${event.id}.`);
+}
+const eventJpeg = eventMedia?.variants.find(
+  (variant) => variant.format === 'jpeg' && variant.width === 1200,
+);
+if (eventMedia && !eventJpeg) {
+  throw new Error(`Event visual JPEG fallback missing for ${event.id}.`);
+}
+const eventOgImage = eventJpeg
+  ? `https://commoditynode.com${eventJpeg.publicUrl}`
+  : undefined;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -47,6 +71,18 @@ const jsonLd = {
   headline: event.data.title,
   description: event.data.summary,
   url: eventUrl,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': eventUrl,
+    ...(eventOgImage
+      ? {
+          primaryImageOfPage: {
+            '@type': 'ImageObject',
+            url: eventOgImage,
+          },
+        }
+      : {}),
+  },
   datePublished: publishedAt.toISOString(),
   dateModified: event.data.updatedAt.toISOString(),
   dateline: event.data.location.label,
@@ -78,6 +114,17 @@ const jsonLd = {
     },
   },
   citation: event.data.evidence.map((item) => item.url),
+  ...(eventOgImage && event.data.visual
+    ? {
+        image: {
+          '@type': 'ImageObject',
+          url: eventOgImage,
+          width: 1200,
+          height: 675,
+          caption: event.data.visual.disclosure,
+        },
+      }
+    : {}),
 };
 
 const breadcrumbLd = {
@@ -116,6 +163,8 @@ const breadcrumbLd = {
   modifiedTime={event.data.updatedAt.toISOString()}
   author={event.data.author}
   section="Commodity Event Pulse"
+  ogImage={eventOgImage}
+  ogImageAlt={event.data.visual?.alt}
   jsonLd={jsonLd}
   breadcrumbLd={breadcrumbLd}
   robots={robots}
@@ -144,6 +193,41 @@ const breadcrumbLd = {
         <div><dt>Fingerprint</dt><dd><code>{event.data.fingerprint}</code></dd></div>
       </dl>
     </header>
+
+    {eventMedia && eventJpeg && event.data.visual && (
+      <figure
+        class="event-visual"
+        style={`--event-visual-placeholder: url("${eventMedia.blurPlaceholder}")`}
+      >
+        <picture>
+          <source
+            type="image/avif"
+            srcset={commodityEventMediaSrcset(eventMedia, 'avif')}
+            sizes="(max-width: 520px) calc(100vw - 28px), min(1120px, calc(100vw - 40px))"
+          />
+          <source
+            type="image/webp"
+            srcset={commodityEventMediaSrcset(eventMedia, 'webp')}
+            sizes="(max-width: 520px) calc(100vw - 28px), min(1120px, calc(100vw - 40px))"
+          />
+          <img
+            src={eventJpeg?.publicUrl}
+            srcset={commodityEventMediaSrcset(eventMedia, 'jpeg')}
+            sizes="(max-width: 520px) calc(100vw - 28px), min(1120px, calc(100vw - 40px))"
+            width="1200"
+            height="675"
+            alt={event.data.visual.alt}
+            loading="eager"
+            fetchpriority="high"
+          />
+        </picture>
+        <div class="event-visual-overlay" aria-hidden="true">
+          <span>Illustrative visualization</span>
+          <strong>Mine → processing → port</strong>
+        </div>
+        <figcaption>{event.data.visual.disclosure}</figcaption>
+      </figure>
+    )}
 
     <section class="event-signal-board" aria-labelledby="event-signal-title">
       <header>

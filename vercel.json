@@ -54,6 +54,7 @@
     { "source": "/robots.txt", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/robots.txt" },
     { "source": "/sitemap-index.xml", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/sitemap-index.xml" },
     { "source": "/sitemap-0.xml", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/sitemap-0.xml" },
+    { "source": "/image-sitemap.xml", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/image-sitemap.xml" },
     { "source": "/_astro/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/_astro/:path*" },
     { "source": "/images/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/images/:path*" },
     { "source": "/og/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/og/:path*" },
