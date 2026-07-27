@@ -30,7 +30,7 @@ CNWM-028,2,Directory,Build commodity directory with benchmark/proxy semantics an
 CNWM-029,2,Commodity hub,Build reusable Commodity Hub template.,P0,CNWM-024,complete
 CNWM-030,2,Event Pulse,Build Event Pulse index and detail templates.,P1,CNWM-024,complete
 CNWM-031,2,Research,"Build Research index/detail, author and reviewer components.",P1,CNWM-024,complete
-CNWM-032,2,Companies,Build company/asset exposure pages only for evidence-backed records.,P1,CNWM-024,planned
+CNWM-032,2,Companies,Build company/asset exposure pages only for evidence-backed records.,P1,CNWM-024,complete
 CNWM-033,2,Trust pages,"Build Methodology, Sources, Editorial Policy, Corrections, About, Contact and legal pages.",P0,CNWM-023,complete
 CNWM-034,2,Source page,Integrate AGPL source offer into both footer and dedicated source page.,P0,CNWM-005,complete
 CNWM-035,2,Search,Implement static/content search that excludes drafts and private records.,P2,CNWM-024,complete

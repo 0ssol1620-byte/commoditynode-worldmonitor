@@ -34,6 +34,7 @@ describe('CommodityNode research build', () => {
     const llms = read('llms.txt');
     assert.match(sitemap, /https:\/\/commoditynode\.com\/methodology\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/commodities\/copper\//);
+    assert.match(sitemap, /https:\/\/commoditynode\.com\/companies\/first-quantum-minerals\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/editorial-policy\//);
     assert.match(sitemap, /https:\/\/commoditynode\.com\/authors\/commoditynode-editorial\//);
     assert.match(sitemap, /commodity-data-needs-two-timestamps/);
@@ -84,6 +85,12 @@ describe('CommodityNode research build', () => {
     assert.equal(searchIndex.version, 1);
     assert.equal(searchIndex.records.filter((record) => record.type === 'commodity').length, 4);
     assert.equal(searchIndex.records.filter((record) => record.type === 'research').length, 3);
+    assert.deepEqual(
+      searchIndex.records
+        .filter((record) => record.type === 'company')
+        .map((record) => record.id),
+      ['company:first-quantum-minerals'],
+    );
     assert.equal(searchIndex.records.some((record) => /fixture/i.test(record.title)), false);
     for (const commodity of ['copper', 'crude-oil', 'gold', 'cocoa']) {
       const html = read(`commodities/${commodity}/index.html`);
@@ -91,6 +98,13 @@ describe('CommodityNode research build', () => {
       assert.match(html, /Source register/i);
       assert.match(html, /"@type":"Dataset"/);
     }
+    const companyHtml = read('companies/first-quantum-minerals/index.html');
+    assert.match(companyHtml, /Documented exposure mechanisms/);
+    assert.match(companyHtml, /What this record does not establish/);
+    assert.match(companyHtml, /Punta Rincón port/);
+    assert.match(companyHtml, /"@type":"Organization"/);
+    assert.match(companyHtml, /<meta name="robots" content="index, follow/);
+    assert.doesNotMatch(companyHtml, /adsbygoogle|pagead2\.googlesyndication/);
     const posts = readdirSync(resolve(researchRoot, 'posts'), { withFileTypes: true })
       .filter((entry) => entry.isDirectory());
     assert.equal(posts.length, 3);

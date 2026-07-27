@@ -6,7 +6,7 @@ export const prerender = true;
 
 interface SearchRecord {
   id: string;
-  type: 'commodity' | 'event' | 'research' | 'policy';
+  type: 'commodity' | 'event' | 'company' | 'research' | 'policy';
   title: string;
   description: string;
   url: string;
@@ -51,6 +51,13 @@ const policyRecords: SearchRecord[] = [
 export async function GET() {
   const commodities = await getCollection('commodities');
   const events = (await getCollection('events')).filter(isPublishedCommodityEvent);
+  const companies = (await getCollection('companies')).filter(
+    (company) =>
+      company.data.publishable
+      && company.data.publicationState === 'published'
+      && !company.data.isFixture
+      && company.data.evidence.length > 0,
+  );
   const research = (await getCollection('blog')).filter(belongsToActiveSite);
 
   const records: SearchRecord[] = [
@@ -92,6 +99,20 @@ export async function GET() {
         event.data.direction,
         event.data.materiality,
         ...event.data.entities.flatMap((entity) => [entity.name, entity.type]),
+      ],
+    })),
+    ...companies.map((company): SearchRecord => ({
+      id: `company:${company.id}`,
+      type: 'company',
+      title: company.data.name,
+      description: company.data.description,
+      url: `/companies/${company.id}/`,
+      terms: [
+        company.data.ticker ?? '',
+        company.data.country,
+        company.data.exposureType,
+        ...company.data.commodityIds,
+        ...company.data.assets.flatMap((asset) => [asset.name, asset.type, asset.status]),
       ],
     })),
     ...policyRecords,

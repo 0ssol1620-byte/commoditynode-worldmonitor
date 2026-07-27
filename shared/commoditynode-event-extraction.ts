@@ -1,8 +1,11 @@
 export const COMMODITYNODE_EVENT_TYPES = [
   'operations_halt',
+  'operations_restart',
   'production_change',
   'transport_disruption',
+  'route_disruption',
   'trade_restriction',
+  'legal_ruling',
   'policy_change',
   'weather_disruption',
   'inventory_change',

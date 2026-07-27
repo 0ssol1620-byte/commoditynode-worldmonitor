@@ -13,6 +13,7 @@ describe('CommodityNode route index and advertising policy', () => {
       '/',
       '/commodities/',
       '/commodities/copper/',
+      '/companies/',
       '/posts/read-commodity-relationship-graph/',
       '/methodology/',
       '/sources/',
@@ -59,6 +60,14 @@ describe('CommodityNode route index and advertising policy', () => {
     }
     assert.equal(
       resolveCommodityNodeRoutePolicy('/events/example/', {
+        publicationState: 'published',
+        evidenceCount: 2,
+        isFixture: false,
+      }).indexable,
+      true,
+    );
+    assert.equal(
+      resolveCommodityNodeRoutePolicy('/companies/example/', {
         publicationState: 'published',
         evidenceCount: 2,
         isFixture: false,

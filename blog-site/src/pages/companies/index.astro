@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { absoluteUrl, site } from '../../lib/site-variant';
+
+const companies = (await getCollection('companies')).filter(
+  (company) =>
+    company.data.publishable
+    && company.data.publicationState === 'published'
+    && !company.data.isFixture
+    && company.data.evidence.length > 0,
+);
+const canonicalUrl = absoluteUrl('/companies/');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': `${canonicalUrl}#collection`,
+  name: 'Evidence-backed company exposures',
+  description:
+    'Reviewed company exposure records linked to physical commodity assets, published events, and exact source locators.',
+  url: canonicalUrl,
+  isPartOf: { '@type': 'WebSite', name: site.name, url: site.origin },
+  hasPart: companies.map((company) => ({
+    '@type': 'Organization',
+    name: company.data.name,
+    url: absoluteUrl(`/companies/${company.id}/`),
+  })),
+};
+---
+
+<Base
+  title="Company exposure directory"
+  metaTitle="Evidence-Backed Commodity Company Exposures | CommodityNode"
+  description="Review company exposure records only when a physical asset, commodity relationship, and exact source trail have passed publication checks."
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <header class="directory-header">
+    <p class="section-label">Company exposures</p>
+    <h1>Company pages begin with a documented physical link.</h1>
+    <p>
+      CommodityNode does not create ticker shells. A company enters this directory only when
+      reviewed evidence connects it to a commodity asset or event and the limits of that evidence
+      are stated beside the exposure.
+    </p>
+  </header>
+
+  <section class="commodity-directory" aria-labelledby="company-directory-title">
+    <div class="directory-summary">
+      <div>
+        <h2 id="company-directory-title">Published records</h2>
+        <p>{companies.length} company exposure record{companies.length === 1 ? '' : 's'} passed the current gate.</p>
+      </div>
+      <a href="/methodology/">Review the publication method</a>
+    </div>
+
+    <div class="directory-table-wrap">
+      <table class="directory-table">
+        <caption>Company records with reviewed asset and evidence links.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Company</th>
+            <th scope="col">Market identifier</th>
+            <th scope="col">Exposure</th>
+            <th scope="col">Commodities</th>
+            <th scope="col">Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {companies.map((company) => (
+            <tr>
+              <th scope="row"><a href={`/companies/${company.id}/`}>{company.data.name}</a></th>
+              <td><code>{company.data.ticker ?? 'Not listed'}</code></td>
+              <td>{company.data.exposureType}</td>
+              <td>{company.data.commodityIds.join(', ')}</td>
+              <td>{company.data.evidence.length} exact records</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>

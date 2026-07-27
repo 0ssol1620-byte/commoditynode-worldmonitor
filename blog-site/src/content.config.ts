@@ -1,5 +1,10 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import {
+  COMMODITYNODE_EVENT_DIRECTIONS,
+  COMMODITYNODE_EVENT_MATERIALITY,
+  COMMODITYNODE_EVENT_TYPES,
+} from '../../shared/commoditynode-event-extraction';
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
@@ -90,17 +95,9 @@ const events = defineCollection({
       latitude: z.number().min(-90).max(90),
       longitude: z.number().min(-180).max(180),
     }),
-    eventType: z.enum([
-      'operations_halt',
-      'operations_restart',
-      'legal_ruling',
-      'route_disruption',
-      'production_change',
-      'policy_change',
-      'weather_disruption',
-    ]),
-    direction: z.enum(['supply_negative', 'supply_positive', 'demand_negative', 'demand_positive', 'mixed']),
-    materiality: z.enum(['minor', 'notable', 'material', 'critical']),
+    eventType: z.enum(COMMODITYNODE_EVENT_TYPES),
+    direction: z.enum(COMMODITYNODE_EVENT_DIRECTIONS),
+    materiality: z.enum(COMMODITYNODE_EVENT_MATERIALITY),
     materialityRationale: z.string().min(80),
     status: z.enum(['candidate', 'reviewed', 'published', 'superseded', 'expired', 'rejected']),
     isFixture: z.boolean().default(false),
@@ -161,12 +158,29 @@ const companies = defineCollection({
     name: z.string(),
     ticker: z.string().optional(),
     country: z.string(),
-    description: z.string(),
+    description: z.string().min(120),
     commodityIds: z.array(z.string()).min(1),
     exposureType: z.enum(['producer', 'processor', 'transporter', 'consumer', 'diversified']),
-    evidence: z.array(evidenceRef).min(1),
+    exposureMechanisms: z.array(z.string().min(40)).min(1),
+    assets: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      type: z.enum(['mine', 'plant', 'port', 'route']),
+      status: z.string(),
+      asOf: z.coerce.date(),
+      commodityIds: z.array(z.string()).min(1),
+      evidenceIds: z.array(z.string()).min(1),
+    })).min(1),
+    relatedEventIds: z.array(z.string()),
+    limitations: z.array(z.string().min(40)).min(1),
+    evidence: z.array(evidenceRef.extend({
+      id: z.string(),
+      locator: z.string().min(15),
+    })).min(1),
     reviewedBy: z.string(),
     reviewedAt: z.coerce.date(),
+    publicationState: z.literal('published'),
+    isFixture: z.literal(false),
     publishable: z.literal(true),
   }),
 });

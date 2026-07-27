@@ -17,7 +17,7 @@ This guide breaks down what free tiers actually include in 2026, what paid tiers
 
 More than most buyers expect. Using [World Monitor's free tier](https://www.worldmonitor.app/) as a concrete reference point — because its scope is public and it requires no signup — a $0 dashboard today includes:
 
-- **56 map layer types** across conflicts, military activity, natural disasters, cyber incidents, infrastructure, shipping, and markets
+- **57 map layer types** across conflicts, military activity, natural disasters, cyber incidents, infrastructure, shipping, and markets
 - **500+ curated news feeds** aggregated and deduplicated in real time
 - **Country briefs and instability scores** for situational context worldwide
 - **Maritime chokepoint monitoring** (Hormuz, Suez, Malacca, Bab el-Mandeb) and undersea cable status
@@ -92,7 +92,7 @@ For a concrete, current example (full details on the [pricing page](https://www.
 
 | Plan | Price | Built for |
 |---|---|---|
-| Free | $0, no signup | Public situational awareness: 56 map layers, 500+ feeds, country briefs, chokepoints, watchlists |
+| Free | $0, no signup | Public situational awareness: 57 map layers, 500+ feeds, country briefs, chokepoints, watchlists |
 | Pro | $39.99/month or $399.99/year | Analysts: WM Analyst chat with citations, Scenario Engine, Route Explorer, AI digest, MCP access with 42 tools |
 | API | $99.99/month or $999/year | Developers: REST access, 1,000 requests/day, 5 webhook rules, OpenAPI docs |
 | API Business | $299.99/month | Teams: 300 requests/minute, 10,000 requests/day, priority support |
@@ -108,7 +108,7 @@ Free access does not eliminate source diligence. For example, conflict and miner
 
 **Are free intelligence dashboards actually usable, or just demos?**
 
-The good ones are fully usable for awareness work. World Monitor's free tier ships 56 map layers and 500+ feeds with no signup; the underlying open data (ACLED, UCDP, USGS, NASA FIRMS) is the same signal paid platforms ingest. The honest limitation is refresh cadence (5–15 minutes) and the absence of the workflow layer — alerts, AI analysis, API access.
+The good ones are fully usable for awareness work. World Monitor's free tier ships 57 map layers and 500+ feeds with no signup; the underlying open data (ACLED, UCDP, USGS, NASA FIRMS) is the same signal paid platforms ingest. The honest limitation is refresh cadence (5–15 minutes) and the absence of the workflow layer — alerts, AI analysis, API access.
 
 **What is the single biggest difference between free and paid tiers?**
 

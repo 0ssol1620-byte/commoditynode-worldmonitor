@@ -5,6 +5,7 @@ export type CommodityNodeRouteType =
   | 'research_article'
   | 'event_index'
   | 'event_detail'
+  | 'company_directory'
   | 'company_detail'
   | 'author'
   | 'trust'
@@ -111,6 +112,15 @@ export function resolveCommodityNodeRoutePolicy(
       reason: indexable
         ? 'Published, evidence-backed, non-fixture Event Pulse.'
         : 'Draft, expired, rejected, unevidenced, or fixture events are noindex.',
+    };
+  }
+  if (path === '/companies/') {
+    return {
+      routeType: 'company_directory',
+      indexable: true,
+      follow: true,
+      adEligible: false,
+      reason: 'Directory containing only evidence-backed published company records.',
     };
   }
   if (/^\/companies\/[^/]+\/$/.test(path)) {
