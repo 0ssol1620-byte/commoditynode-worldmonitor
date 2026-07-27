@@ -757,6 +757,13 @@
       "reason": "Migrating to analyst/v1.ListAgentSkills in commit 9 of #3207. Blocked on sebuf#150.",
       "owner": "@SebastienMelki",
       "removal_issue": "#3207"
+    },
+    {
+      "path": "api/commoditynode-graph.ts",
+      "category": "migration-pending",
+      "reason": "Compatibility endpoint for the first governed CommodityNode graph slice while the equivalent typed impact-graph sebuf service is generated and adopted by clients in this feature branch.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
     }
   ]
 }

@@ -67,6 +67,12 @@ import {
 } from '@/config/map-layer-definitions';
 import { renderLayerExplanationCard } from '@/utils/layer-explanation-card';
 import {
+  applyCommodityNodeMapPreset,
+  COMMODITYNODE_LAYER_GROUPS,
+  COMMODITYNODE_MAP_PRESETS,
+  type CommodityNodeMapPresetId,
+} from '@/config/commoditynode-map';
+import {
   createCountryClickGestureTracker,
   finishCountryClickGesture,
   shouldSuppressCountryClick,
@@ -572,6 +578,33 @@ export class MapComponent {
         }
       });
     };
+    const commodityGroupTargets = new Map<keyof MapLayers, HTMLElement>();
+    if (SITE_VARIANT === 'commoditynode') {
+      const presets = document.createElement('div');
+      presets.className = 'cn-map-presets';
+      presets.setAttribute('aria-label', 'Commodity map presets');
+      for (const preset of COMMODITYNODE_MAP_PRESETS) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.commodityMapPreset = preset.id;
+        button.setAttribute('aria-pressed', 'false');
+        button.textContent = preset.label;
+        presets.appendChild(button);
+      }
+      toggles.appendChild(presets);
+
+      for (const group of COMMODITYNODE_LAYER_GROUPS) {
+        const section = document.createElement('section');
+        section.className = 'cn-map-layer-group';
+        const heading = document.createElement('h3');
+        heading.id = `cn-map-layer-group-${group.id}`;
+        heading.textContent = group.label;
+        section.setAttribute('aria-labelledby', heading.id);
+        section.appendChild(heading);
+        for (const layer of group.layers) commodityGroupTargets.set(layer, section);
+        toggles.appendChild(section);
+      }
+    }
 
     layers.forEach((layer) => {
       const layerLabel = this.getLayerControlLabel(layer);
@@ -604,8 +637,61 @@ export class MapComponent {
       });
       row.appendChild(explainBtn);
 
-      toggles.appendChild(row);
+      (commodityGroupTargets.get(layer) ?? toggles).appendChild(row);
     });
+
+    if (SITE_VARIANT === 'commoditynode') {
+      toggles.querySelectorAll<HTMLElement>('.cn-map-layer-group').forEach((group) => {
+        if (group.querySelector('.layer-toggle-row')) return;
+        const unavailable = document.createElement('p');
+        unavailable.className = 'cn-map-layer-unavailable';
+        unavailable.textContent =
+          'Asset markers require the enhanced WebGL map and are unavailable in this fallback.';
+        group.appendChild(unavailable);
+      });
+      toggles.querySelectorAll<HTMLElement>('[data-commodity-map-preset]').forEach(
+        (button) => {
+          button.addEventListener('click', () => {
+            const presetId = button.dataset.commodityMapPreset as
+              | CommodityNodeMapPresetId
+              | undefined;
+            if (!presetId) return;
+            const { layers: nextLayers, preset } = applyCommodityNodeMapPreset(
+              this.state.layers,
+              presetId,
+            );
+            for (const layer of layers) {
+              const enabled = Boolean(nextLayers[layer]);
+              if (Boolean(this.state.layers[layer]) === enabled) continue;
+              this.state.layers[layer] = enabled;
+              const layerButton = toggles.querySelector<HTMLElement>(
+                `.layer-toggle[data-layer="${layer}"]`,
+              );
+              layerButton?.classList.toggle('active', enabled);
+              this.onLayerChange?.(layer, enabled, 'programmatic');
+            }
+            toggles
+              .querySelectorAll<HTMLElement>('[data-commodity-map-preset]')
+              .forEach((candidate) => {
+                candidate.setAttribute(
+                  'aria-pressed',
+                  String(candidate.dataset.commodityMapPreset === preset.id),
+                );
+              });
+            this.setView(preset.view);
+            window.dispatchEvent(
+              new CustomEvent('commoditynode:universe-selection', {
+                detail: {
+                  commodityId: preset.primaryCommodityId,
+                  source: 'map-preset',
+                },
+              }),
+            );
+            enforceLayerLimit();
+          });
+        },
+      );
+    }
 
     // Add help button
     const helpBtn = document.createElement('button');

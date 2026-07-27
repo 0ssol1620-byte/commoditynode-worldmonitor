@@ -17,7 +17,7 @@ indexable: true
 adEligible: false
 editorialPurpose: "Teach readers to inspect entity types, edge meaning, evidence limits, and inference distance instead of trusting a visually persuasive graph."
 site: "commoditynode"
-heroImage: "/blog/images/blog/read-commodity-relationship-graph.jpg"
+heroImage: "/images/blog/read-commodity-relationship-graph.jpg"
 pinned: true
 ---
 

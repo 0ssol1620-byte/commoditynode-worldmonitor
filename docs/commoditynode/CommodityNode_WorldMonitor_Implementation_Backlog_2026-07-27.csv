@@ -47,9 +47,9 @@ CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media
 CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,in_progress
 CNWM-047,3,Fail-soft,Replace global publication kill switch with dataset/module/page publication contracts.,P0,CNWM-036,complete
 CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,planned
-CNWM-049,4,Map data,Create CommodityNode marker discriminants and typed render adapters.,P0,"CNWM-014,CNWM-041",planned
+CNWM-049,4,Map data,Create CommodityNode marker discriminants and typed render adapters.,P0,"CNWM-014,CNWM-041",complete
 CNWM-050,4,Layers,"Implement verified mines, plants, ports, pipelines, routes and events layers.",P0,CNWM-046,planned
-CNWM-051,4,Layer UX,Create grouped layer drawer with presets by commodity and event type.,P1,CNWM-048,planned
+CNWM-051,4,Layer UX,Create grouped layer drawer with presets by commodity and event type.,P1,CNWM-048,complete
 CNWM-052,4,Selection,Build unified entity/event detail drawer.,P1,CNWM-048,planned
 CNWM-053,4,Map ↔ research,Deep-link live entities/events to Commodity Hubs and Event Pulses.,P1,"CNWM-049,CNWM-027",planned
 CNWM-054,4,Search,"Add commodity, facility, company, event and route search.",P1,CNWM-048,planned
@@ -57,7 +57,7 @@ CNWM-055,4,Event animation,Render bounded pulse/ripple animation for verified ev
 CNWM-056,4,Performance,Lazy-load globe and non-default layers; keep flat map as analytical default.,P0,CNWM-048,complete
 CNWM-057,4,Mobile,Create mobile bottom-sheet workflow and reduced default layers.,P1,CNWM-048,planned
 CNWM-058,4,Unavailable states,Implement source-specific stale/unavailable/partial map states.,P1,CNWM-044,planned
-CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets first.",P1,CNWM-048,planned
+CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets first.",P1,CNWM-048,complete
 CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,in_progress
 CNWM-061,5,News ingestion,Curate commodity-specific RSS/official/filing source catalog.,P0,CNWM-036,complete
 CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,complete

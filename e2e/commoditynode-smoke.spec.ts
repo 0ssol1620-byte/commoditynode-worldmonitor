@@ -14,6 +14,20 @@ test.describe('CommodityNode live shell', () => {
       await expect(page.locator(`[data-panel="${panel}"]`)).toBeAttached();
     }
 
+    await expect(page.locator('.cn-map-layer-group')).toHaveCount(3);
+    await expect(page.locator('[data-commodity-map-preset]')).toHaveCount(4);
+    await page.locator('[data-commodity-map-preset="copper"]').click();
+    await expect(page.locator('[data-commodity-map-preset="copper"]')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(
+      page.locator('.layer-toggle[data-layer="waterways"]'),
+    ).toHaveClass(/active/);
+    await expect(
+      page.locator('.layer-toggle[data-layer="pipelines"]'),
+    ).not.toHaveClass(/active/);
+
     await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
     await expect(page.locator('.cn-universe-graph-stage')).toBeVisible();
     await expect(page.locator('.cn-universe-webgl-canvas')).toBeAttached();

@@ -111,6 +111,12 @@ import { STARTUP_HUBS, ACCELERATORS, TECH_HQS, CLOUD_REGIONS } from '@/config/te
 import { AI_DATA_CENTERS } from '@/config/ai-datacenters';
 import { UNDERSEA_CABLES, NUCLEAR_FACILITIES, ECONOMIC_CENTERS, SPACEPORTS, CRITICAL_MINERALS, SANCTIONED_COUNTRIES_ALPHA2 } from '@/config/geo-map';
 import { getCommodityUniverseNodeIdForLabel } from '@/config/commoditynode-universe';
+import {
+  applyCommodityNodeMapPreset,
+  COMMODITYNODE_LAYER_GROUPS,
+  COMMODITYNODE_MAP_PRESETS,
+  type CommodityNodeMapPresetId,
+} from '@/config/commoditynode-map';
 import type { GulfInvestment } from '@/types';
 import { resolveTradeRouteSegments, TRADE_ROUTES as TRADE_ROUTES_LIST, type TradeRouteSegment, type TradeRouteStatus } from '@/config/trade-routes';
 import type { ScenarioVisualState } from '@/config/scenario-templates';
@@ -5492,6 +5498,53 @@ export class DeckGLMap {
       explainLabel: escapeHtml(`Explain ${resolveLayerLabel(def, t)} layer`),
       hasExplanation: hasCuratedLayerExplanation(def.key),
     }));
+    const renderLayerRow = ({
+      key,
+      label,
+      icon,
+      premium,
+      explainLabel,
+      hasExplanation,
+    }: (typeof layerConfig)[number]): string => {
+      const isLocked = premium === 'locked' && !premiumUnlocked;
+      const isEnhanced = premium === 'enhanced' && !premiumUnlocked;
+      return `
+        <div class="layer-toggle-row" data-layer="${key}">
+          <label class="layer-toggle${isLocked ? ' layer-toggle-locked' : ''}" data-layer="${key}">
+            <input type="checkbox" ${this.state.layers[key as keyof MapLayers] ? 'checked' : ''}${isLocked ? ' disabled' : ''}>
+            <span class="toggle-icon">${icon}</span>
+            <span class="toggle-label">${label}${isLocked ? ' \uD83D\uDD12' : ''}${isEnhanced ? ' <span class="layer-pro-badge">PRO</span>' : ''}</span>
+          </label>
+          <button type="button" class="layer-explain-btn${hasExplanation ? ' has-layer-explanation' : ''}" data-layer="${key}" aria-label="${explainLabel}">i</button>
+        </div>`;
+    };
+    const layerRows =
+      SITE_VARIANT === 'commoditynode'
+        ? COMMODITYNODE_LAYER_GROUPS.map((group) => {
+            const rows = group.layers
+              .map((key) => layerConfig.find((item) => item.key === key))
+              .filter((item): item is (typeof layerConfig)[number] => Boolean(item))
+              .map(renderLayerRow)
+              .join('');
+            return `
+              <section class="cn-map-layer-group" aria-labelledby="cn-map-layer-group-${group.id}">
+                <h3 id="cn-map-layer-group-${group.id}">${group.label}</h3>
+                ${rows}
+              </section>`;
+          }).join('')
+        : layerConfig.map(renderLayerRow).join('');
+    const commodityPresets =
+      SITE_VARIANT === 'commoditynode'
+        ? `
+          <div class="cn-map-presets" aria-label="Commodity map presets">
+            ${COMMODITYNODE_MAP_PRESETS.map(
+              (preset) => `
+                <button type="button" data-commodity-map-preset="${preset.id}" aria-pressed="false">
+                  ${preset.label}
+                </button>`,
+            ).join('')}
+          </div>`
+        : '';
 
     setTrustedHtml(toggles, trustedHtml(`
       <div class="toggle-header">
@@ -5499,28 +5552,19 @@ export class DeckGLMap {
         <button class="layer-help-btn" aria-label="${t('components.deckgl.layerGuide')}">?</button>
         <button class="toggle-collapse">&#9660;</button>
       </div>
+      ${commodityPresets}
       <input type="text" class="layer-search" placeholder="${t('components.deckgl.layerSearch')}" autocomplete="off" spellcheck="false" />
       <div class="toggle-list" style="max-height: 32vh; overflow-y: auto; scrollbar-width: thin;">
-        ${layerConfig.map(({ key, label, icon, premium, explainLabel, hasExplanation }) => {
-          const isLocked = premium === 'locked' && !premiumUnlocked;
-          const isEnhanced = premium === 'enhanced' && !premiumUnlocked;
-          return `
-          <div class="layer-toggle-row" data-layer="${key}">
-            <label class="layer-toggle${isLocked ? ' layer-toggle-locked' : ''}" data-layer="${key}">
-              <input type="checkbox" ${this.state.layers[key as keyof MapLayers] ? 'checked' : ''}${isLocked ? ' disabled' : ''}>
-              <span class="toggle-icon">${icon}</span>
-              <span class="toggle-label">${label}${isLocked ? ' \uD83D\uDD12' : ''}${isEnhanced ? ' <span class="layer-pro-badge">PRO</span>' : ''}</span>
-            </label>
-            <button type="button" class="layer-explain-btn${hasExplanation ? ' has-layer-explanation' : ''}" data-layer="${key}" aria-label="${explainLabel}">i</button>
-          </div>`;
-        }).join('')}
+        ${layerRows}
       </div>
     `, "legacy direct innerHTML migration"));
 
-    const authorBadge = document.createElement('div');
-    authorBadge.className = 'map-author-badge';
-    authorBadge.textContent = '© Elie Habib · Someone™';
-    toggles.appendChild(authorBadge);
+    if (SITE_VARIANT !== 'commoditynode') {
+      const authorBadge = document.createElement('div');
+      authorBadge.className = 'map-author-badge';
+      authorBadge.textContent = '© Elie Habib · Someone™';
+      toggles.appendChild(authorBadge);
+    }
 
     this.container.appendChild(toggles);
 
@@ -5555,6 +5599,15 @@ export class DeckGLMap {
     };
     this._unsubscribeAuthState = subscribeAuthState(() => unlockIfPro());
     this._unsubscribeEntitlement = onEntitlementChange(() => unlockIfPro());
+
+    toggles.querySelectorAll<HTMLElement>('[data-commodity-map-preset]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const presetId = button.dataset.commodityMapPreset as
+          | CommodityNodeMapPresetId
+          | undefined;
+        if (presetId) this.applyCommodityMapPreset(presetId);
+      });
+    });
 
     // Bind toggle events
     toggles.querySelectorAll('.layer-toggle input').forEach(input => {
@@ -7235,6 +7288,40 @@ export class DeckGLMap {
       ids.forEach(id => this.highlightedAssets[assetType]?.delete(id));
       this.render();
     }, 3000);
+  }
+
+  private applyCommodityMapPreset(presetId: CommodityNodeMapPresetId): void {
+    const previous = this.state.layers;
+    const { layers, preset } = applyCommodityNodeMapPreset(previous, presetId);
+    this.state.layers = layers;
+    for (const key of Object.keys(layers) as (keyof MapLayers)[]) {
+      if (previous[key] === layers[key]) continue;
+      const enabled = Boolean(layers[key]);
+      const input = this.container.querySelector<HTMLInputElement>(
+        `.layer-toggle[data-layer="${key}"] input`,
+      );
+      if (input) input.checked = enabled;
+      this.onLayerChange?.(key, enabled, 'programmatic');
+    }
+    this.container
+      .querySelectorAll<HTMLElement>('[data-commodity-map-preset]')
+      .forEach((button) => {
+        button.setAttribute(
+          'aria-pressed',
+          String(button.dataset.commodityMapPreset === preset.id),
+        );
+      });
+    this.setView(preset.view);
+    this.updateLegend();
+    this.enforceLayerLimit();
+    window.dispatchEvent(
+      new CustomEvent('commoditynode:universe-selection', {
+        detail: {
+          commodityId: preset.primaryCommodityId,
+          source: 'map-preset',
+        },
+      }),
+    );
   }
 
   // Enable layer programmatically
