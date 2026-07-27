@@ -4,6 +4,15 @@ interface Props {
 }
 
 const { liveUrl } = Astro.props;
+const embedUrl = new URL('/embed', liveUrl);
+embedUrl.searchParams.set(
+  'layers',
+  'miningSites,processingPlants,commodityPorts,commodityHubs,tradeRoutes,waterways,pipelines',
+);
+embedUrl.searchParams.set('center', '15,10');
+embedUrl.searchParams.set('zoom', '1.2');
+embedUrl.searchParams.set('theme', 'dark');
+embedUrl.searchParams.set('variant', 'commoditynode');
 ---
 
 <section class="home-live-teaser" aria-labelledby="live-map-teaser-title" data-live-map-teaser>
@@ -36,7 +45,7 @@ const { liveUrl } = Astro.props;
     </div>
     <iframe
       title="CommodityNode live commodity intelligence preview"
-      data-src={liveUrl}
+      data-src={embedUrl.toString()}
       loading="lazy"
       referrerpolicy="strict-origin-when-cross-origin"
       sandbox="allow-scripts allow-same-origin allow-popups"

@@ -27,7 +27,10 @@ describe('CommodityNode research build', () => {
     );
     assert.match(html, /Trace commodity shocks from source event to market exposure\./);
     assert.match(html, /data-live-map-teaser/);
-    assert.match(html, /data-src="https:\/\/live\.commoditynode\.com"/);
+    assert.match(
+      html,
+      /data-src="https:\/\/live\.commoditynode\.com\/embed\?[^"]*variant=commoditynode/,
+    );
     assert.doesNotMatch(
       html,
       /<iframe[^>]+\ssrc="https:\/\/live\.commoditynode\.com\//,

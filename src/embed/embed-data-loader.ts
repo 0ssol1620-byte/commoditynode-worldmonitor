@@ -22,6 +22,9 @@ const STATIC_LAYER_READY_BY_EMBED_ID: Partial<Record<EmbedLayerId, keyof MapLaye
   financialCenters: 'financialCenters',
   centralBanks: 'centralBanks',
   commodityHubs: 'commodityHubs',
+  miningSites: 'miningSites',
+  processingPlants: 'processingPlants',
+  commodityPorts: 'commodityPorts',
   gulfInvestments: 'gulfInvestments',
 };
 
