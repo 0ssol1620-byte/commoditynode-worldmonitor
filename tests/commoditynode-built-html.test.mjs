@@ -18,6 +18,22 @@ describe('CommodityNode built HTML', () => {
       return;
     }
     assert.match(html, /<title>CommodityNode Live - Commodity Impact Intelligence<\/title>/);
+    assert.match(
+      html,
+      /<link rel="canonical" href="https:\/\/live\.commoditynode\.com\/" \/>/,
+    );
+    assert.match(
+      html,
+      /<link rel="alternate" hreflang="en" href="https:\/\/live\.commoditynode\.com\/" \/>/,
+    );
+    assert.match(
+      html,
+      /<link rel="alternate" hreflang="x-default" href="https:\/\/live\.commoditynode\.com\/" \/>/,
+    );
+    assert.match(
+      html,
+      /<meta name="robots" content="noindex, follow, max-image-preview:large" \/>/,
+    );
     assert.match(html, /<h1 class="app-heading">CommodityNode Live - Commodity Impact Intelligence<\/h1>/);
     assert.match(html, /"codeRepository":\s*"https:\/\/github\.com\/0ssol1620-byte\/commoditynode-worldmonitor"/);
     assert.match(html, /"isBasedOn"/);

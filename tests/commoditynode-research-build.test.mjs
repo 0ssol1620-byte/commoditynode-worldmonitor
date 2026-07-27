@@ -17,6 +17,14 @@ describe('CommodityNode research build', () => {
     const html = read('index.html');
     assert.match(html, /<html lang="en" data-site="commoditynode">/);
     assert.match(html, /<link rel="canonical" href="https:\/\/commoditynode\.com\/">/);
+    assert.match(
+      html,
+      /<link rel="alternate" hreflang="en" href="https:\/\/commoditynode\.com\/">/,
+    );
+    assert.match(
+      html,
+      /<link rel="alternate" hreflang="x-default" href="https:\/\/commoditynode\.com\/">/,
+    );
     assert.match(html, /Trace commodity shocks from source event to market exposure\./);
     assert.match(html, /data-live-map-teaser/);
     assert.match(html, /data-src="https:\/\/live\.commoditynode\.com"/);
@@ -30,6 +38,10 @@ describe('CommodityNode research build', () => {
     assert.match(html, /href="https:\/\/live\.commoditynode\.com"/);
     assert.match(html, /id="main-content"/);
     assert.doesNotMatch(html, /@worldmonitorai|abacus\.worldmonitor|>WORLD MONITOR<|>World Monitor</);
+
+    const searchHtml = read('search/index.html');
+    assert.match(searchHtml, /<meta name="robots" content="noindex, follow/);
+    assert.doesNotMatch(searchHtml, /hreflang=/);
   });
 
   it('keeps only CommodityNode research in discovery files', (t) => {

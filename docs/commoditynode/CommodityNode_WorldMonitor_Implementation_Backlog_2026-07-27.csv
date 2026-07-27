@@ -44,7 +44,7 @@ CNWM-042,3,Official data,"Add EIA, USGS, USDA, World Bank/FRED adapters for appr
 CNWM-043,3,Asset registry,Import upstream commodity geography as candidate records.,P1,CNWM-035,complete
 CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locators.,P0,CNWM-035,complete
 CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,complete
-CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,in_progress
+CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,complete
 CNWM-047,3,Fail-soft,Replace global publication kill switch with dataset/module/page publication contracts.,P0,CNWM-036,complete
 CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,complete
 CNWM-049,4,Map data,Create CommodityNode marker discriminants and typed render adapters.,P0,"CNWM-014,CNWM-041",complete
@@ -95,7 +95,7 @@ CNWM-093,7,MCP tools,"Expose commodity event, benchmark, route and evidence tool
 CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API conversions separately from ads.",P2,CNWM-085..091,planned
 CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,complete
 CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,complete
-CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,planned
+CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,complete
 CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,complete
 CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,complete
 CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete

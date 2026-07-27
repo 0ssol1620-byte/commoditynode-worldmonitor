@@ -51,6 +51,7 @@ const proCtaLabel = productFacts.product.primaryCtaLabel;
 const routePolicy = isCommodityNode
   ? resolveCommodityNodeRoutePolicy(Astro.url.pathname)
   : null;
+const emitLanguageAlternates = isCommodityNode && (routePolicy?.indexable ?? true);
 const robotsContent = robots
   ?? (routePolicy
     ? commodityNodeRobotsContent(routePolicy)
@@ -73,6 +74,12 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     <meta name="author" content={author || site.defaultAuthor} />
     <meta name="theme-color" content={isCommodityNode ? '#071116' : '#050505'} />
     <link rel="canonical" href={resolvedCanonicalUrl} />
+    {emitLanguageAlternates && (
+      <>
+        <link rel="alternate" hreflang="en" href={resolvedCanonicalUrl} />
+        <link rel="alternate" hreflang="x-default" href={resolvedCanonicalUrl} />
+      </>
+    )}
 
     <meta property="og:type" content={resolvedOgType} />
     <meta property="og:title" content={pageTitle} />
