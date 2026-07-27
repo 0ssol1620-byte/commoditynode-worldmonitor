@@ -9,11 +9,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/dashboard.html"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/dashboard.html"
+      "destination": "/dashboard"
     }
   ],
   "headers": [
