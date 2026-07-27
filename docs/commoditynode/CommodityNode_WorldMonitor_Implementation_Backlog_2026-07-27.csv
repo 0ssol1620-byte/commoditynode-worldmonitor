@@ -35,15 +35,15 @@ CNWM-033,2,Trust pages,"Build Methodology, Sources, Editorial Policy, Correction
 CNWM-034,2,Source page,Integrate AGPL source offer into both footer and dedicated source page.,P0,CNWM-005,complete
 CNWM-035,2,Search,Implement static/content search that excludes drafts and private records.,P2,CNWM-024,complete
 CNWM-036,2,Legacy redirects,Implement route dispositions for reports/tools/legacy SaaS routes.,P1,CNWM-010,planned
-CNWM-037,3,Database,"Provision PostgreSQL as durable source of truth for registry, claims, graph and editorial workflow.",P0,CNWM-020,planned
+CNWM-037,3,Database,"Provision PostgreSQL as durable source of truth for registry, claims, graph and editorial workflow.",P0,CNWM-020,in_progress
 CNWM-038,3,Registry,"Implement DataSourceRegistry with terms, rights, cadence, attribution and owner.",P0,CNWM-035,complete
 CNWM-039,3,Market contract,Implement MarketInstrument/BenchmarkContract schemas.,P0,CNWM-035,complete
-CNWM-040,3,Provider adapters,"Wrap Yahoo/yfinance, official series and alternatives behind provider adapters.",P0,CNWM-037,planned
-CNWM-041,3,yfinance,"Implement yfinance/Yahoo proxy adapter with staggered fetch, cache and explicit source labels.",P0,CNWM-038,planned
-CNWM-042,3,Official data,"Add EIA, USGS, USDA, World Bank/FRED adapters for approved series.",P1,CNWM-036,planned
+CNWM-040,3,Provider adapters,"Wrap Yahoo/yfinance, official series and alternatives behind provider adapters.",P0,CNWM-037,complete
+CNWM-041,3,yfinance,"Implement yfinance/Yahoo proxy adapter with staggered fetch, cache and explicit source labels.",P0,CNWM-038,complete
+CNWM-042,3,Official data,"Add EIA, USGS, USDA, World Bank/FRED adapters for approved series.",P1,CNWM-036,complete
 CNWM-043,3,Asset registry,Import upstream commodity geography as candidate records.,P1,CNWM-035,planned
-CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locators.,P0,CNWM-035,in_progress
-CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,in_progress
+CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locators.,P0,CNWM-035,complete
+CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,complete
 CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,in_progress
 CNWM-047,3,Fail-soft,Replace global publication kill switch with dataset/module/page publication contracts.,P0,CNWM-036,complete
 CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,planned
