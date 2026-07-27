@@ -109,6 +109,7 @@ const PANEL_CLUSTER: Record<string, PanelChunkName> = {
   EnergyCrisis: 'panels-energy', EnergyDisruptions: 'panels-energy',
   EnergyRiskOverview: 'panels-energy', FuelPrices: 'panels-energy',
   FuelShortage: 'panels-energy', Hormuz: 'panels-energy',
+  ImpactUniverse: 'panels-energy',
   OilInventories: 'panels-energy', PipelineStatus: 'panels-energy',
   StorageFacilityMap: 'panels-energy', RenewableEnergy: 'panels-energy',
   // Defense / military / aviation

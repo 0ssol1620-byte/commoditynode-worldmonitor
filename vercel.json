@@ -33,6 +33,8 @@
     { "source": "/legal", "destination": "/docs/terms", "permanent": false }
   ],
   "rewrites": [
+    { "source": "/", "has": [{ "type": "query", "key": "mode", "value": "agent" }], "destination": "/agent-view.json" },
+    { "source": "/", "has": [{ "type": "host", "value": "^(?:(?:www|tech|finance|commodity|happy|energy)\\.)?worldmonitor\\.app$" }], "destination": "/pro/welcome.html" },
     { "source": "/", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/index.html" },
     { "source": "/posts/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/posts/:path*" },
     { "source": "/methodology/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/methodology/:path*" },
@@ -49,8 +51,6 @@
     { "source": "/", "has": [{ "type": "host", "value": "^live\\.commoditynode\\.com$" }], "destination": "/dashboard.html" },
     { "source": "/docs/mcp", "destination": "/api/docs-mcp" },
     { "source": "/docs/:match*", "destination": "https://worldmonitor.mintlify.dev/docs/:match*" },
-    { "source": "/", "has": [{ "type": "query", "key": "mode", "value": "agent" }], "destination": "/agent-view.json" },
-    { "source": "/", "has": [{ "type": "host", "value": "^(?:(?:www|tech|finance|commodity|happy|energy)\\.)?worldmonitor\\.app$" }], "destination": "/pro/welcome.html" },
     { "source": "/index.md", "destination": "/home.md" },
     { "source": "/pro", "destination": "/pro/index.html" },
     { "source": "/mcp", "destination": "/api/mcp" },

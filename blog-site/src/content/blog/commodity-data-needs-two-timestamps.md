@@ -4,10 +4,11 @@ description: "Publication time and observation time answer different questions. 
 metaTitle: "Why Commodity Data Needs Two Timestamps"
 keywords: "commodity data, observation time, publication time, data freshness, revisions"
 audience: "Analysts"
-pubDate: 2026-07-27
-modifiedDate: 2026-07-27
+pubDate: "2026-07-27"
+modifiedDate: "2026-07-27"
 author: "CommodityNode Editorial Desk"
-site: commoditynode
+site: "commoditynode"
+heroImage: "/blog/images/blog/commodity-data-needs-two-timestamps.jpg"
 pinned: true
 ---
 
@@ -36,6 +37,8 @@ Freshness measures how recently a source delivered a record. Timeliness measures
 
 CommodityNode does not collapse those qualities into one green or red status. The source, period, delay, and coverage remain visible so the reader can decide whether the series is fit for the question.
 
+This follows the provenance and timeliness principles in the [W3C Data on the Web Best Practices](https://www.w3.org/TR/dwbp/). The same timestamps also limit how far an inference should travel through a [commodity relationship graph](/posts/read-commodity-relationship-graph/).
+
 ## What to check before using a chart
 
 1. Read the unit and reporting period.
@@ -45,3 +48,17 @@ CommodityNode does not collapse those qualities into one green or red status. Th
 5. Open the original source before making a material decision.
 
 Showing both timestamps keeps an old observation from borrowing authority from a recent publication date.
+
+## Frequently Asked Questions
+
+### Is publication time the same as collection time?
+
+No. Publication time belongs to the source. Collection time records when CommodityNode retrieved the record. A delayed collection does not change when the source first released the data.
+
+### Which timestamp should appear first?
+
+Use observation time when the question is about the state of the market during a defined period. Use source time when the question is about what information was available at a particular moment. Material revisions should show both.
+
+### Can a recent update still be stale?
+
+Yes. A record published today may describe an older reporting period. Recency of publication does not establish timeliness of the observation.

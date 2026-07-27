@@ -1175,6 +1175,7 @@ export const VARIANT_PANEL_OVERRIDES: Partial<Record<string, Partial<Record<stri
   },
   commoditynode: {
     map:                   { name: 'Commodity Impact Map' },
+    'impact-universe':     { name: 'Impact Universe' },
     'event-pulse':         { name: 'Material Commodity Events' },
     commodities:           { name: 'Benchmark & Proxy Tape' },
     'supply-chain':         { name: 'Supply Chain & Shipping' },

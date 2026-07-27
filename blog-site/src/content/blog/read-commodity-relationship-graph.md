@@ -4,10 +4,11 @@ description: "A useful network explains what each line means, how far an inferen
 metaTitle: "How to Read a Commodity Relationship Graph"
 keywords: "commodity graph, relationship network, supply chain, impact path, data visualization"
 audience: "Analysts"
-pubDate: 2026-07-27
-modifiedDate: 2026-07-27
+pubDate: "2026-07-27"
+modifiedDate: "2026-07-27"
 author: "CommodityNode Editorial Desk"
-site: commoditynode
+site: "commoditynode"
+heroImage: "/blog/images/blog/read-commodity-relationship-graph.jpg"
 pinned: true
 ---
 
@@ -42,8 +43,24 @@ A direct path has one edge: an asset produces a commodity, or a route carries a 
 
 The longer path may be useful, but it should carry lower confidence and expose each intermediate step. The graph documents the reasoning and stops short of predicting the final market move.
 
+Evidence attached to each edge should retain its source and reporting period. The [W3C Data on the Web Best Practices](https://www.w3.org/TR/dwbp/) provides the broader provenance standard; CommodityNode applies it with the [two-timestamp rule](/posts/commodity-data-needs-two-timestamps/) for market data.
+
 ## Why the mobile view is a list
 
 On a narrow screen, a dense force-directed graph becomes difficult to operate and impossible to compare. CommodityNode therefore presents ranked paths as a list by default on mobile. Each row preserves the same nodes, edge types, evidence, and confidence as the visual view.
 
 The ranked list carries the complete model. The canvas remains an optional way to explore the same evidence.
+
+## Frequently Asked Questions
+
+### Does a connection imply causation?
+
+No. The edge label states the documented relationship. A correlation edge describes co-movement during a stated window; it does not become a physical or causal link.
+
+### Why does confidence fall across longer paths?
+
+Each additional edge introduces another assumption, source, and reporting delay. CommodityNode exposes those steps and discounts the combined path instead of presenting a multi-hop inference as a direct fact.
+
+### Can the table and graph disagree?
+
+They should not. Both views use the same nodes, edges, evidence, and confidence. The table is the accessible reference; the graph is a spatial way to explore it.

@@ -7,6 +7,7 @@ import type { VariantConfig } from './base';
  */
 export const COMMODITYNODE_PANELS: Record<string, PanelConfig> = {
   map: { name: 'Commodity Impact Map', enabled: true, priority: 1 },
+  'impact-universe': { name: 'Impact Universe', enabled: true, priority: 1 },
   'event-pulse': { name: 'Material Commodity Events', enabled: true, priority: 1 },
   commodities: { name: 'Benchmark & Proxy Tape', enabled: true, priority: 1 },
   'supply-chain': { name: 'Supply Chain & Shipping', enabled: true, priority: 1 },

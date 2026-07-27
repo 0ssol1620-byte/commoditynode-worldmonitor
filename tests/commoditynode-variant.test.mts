@@ -34,6 +34,7 @@ describe('CommodityNode additive variant contract', () => {
   it('ships only the decision-bearing initial panel set', () => {
     assert.deepEqual(Object.keys(COMMODITYNODE_PANELS), [
       'map',
+      'impact-universe',
       'event-pulse',
       'commodities',
       'supply-chain',

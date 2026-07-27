@@ -63,7 +63,7 @@ const jsonLd = {
         "@type": "Person",
         "name": authorName,
         ...(authorUrl ? { "url": authorUrl } : {}),
-        ...(authorName === DEFAULT_AUTHOR && DEFAULT_AUTHOR_ID ? { "@id": DEFAULT_AUTHOR_ID } : {})
+        ...(authorName === DEFAULT_AUTHOR ? { "@id": DEFAULT_AUTHOR_ID } : {})
       },
       "url": absoluteUrl(postPath(post.id)),
       "image": post.data.heroImage

@@ -10,9 +10,12 @@ test.describe('CommodityNode live shell', () => {
     await expect(page.locator('.site-footer-name')).toHaveText('COMMODITYNODE');
     await expect(page.locator('.site-footer')).toContainText('Derived from World Monitor');
 
-    for (const panel of ['event-pulse', 'commodities', 'supply-chain', 'route-risk', 'monitors']) {
+    for (const panel of ['impact-universe', 'event-pulse', 'commodities', 'supply-chain', 'route-risk', 'monitors']) {
       await expect(page.locator(`[data-panel="${panel}"]`)).toBeAttached();
     }
+
+    await expect(page.locator('[data-panel="impact-universe"] [data-universe-node]')).toHaveCount(23);
+    await expect(page.locator('[data-panel="impact-universe"]')).not.toContainText(/\bRL\b/);
 
     for (const panel of ['airline-intel', 'world-clock', 'polymarket', 'military-correlation']) {
       await expect(page.locator(`[data-panel="${panel}"]`)).toHaveCount(0);

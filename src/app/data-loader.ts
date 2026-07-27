@@ -123,6 +123,10 @@ import type {
   SectorValuation,
 } from '@/components/MarketPanel';
 import type { ChinaCorporateDisclosureSnapshot } from '@/components/market-disclosures';
+import type {
+  ImpactUniversePanel,
+  ImpactUniverseQuote,
+} from '@/components/ImpactUniversePanel';
 import { mountCommunityWidget } from '@/components/CommunityWidget';
 
 import type { StockAnalysisPanel } from '@/components/StockAnalysisPanel';
@@ -758,7 +762,7 @@ export class DataLoaderManager implements AppModule {
 
     // Happy variant only loads news data -- skip all geopolitical/financial/military data
     if (SITE_VARIANT !== 'happy') {
-      if (shouldLoadAny(['markets', 'heatmap', 'commodities', 'crypto', 'energy-complex', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens'])) {
+      if (shouldLoadAny(['markets', 'heatmap', 'commodities', 'impact-universe', 'crypto', 'energy-complex', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens'])) {
         tasks.push({ name: 'markets', task: () => runGuarded('markets', () => this.loadMarkets()) });
       }
       if (hasPremiumAccess() && shouldLoad('stock-analysis')) {
@@ -1925,13 +1929,22 @@ export class DataLoaderManager implements AppModule {
       }
 
       const commoditiesPanel = this.ctx.panels['commodities'] as CommoditiesPanel | undefined;
+      const universePanel = this.ctx.panels['impact-universe'] as ImpactUniversePanel | undefined;
       const energyPanel = this.ctx.panels['energy-complex'] as EnergyComplexPanel | undefined;
-      const mapCommodity = (c: MarketData) => ({ symbol: c.symbol, display: c.display, price: c.price, change: c.change, sparkline: c.sparkline });
+      const mapCommodity = (c: MarketData): ImpactUniverseQuote & { sparkline?: number[] } => ({
+        symbol: c.symbol,
+        display: c.display,
+        price: c.price,
+        change: c.change,
+        sparkline: c.sparkline,
+      });
       const energySymbols = new Set(['CL=F', 'BZ=F', 'NG=F']);
       const filterCommodityTape = (data: MarketData[]) => data.filter((item) => item.symbol !== '^VIX' && !energySymbols.has(item.symbol));
       const filterEnergyTape = (data: MarketData[]) => data.filter((item) => energySymbols.has(item.symbol));
+      const filterUniverse = (data: MarketData[]) =>
+        data.filter((item) => item.symbol !== '^VIX' && !item.symbol.endsWith('=X'));
 
-      if (commoditiesPanel || energyPanel) {
+      if (commoditiesPanel || energyPanel || universePanel) {
         // Hydrate commodities from bootstrap (same pattern as sectors/markets)
         const hydratedCommodities = getHydratedData('commodityQuotes') as ListCommodityQuotesResponse | undefined;
         const skipFetch = stocksResult.rateLimited && stocksResult.data.length === 0;
@@ -1953,8 +1966,10 @@ export class DataLoaderManager implements AppModule {
           }));
           const commodityMapped = filterCommodityTape(data).map(mapCommodity);
           const energyMapped = filterEnergyTape(data);
-          if (commoditiesPanel && commodityMapped.some(d => d.price !== null)) {
-            commoditiesPanel.renderCommodities(commodityMapped);
+          const universeMapped = filterUniverse(data).map(mapCommodity);
+          universePanel?.renderCommodities(universeMapped);
+          if (commodityMapped.some(d => d.price !== null)) {
+            commoditiesPanel?.renderCommodities(commodityMapped);
             metalsLoaded = true;
           }
           if (energyMapped.some(d => d.price !== null)) {
@@ -1968,14 +1983,18 @@ export class DataLoaderManager implements AppModule {
             onBatch: (partial) => {
               const commodityMapped = filterCommodityTape(partial).map(mapCommodity);
               const energyMapped = filterEnergyTape(partial);
-              if (commoditiesPanel) commoditiesPanel.renderCommodities(commodityMapped);
+              universePanel?.renderCommodities(filterUniverse(partial).map(mapCommodity));
+              commoditiesPanel?.renderCommodities(commodityMapped);
               energyPanel?.updateTape(energyMapped);
             },
           });
           const commodityMapped = filterCommodityTape(commoditiesResult.data).map(mapCommodity);
           const energyMapped = filterEnergyTape(commoditiesResult.data);
-          if (commoditiesPanel && commodityMapped.some(d => d.price !== null)) {
-            commoditiesPanel.renderCommodities(commodityMapped);
+          universePanel?.renderCommodities(
+            filterUniverse(commoditiesResult.data).map(mapCommodity),
+          );
+          if (commodityMapped.some(d => d.price !== null)) {
+            commoditiesPanel?.renderCommodities(commodityMapped);
             metalsLoaded = true;
           }
           if (energyMapped.some(d => d.price !== null)) {
@@ -1985,6 +2004,7 @@ export class DataLoaderManager implements AppModule {
         }
         if (!metalsLoaded) commoditiesPanel?.renderCommodities([]);
         if (!energyLoaded) energyPanel?.updateTape([]);
+        if (!metalsLoaded && !energyLoaded) universePanel?.renderCommodities([]);
       }
 
       // Load ECB FX rates for CommoditiesPanel FX tab
