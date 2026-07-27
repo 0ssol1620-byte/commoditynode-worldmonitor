@@ -110,6 +110,7 @@ export const LAYER_REGISTRY: Record<keyof MapLayers, LayerDefinition> = {
   miningSites:              def('miningSites',              '&#128301;', 'miningSites',              'Mining Sites'),
   processingPlants:         def('processingPlants',         '&#127981;', 'processingPlants',         'Processing Plants'),
   commodityPorts:           def('commodityPorts',           '&#9973;',   'commodityPorts',           'Commodity Ports'),
+  commodityEvents:          def('commodityEvents',          '&#9678;',   'commodityEvents',          'Verified Events', ['flat']),
   webcams:                  def('webcams',                  '&#128247;', 'webcams',                  'Live Webcams'),
   // weatherRadar removed — radar tiles now auto-start when Weather Alerts layer is toggled on
   diseaseOutbreaks:         def('diseaseOutbreaks',         '&#129440;', 'diseaseOutbreaks',         'Disease Outbreaks', ['flat'], undefined, true),
@@ -324,7 +325,7 @@ const VARIANT_LAYER_ORDER: Record<MapVariant, Array<keyof MapLayers>> = {
     'resilienceScore', 'natural', 'weather', 'outages', 'sanctions', 'dayNight',
   ],
   commoditynode: [
-    'miningSites', 'processingPlants', 'commodityPorts', 'commodityHubs',
+    'miningSites', 'processingPlants', 'commodityPorts', 'commodityEvents', 'commodityHubs',
     'pipelines', 'waterways', 'tradeRoutes', 'natural',
     'ais', 'sanctions', 'fires', 'outages', 'economic', 'climate',
     'weather', 'minerals', 'resilienceScore', 'dayNight',

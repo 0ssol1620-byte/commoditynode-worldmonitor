@@ -100,7 +100,7 @@ describe('CommodityNode research build', () => {
       assert.match(html, /<meta name="robots" content="index, follow/);
       assert.match(html, /"author":\{"@type":"Organization"/);
       assert.match(html, /Reviewed by CommodityNode Editorial/);
-      assert.match(html, /src="\/images\/blog\//);
+      assert.match(html, /src="\/blog\/images\/blog\//);
       assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication|data-ad-slot/);
     }
     const searchHtml = read('search/index.html');

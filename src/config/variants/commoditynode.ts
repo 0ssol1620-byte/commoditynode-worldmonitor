@@ -71,6 +71,7 @@ export const COMMODITYNODE_MAP_LAYERS: MapLayers = {
   miningSites: true,
   processingPlants: true,
   commodityPorts: true,
+  commodityEvents: true,
   webcams: false,
   diseaseOutbreaks: false,
 };

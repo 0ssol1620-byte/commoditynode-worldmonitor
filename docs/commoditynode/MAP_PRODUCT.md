@@ -41,7 +41,7 @@ The first four presets are deterministic:
 | Gold | Global | Gold |
 | Cocoa | Africa | Cocoa |
 
-A preset changes only CommodityNode's eight governed layer keys. It does not
+A preset changes only CommodityNode's nine governed layer keys. It does not
 silently overwrite unrelated user settings. Applying a preset updates the
 visible layer controls, map view, persisted layer callback, and Impact
 Universe focus in one action.
@@ -92,10 +92,31 @@ historical.
 ## Fallback behavior
 
 Desktop WebGL receives the full production, processing, port, pipeline, route,
-waterway, hub, and event-context controls. Mobile and software-rendered
-browsers use the SVG map. Unsupported production markers are explicitly
-unavailable there; supported route and context layers and all four presets
-remain operable.
+waterway, hub, and verified-event controls. Mobile and software-rendered
+browsers use the SVG map. The verified historical event remains interactive
+and opens the same detail sheet. Production markers and trade-route geometry
+that the SVG renderer cannot draw are listed with an explicit unavailable
+state; supported pipeline, waterway, hub, natural-event, and verified-event
+layers remain operable.
+
+## Verified events and source states
+
+The event layer accepts only reviewed records whose ontology status is
+`published`. The first record is the historical Cobre Panama production halt,
+located from the reviewed mine registry and linked to its three primary-source
+evidence records. It is labeled as historical and never presented as live
+telemetry.
+
+WebGL renders a static event core plus a two-cycle, 2.4-second ripple. The
+animation settles permanently, restarts only when the layer is re-enabled, and
+becomes a static ring when the operating system requests reduced motion. The
+SVG fallback uses the same two-cycle limit and keyboard-operable marker.
+
+Every governed layer exposes a source-state label. Curated geometry is marked
+`Reviewed reference`; the event is `Verified historical`; monitored sources
+preserve `Current`, `Partial coverage`, `Stale source`, and
+`Status unavailable` as separate states. An unavailable operational source
+does not remove reviewed reference geometry or imply an all-clear condition.
 
 ## Verification
 
@@ -108,8 +129,9 @@ npm run test:e2e:commoditynode
 ```
 
 The contract suite validates discriminants, namespaced identifiers, unique
-layer grouping, preset determinism, search-category completeness, map-ID
-resolution, and route existence. Browser tests verify grouped fallback
+layer grouping, preset determinism, event publication and bounded motion,
+source-state separation, search-category completeness, map-ID resolution, and
+route existence. Browser tests verify grouped fallback
 controls, a complete Copper preset interaction, search-to-drawer selection,
 deep-link restoration, focus-safe Escape close, evidence labels, and the
 mobile bottom sheet.

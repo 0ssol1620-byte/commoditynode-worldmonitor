@@ -61,6 +61,7 @@ describe('CommodityNode additive variant contract', () => {
       'miningSites',
       'processingPlants',
       'commodityPorts',
+      'commodityEvents',
       'commodityHubs',
       'pipelines',
       'waterways',
@@ -69,6 +70,7 @@ describe('CommodityNode additive variant contract', () => {
     ] as const) {
       assert.equal(COMMODITYNODE_MAP_LAYERS[layer], true, `${layer} should be on for desktop`);
     }
+    assert.equal(COMMODITYNODE_MOBILE_MAP_LAYERS.commodityEvents, true);
 
     for (const layer of [
       'processingPlants',

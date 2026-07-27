@@ -72,6 +72,13 @@ import {
   COMMODITYNODE_MAP_PRESETS,
   type CommodityNodeMapPresetId,
 } from '@/config/commoditynode-map';
+import { COMMODITYNODE_VERIFIED_MAP_EVENTS } from '@/config/commoditynode-map-events';
+import {
+  deriveCommodityNodeMapLayerHealth,
+  type CommodityNodeMapSourceState,
+} from '@/config/commoditynode-map-health';
+import { resolveCommodityNodeSelection } from '@/config/commoditynode-selection';
+import { dataFreshness, type DataSourceId } from '@/services/data-freshness';
 import {
   createCountryClickGestureTracker,
   finishCountryClickGesture,
@@ -221,6 +228,7 @@ export class MapComponent {
   // Set in destroy(); guards render() (incl. the deferred first-paint callback and the
   // resize/visibility rAF callbacks) from running on a torn-down instance.
   private destroyed = false;
+  private commodityLayerHealthUnsubscribe: (() => void) | null = null;
   // Mobile loads the lighter 110m country topology (U6); passed in from MapContainer.
   private readonly isMobile: boolean;
   private overlayAppendTarget: ParentNode | null = null;
@@ -370,6 +378,8 @@ export class MapComponent {
   public destroy(): void {
     this.destroyed = true;
     this.listenerAbort.abort();
+    this.commodityLayerHealthUnsubscribe?.();
+    this.commodityLayerHealthUnsubscribe = null;
     if (this.markerSettleTimer !== null) {
       clearTimeout(this.markerSettleTimer);
       this.markerSettleTimer = null;
@@ -482,6 +492,54 @@ export class MapComponent {
     return def ? resolveLayerLabel(def, t) : String(layer);
   }
 
+  private getCommodityLayerHealthSources(
+    layer: keyof MapLayers,
+  ): CommodityNodeMapSourceState[] {
+    const sourceIds: Partial<Record<keyof MapLayers, readonly DataSourceId[]>> = {
+      natural: ['usgs'],
+      tradeRoutes: ['supply_chain'],
+      waterways: ['supply_chain'],
+    };
+    return (sourceIds[layer] ?? []).flatMap((sourceId) => {
+      const source = dataFreshness.getSource(sourceId);
+      return source
+        ? [{
+            name: source.name,
+            status: source.status,
+            lastUpdate: source.lastUpdate,
+          }]
+        : [];
+    });
+  }
+
+  private updateCommodityLayerHealthBadges(root: ParentNode): void {
+    if (SITE_VARIANT !== 'commoditynode') return;
+    for (const group of COMMODITYNODE_LAYER_GROUPS) {
+      for (const layer of group.layers) {
+        const health = deriveCommodityNodeMapLayerHealth(
+          layer,
+          'svg',
+          this.getCommodityLayerHealthSources(layer),
+        );
+        root
+          .querySelectorAll<HTMLElement>(
+            `.cn-map-layer-health[data-layer="${layer}"]`,
+          )
+          .forEach((badge) => {
+            badge.textContent = health.label;
+            badge.dataset.state = health.state;
+            badge.className =
+              `cn-map-layer-health cn-map-layer-health--${health.state}`;
+            badge.title = health.detail;
+            badge.setAttribute(
+              'aria-label',
+              `${health.label}. ${health.detail}`,
+            );
+          });
+      }
+    }
+  }
+
   private createLayerToggles(): HTMLElement {
     const toggles = document.createElement('div');
     toggles.className = 'layer-toggles';
@@ -530,7 +588,7 @@ export class MapComponent {
     ];
     const commodityNodeLayers: (keyof MapLayers)[] = [
       'pipelines', 'waterways', 'commodityHubs', 'minerals',
-      'natural', 'weather', 'fires', 'economic',
+      'commodityEvents', 'natural', 'weather', 'fires', 'economic',
     ];
     // Energy variant — SVG/mobile fallback. Only include keys that actually render
     // in this file (commodityPorts/climate/tradeRoutes/resilienceScore/dayNight do
@@ -623,6 +681,26 @@ export class MapComponent {
       });
       row.appendChild(btn);
 
+      if (SITE_VARIANT === 'commoditynode') {
+        const health = deriveCommodityNodeMapLayerHealth(
+          layer,
+          'svg',
+          this.getCommodityLayerHealthSources(layer),
+        );
+        const healthBadge = document.createElement('span');
+        healthBadge.className =
+          `cn-map-layer-health cn-map-layer-health--${health.state}`;
+        healthBadge.dataset.layer = layer;
+        healthBadge.dataset.state = health.state;
+        healthBadge.textContent = health.label;
+        healthBadge.title = health.detail;
+        healthBadge.setAttribute(
+          'aria-label',
+          `${health.label}. ${health.detail}`,
+        );
+        row.appendChild(healthBadge);
+      }
+
       const explainBtn = document.createElement('button');
       explainBtn.type = 'button';
       explainBtn.className = `layer-explain-btn ${hasCuratedLayerExplanation(layer) ? 'has-layer-explanation' : ''}`;
@@ -641,14 +719,40 @@ export class MapComponent {
     });
 
     if (SITE_VARIANT === 'commoditynode') {
-      toggles.querySelectorAll<HTMLElement>('.cn-map-layer-group').forEach((group) => {
-        if (group.querySelector('.layer-toggle-row')) return;
-        const unavailable = document.createElement('p');
-        unavailable.className = 'cn-map-layer-unavailable';
-        unavailable.textContent =
-          'Asset markers require the enhanced WebGL map and are unavailable in this fallback.';
-        group.appendChild(unavailable);
-      });
+      for (const group of COMMODITYNODE_LAYER_GROUPS) {
+        const section = toggles.querySelector<HTMLElement>(
+          `#cn-map-layer-group-${group.id}`,
+        )?.parentElement;
+        if (!section) continue;
+        for (const layer of group.layers) {
+          if (section.querySelector(`[data-layer="${layer}"]`)) continue;
+          const health = deriveCommodityNodeMapLayerHealth(
+            layer,
+            'svg',
+            this.getCommodityLayerHealthSources(layer),
+          );
+          const state = document.createElement('div');
+          state.className = 'cn-map-layer-static-state';
+          state.dataset.layer = layer;
+
+          const name = document.createElement('span');
+          name.className = 'cn-map-layer-static-state__name';
+          name.textContent = this.getLayerControlLabel(layer);
+          const healthBadge = document.createElement('span');
+          healthBadge.className =
+            `cn-map-layer-health cn-map-layer-health--${health.state}`;
+          healthBadge.dataset.layer = layer;
+          healthBadge.dataset.state = health.state;
+          healthBadge.textContent = health.label;
+          healthBadge.title = health.detail;
+          healthBadge.setAttribute(
+            'aria-label',
+            `${health.label}. ${health.detail}`,
+          );
+          state.append(name, healthBadge);
+          section.appendChild(state);
+        }
+      }
       toggles.querySelectorAll<HTMLElement>('[data-commodity-map-preset]').forEach(
         (button) => {
           button.addEventListener('click', () => {
@@ -679,6 +783,9 @@ export class MapComponent {
                 );
               });
             this.setView(preset.view);
+            if (preset.id === 'copper') {
+              this.setCenter(8.854, -80.647);
+            }
             window.dispatchEvent(
               new CustomEvent('commoditynode:universe-selection', {
                 detail: {
@@ -702,6 +809,13 @@ export class MapComponent {
     helpBtn.addEventListener('click', () => this.showLayerHelp());
     toggles.appendChild(helpBtn);
     enforceLayerLimit();
+    if (SITE_VARIANT === 'commoditynode') {
+      this.updateCommodityLayerHealthBadges(toggles);
+      this.commodityLayerHealthUnsubscribe?.();
+      this.commodityLayerHealthUnsubscribe = dataFreshness.subscribe(() => {
+        this.updateCommodityLayerHealthBadges(toggles);
+      });
+    }
 
     return toggles;
   }
@@ -1756,6 +1870,57 @@ export class MapComponent {
     const thresholds = MapComponent.LAYER_ZOOM_THRESHOLDS[layer];
     if (!thresholds) return true;
     return Boolean(this.layerZoomOverrides[layer]) || this.state.zoom >= thresholds.minZoom;
+  }
+
+  private renderCommodityEvents(projection: d3.GeoProjection): void {
+    for (const event of COMMODITYNODE_VERIFIED_MAP_EVENTS) {
+      const pos = projection([event.longitude, event.latitude]);
+      if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) continue;
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'map-marker cn-map-event-marker';
+      button.style.left = `${pos[0]}px`;
+      button.style.top = `${pos[1]}px`;
+      button.style.zIndex = '58';
+      button.title =
+        `${event.name}. Verified historical event with ${event.evidenceCount} reviewed evidence records.`;
+      button.setAttribute(
+        'aria-label',
+        `${event.name}. Open verified historical event details.`,
+      );
+
+      const ring = document.createElement('span');
+      ring.className = 'cn-map-event-marker__ring';
+      ring.setAttribute('aria-hidden', 'true');
+      const core = document.createElement('span');
+      core.className = 'cn-map-event-marker__core';
+      core.setAttribute('aria-hidden', 'true');
+      button.append(ring, core);
+
+      button.addEventListener('click', (clickEvent) => {
+        clickEvent.stopPropagation();
+        const selection = resolveCommodityNodeSelection(
+          `event:${event.id}`,
+          'commodity-events-layer',
+        );
+        window.dispatchEvent(
+          new CustomEvent('commoditynode:map-selection', {
+            detail: {
+              commodityId: selection?.commodityId ?? event.commodityId,
+              entityId: selection?.entityId ?? `event:${event.id}`,
+              entityName: selection?.entityName ?? event.name,
+              layerId: 'commodity-events-layer',
+              latitude: event.latitude,
+              longitude: event.longitude,
+              selection,
+              source: 'map',
+            },
+          }),
+        );
+      });
+      this.appendOverlay(button);
+    }
   }
 
   private renderOverlays(projection: d3.GeoProjection): void {
@@ -3248,6 +3413,12 @@ export class MapComponent {
         });
         this.appendOverlay(dot);
       });
+    }
+
+    // Verified events render last so a nearby reference marker (for example
+    // Panama Canal) cannot take the event's pointer target.
+    if (this.state.layers.commodityEvents && SITE_VARIANT === 'commoditynode') {
+      this.renderCommodityEvents(projection);
     }
 
     } finally {

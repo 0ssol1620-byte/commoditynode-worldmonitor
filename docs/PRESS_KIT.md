@@ -14,7 +14,7 @@ The platform monitors over 200 countries using 500+ news feeds, 8 live news stre
 
 When a user opens World Monitor, they see a globe (or flat map) populated with live data points. Each point represents something happening in the world right now: a military flight over the Black Sea, an earthquake in Turkey, a protest in Nairobi, a cyberattack origin in Eastern Europe, or a spike in GPS jamming near a conflict zone.
 
-Users can toggle 56 map layer types on and off, zoom into regions, click on any event for details, and read AI-generated summaries that connect dots across multiple data streams. A command palette (Cmd+K) provides instant search across countries, layers, and intelligence categories.
+Users can toggle 57 map layer types on and off, zoom into regions, click on any event for details, and read AI-generated summaries that connect dots across multiple data streams. A command palette (Cmd+K) provides instant search across countries, layers, and intelligence categories.
 
 ### Six Specialized Dashboards
 

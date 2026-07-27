@@ -113,11 +113,20 @@ import { UNDERSEA_CABLES, NUCLEAR_FACILITIES, ECONOMIC_CENTERS, SPACEPORTS, CRIT
 import { getCommodityUniverseNodeIdForLabel } from '@/config/commoditynode-universe';
 import { resolveCommodityNodeSelection } from '@/config/commoditynode-selection';
 import {
+  COMMODITYNODE_VERIFIED_MAP_EVENTS,
+  getCommodityEventPulseFrame,
+} from '@/config/commoditynode-map-events';
+import {
+  deriveCommodityNodeMapLayerHealth,
+  type CommodityNodeMapSourceState,
+} from '@/config/commoditynode-map-health';
+import {
   applyCommodityNodeMapPreset,
   COMMODITYNODE_LAYER_GROUPS,
   COMMODITYNODE_MAP_PRESETS,
   type CommodityNodeMapPresetId,
 } from '@/config/commoditynode-map';
+import { dataFreshness, type DataSourceId } from '@/services/data-freshness';
 import type { GulfInvestment } from '@/types';
 import { resolveTradeRouteSegments, TRADE_ROUTES as TRADE_ROUTES_LIST, type TradeRouteSegment, type TradeRouteStatus } from '@/config/trade-routes';
 import type { ScenarioVisualState } from '@/config/scenario-templates';
@@ -619,6 +628,10 @@ export class DeckGLMap {
   private tradeAnimationFrame: number | null = null;
   private tradeAnimationFrameCount = 0;
   private tradeReducedMotionMedia: MediaQueryList | null = null;
+  private commodityEventPulseStartedAt: number | null = null;
+  private commodityEventPulseNow = 0;
+  private commodityEventPulseFrame: number | null = null;
+  private commodityLayerHealthUnsubscribe: (() => void) | null = null;
   private storedChokepointData: GetChokepointStatusResponse | null = null;
   private highlightedRouteIds: Set<string> = new Set();
   private highlightedMarkers: HighlightedMarker[] = [];
@@ -819,8 +832,16 @@ export class DeckGLMap {
   private readonly handleTradeMotionPreferenceChange = (): void => {
     if (this.prefersReducedTradeMotion()) {
       this.stopTradeAnimation();
+      this.stopCommodityEventPulse();
     } else if (this.state.layers.tradeRoutes && !this.renderPaused) {
       this.startTradeAnimation();
+    }
+    if (
+      !this.prefersReducedTradeMotion()
+      && this.state.layers.commodityEvents
+      && !this.renderPaused
+    ) {
+      this.restartCommodityEventPulse();
     }
     this.render();
   };
@@ -2128,6 +2149,18 @@ export class DeckGLMap {
     }
     if (mapLayers.commodityPorts) {
       layers.push(this.createCommodityPortsLayer());
+    }
+    if (mapLayers.commodityEvents) {
+      layers.push(...this.createCommodityEventLayers());
+      if (
+        this.commodityEventPulseStartedAt === null
+        && this.commodityEventPulseFrame === null
+      ) {
+        this.startCommodityEventPulse();
+      }
+    } else {
+      this.stopCommodityEventPulse();
+      this.commodityEventPulseStartedAt = null;
     }
 
     // APT Groups layer — loaded lazily when cyberThreats layer is enabled
@@ -3936,6 +3969,54 @@ export class DeckGLMap {
     });
   }
 
+  private createCommodityEventLayers(): Layer[] {
+    const now =
+      this.commodityEventPulseNow
+      || this.commodityEventPulseStartedAt
+      || performance.now();
+    const startedAt = this.commodityEventPulseStartedAt ?? now;
+    const pulse = getCommodityEventPulseFrame(
+      now,
+      startedAt,
+      this.prefersReducedTradeMotion(),
+    );
+    const lineAlpha = Math.round(255 * pulse.opacity);
+
+    return [
+      new ScatterplotLayer({
+        id: 'commodity-events-pulse-layer',
+        data: COMMODITYNODE_VERIFIED_MAP_EVENTS,
+        getPosition: (event) => [event.longitude, event.latitude],
+        getRadius: 15_000,
+        radiusScale: pulse.radiusScale,
+        radiusMinPixels: 11,
+        radiusMaxPixels: 34,
+        stroked: true,
+        filled: false,
+        getLineColor: [244, 190, 73, lineAlpha] as [number, number, number, number],
+        lineWidthMinPixels: 1.5,
+        pickable: false,
+        updateTriggers: {
+          radiusScale: pulse.radiusScale,
+          getLineColor: lineAlpha,
+        },
+      }),
+      new ScatterplotLayer({
+        id: 'commodity-events-layer',
+        data: COMMODITYNODE_VERIFIED_MAP_EVENTS,
+        getPosition: (event) => [event.longitude, event.latitude],
+        getRadius: 8_000,
+        radiusMinPixels: 6,
+        radiusMaxPixels: 11,
+        getFillColor: [244, 190, 73, 235] as [number, number, number, number],
+        stroked: true,
+        getLineColor: [255, 246, 212, 235] as [number, number, number, number],
+        lineWidthMinPixels: 1.5,
+        pickable: true,
+      }),
+    ];
+  }
+
   // Tech variant layers
   private createStartupHubsLayer(): ScatterplotLayer {
     return new ScatterplotLayer({
@@ -4870,6 +4951,13 @@ export class DeckGLMap {
         const volumeStr = obj.annualVolumeMt ? `<br/><span style="opacity:.75">${text(String(obj.annualVolumeMt))}Mt/yr</span>` : '';
         return { html: `<div class="deckgl-tooltip"><strong>⚓ ${text(obj.name)}</strong><br/>${text(obj.country)}<br/>${text(commoditiesStr)}${volumeStr}</div>` };
       }
+      case 'commodity-events-layer':
+        return {
+          html:
+            `<div class="deckgl-tooltip"><strong>${text(obj.name)}</strong>`
+            + `<br/>Verified historical event · ${text(obj.commodityLabel)}`
+            + `<br/><span style="opacity:.75">${text(String(obj.evidenceCount))} reviewed evidence records · not live telemetry</span></div>`,
+        };
       case 'ais-disruptions-layer':
         return { html: `<div class="deckgl-tooltip"><strong>AIS ${text(obj.type || t('components.deckgl.tooltip.disruption'))}</strong><br/>${text(obj.severity)} ${t('popups.severity')}<br/>${text(obj.description)}</div>` };
       case 'gps-jamming-layer':
@@ -5025,6 +5113,7 @@ export class DeckGLMap {
         'mining-sites-layer',
         'processing-plants-layer',
         'commodity-ports-layer',
+        'commodity-events-layer',
         'trade-routes-layer',
       ].includes(layerId)
     ) {
@@ -5038,6 +5127,8 @@ export class DeckGLMap {
         commodities?: string[];
         lat?: number;
         lon?: number;
+        latitude?: number;
+        longitude?: number;
       };
       const commodityLabel =
         object.mineral ?? object.materials?.[0] ?? object.commodities?.[0] ?? null;
@@ -5053,8 +5144,8 @@ export class DeckGLMap {
               entityName:
                 selection?.entityName ?? object.routeName ?? object.name ?? null,
               layerId,
-              latitude: selection?.latitude ?? object.lat ?? null,
-              longitude: selection?.longitude ?? object.lon ?? null,
+              latitude: selection?.latitude ?? object.lat ?? object.latitude ?? null,
+              longitude: selection?.longitude ?? object.lon ?? object.longitude ?? null,
               selection,
               source: 'map',
             },
@@ -5495,6 +5586,48 @@ export class DeckGLMap {
     });
   }
 
+  private getCommodityLayerHealthSources(
+    layer: keyof MapLayers,
+  ): CommodityNodeMapSourceState[] {
+    const sourceIds: Partial<Record<keyof MapLayers, readonly DataSourceId[]>> = {
+      natural: ['usgs'],
+      tradeRoutes: ['supply_chain'],
+      waterways: ['supply_chain'],
+    };
+    return (sourceIds[layer] ?? []).flatMap((sourceId) => {
+      const source = dataFreshness.getSource(sourceId);
+      return source
+        ? [{
+            name: source.name,
+            status: source.status,
+            lastUpdate: source.lastUpdate,
+          }]
+        : [];
+    });
+  }
+
+  private updateCommodityLayerHealthBadges(root: ParentNode): void {
+    if (SITE_VARIANT !== 'commoditynode') return;
+    for (const group of COMMODITYNODE_LAYER_GROUPS) {
+      for (const layer of group.layers) {
+        const health = deriveCommodityNodeMapLayerHealth(
+          layer,
+          'webgl',
+          this.getCommodityLayerHealthSources(layer),
+        );
+        const badge = root.querySelector<HTMLElement>(
+          `.cn-map-layer-health[data-layer="${layer}"]`,
+        );
+        if (!badge) continue;
+        badge.textContent = health.label;
+        badge.dataset.state = health.state;
+        badge.className = `cn-map-layer-health cn-map-layer-health--${health.state}`;
+        badge.title = health.detail;
+        badge.setAttribute('aria-label', `${health.label}. ${health.detail}`);
+      }
+    }
+  }
+
   private createLayerToggles(): void {
     const toggles = document.createElement('div');
     toggles.className = 'layer-toggles deckgl-layer-toggles';
@@ -5519,6 +5652,14 @@ export class DeckGLMap {
     }: (typeof layerConfig)[number]): string => {
       const isLocked = premium === 'locked' && !premiumUnlocked;
       const isEnhanced = premium === 'enhanced' && !premiumUnlocked;
+      const health =
+        SITE_VARIANT === 'commoditynode'
+          ? deriveCommodityNodeMapLayerHealth(
+              key,
+              'webgl',
+              this.getCommodityLayerHealthSources(key),
+            )
+          : null;
       return `
         <div class="layer-toggle-row" data-layer="${key}">
           <label class="layer-toggle${isLocked ? ' layer-toggle-locked' : ''}" data-layer="${key}">
@@ -5526,6 +5667,7 @@ export class DeckGLMap {
             <span class="toggle-icon">${icon}</span>
             <span class="toggle-label">${label}${isLocked ? ' \uD83D\uDD12' : ''}${isEnhanced ? ' <span class="layer-pro-badge">PRO</span>' : ''}</span>
           </label>
+          ${health ? `<span class="cn-map-layer-health cn-map-layer-health--${health.state}" data-layer="${key}" data-state="${health.state}" title="${escapeHtml(health.detail)}">${health.label}</span>` : ''}
           <button type="button" class="layer-explain-btn${hasExplanation ? ' has-layer-explanation' : ''}" data-layer="${key}" aria-label="${explainLabel}">i</button>
         </div>`;
     };
@@ -5578,6 +5720,13 @@ export class DeckGLMap {
     }
 
     this.container.appendChild(toggles);
+    if (SITE_VARIANT === 'commoditynode') {
+      this.updateCommodityLayerHealthBadges(toggles);
+      this.commodityLayerHealthUnsubscribe?.();
+      this.commodityLayerHealthUnsubscribe = dataFreshness.subscribe(() => {
+        this.updateCommodityLayerHealthBadges(toggles);
+      });
+    }
 
     // Unlock premium layers when Pro status resolves. Pro can come from EITHER:
     //   1. Clerk role === 'pro' (subscribeAuthState fires on Clerk changes)
@@ -5639,6 +5788,14 @@ export class DeckGLMap {
             }
           }
           this.state.layers[layer] = enabled;
+          if (layer === 'commodityEvents') {
+            if (enabled) this.restartCommodityEventPulse();
+            else {
+              this.stopCommodityEventPulse();
+              this.commodityEventPulseStartedAt = null;
+              this.commodityEventPulseNow = 0;
+            }
+          }
           if (layer === 'military' && !enabled) this.clearFlightTrails();
           if (layer === 'flights') this.manageAircraftTimer(enabled);
           if (this.state.layers.weather && !prevRadar) this.startWeatherRadar();
@@ -5948,6 +6105,7 @@ export class DeckGLMap {
               { shape: shapes.hexagon(isLight ? 'rgb(180, 120, 0)' : 'rgb(255, 200, 0)'), label: t('components.deckgl.legend.commodityHub'), layerKey: 'commodityHubs' },
               { shape: shapes.circle('rgb(180, 80, 80)'), label: t('components.deckgl.legend.miningSite'), layerKey: 'miningSites' },
               { shape: shapes.square('rgb(80, 160, 220)'), label: t('components.deckgl.legend.commodityPort'), layerKey: 'commodityPorts' },
+              { shape: shapes.circle('rgb(244, 190, 73)'), label: 'Verified historical event', layerKey: 'commodityEvents' },
               { shape: shapes.circle('rgb(255, 150, 50)'), label: t('components.deckgl.legend.pipeline'), layerKey: 'pipelines' },
               { shape: shapes.triangle('rgb(80, 170, 255)'), label: t('components.deckgl.legend.waterway'), layerKey: 'waterways' },
               { shape: shapes.circle('rgb(200, 100, 255)'), label: t('components.deckgl.legend.processingPlant'), layerKey: 'processingPlants' },
@@ -6035,12 +6193,14 @@ export class DeckGLMap {
       this.stopPulseAnimation();
       this.stopDayNightTimer();
       this.stopTradeAnimation();
+      this.stopCommodityEventPulse();
       return;
     }
 
     this.syncPulseAnimation();
     if (this.state.layers.dayNight) this.startDayNightTimer();
     if (this.state.layers.tradeRoutes) this.startTradeAnimation();
+    if (this.state.layers.commodityEvents) this.restartCommodityEventPulse();
     if (!paused && this.renderPending) {
       this.renderPending = false;
       this.render();
@@ -6422,6 +6582,47 @@ export class DeckGLMap {
 
   private prefersReducedTradeMotion(): boolean {
     return this.tradeReducedMotionMedia?.matches ?? window.matchMedia(PREFERS_REDUCED_MOTION_QUERY).matches;
+  }
+
+  private startCommodityEventPulse(): void {
+    if (this.commodityEventPulseFrame !== null) return;
+    if (this.renderPaused || this.prefersReducedTradeMotion()) return;
+
+    this.commodityEventPulseStartedAt ??= performance.now();
+    this.commodityEventPulseNow = this.commodityEventPulseStartedAt;
+    const step = (now: number) => {
+      if (this.destroyed || this.renderPaused || !this.state.layers.commodityEvents) {
+        this.commodityEventPulseFrame = null;
+        return;
+      }
+      this.commodityEventPulseNow = now;
+      const pulse = getCommodityEventPulseFrame(
+        now,
+        this.commodityEventPulseStartedAt ?? now,
+        false,
+      );
+      this.render();
+      if (!pulse.active) {
+        this.commodityEventPulseFrame = null;
+        return;
+      }
+      this.commodityEventPulseFrame = requestAnimationFrame(step);
+    };
+    this.commodityEventPulseFrame = requestAnimationFrame(step);
+  }
+
+  private stopCommodityEventPulse(): void {
+    if (this.commodityEventPulseFrame !== null) {
+      cancelAnimationFrame(this.commodityEventPulseFrame);
+      this.commodityEventPulseFrame = null;
+    }
+  }
+
+  private restartCommodityEventPulse(): void {
+    this.stopCommodityEventPulse();
+    this.commodityEventPulseStartedAt = null;
+    this.commodityEventPulseNow = 0;
+    this.startCommodityEventPulse();
   }
 
   private startTradeAnimation(): void {
@@ -7945,6 +8146,9 @@ export class DeckGLMap {
   public destroy(): void {
     this.destroyed = true;
     this.stopTradeAnimation();
+    this.stopCommodityEventPulse();
+    this.commodityLayerHealthUnsubscribe?.();
+    this.commodityLayerHealthUnsubscribe = null;
     this.activeFlightTrails.clear();
     this.clearTrailsBtn = null;
     this._unsubscribeAuthState?.();

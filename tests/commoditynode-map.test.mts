@@ -10,6 +10,12 @@ import {
   COMMODITYNODE_MAP_PRESETS,
 } from '../src/config/commoditynode-map';
 import { COMMODITYNODE_MAP_LAYERS } from '../src/config/variants/commoditynode';
+import {
+  COMMODITYNODE_VERIFIED_MAP_EVENTS,
+  COMMODITY_EVENT_PULSE_DURATION_MS,
+  getCommodityEventPulseFrame,
+} from '../src/config/commoditynode-map-events';
+import { deriveCommodityNodeMapLayerHealth } from '../src/config/commoditynode-map-health';
 
 describe('CommodityNode map product contract', () => {
   it('adapts curated assets into explicit discriminated marker records', () => {
@@ -62,6 +68,7 @@ describe('CommodityNode map product contract', () => {
       [
         'commodityHubs',
         'commodityPorts',
+        'commodityEvents',
         'miningSites',
         'natural',
         'pipelines',
@@ -88,5 +95,69 @@ describe('CommodityNode map product contract', () => {
     assert.equal(copper.layers.pipelines, false);
     assert.equal(copper.layers.miningSites, true);
     assert.equal(copper.layers.tradeRoutes, true);
+    assert.equal(copper.layers.commodityEvents, true);
+  });
+
+  it('publishes only evidence-linked events and settles the ripple after two cycles', () => {
+    assert.equal(COMMODITYNODE_VERIFIED_MAP_EVENTS.length, 1);
+    const event = COMMODITYNODE_VERIFIED_MAP_EVENTS[0]!;
+    assert.equal(event.status, 'published');
+    assert.equal(event.sourceStatus, 'verified_historical_event');
+    assert.equal(event.evidenceCount, 3);
+    assert.equal(event.detailHref, '/events/cobre-panama-production-halt/');
+
+    const first = getCommodityEventPulseFrame(100, 100, false);
+    assert.equal(first.active, true);
+    assert.equal(first.radiusScale, 0.82);
+    const settled = getCommodityEventPulseFrame(
+      100 + COMMODITY_EVENT_PULSE_DURATION_MS,
+      100,
+      false,
+    );
+    assert.deepEqual(settled, {
+      active: false,
+      opacity: 0.28,
+      radiusScale: 1,
+    });
+    assert.equal(getCommodityEventPulseFrame(200, 100, true).active, false);
+  });
+
+  it('does not collapse partial, stale, and unavailable source states', () => {
+    const fresh = {
+      name: 'Source A',
+      status: 'fresh' as const,
+      lastUpdate: new Date('2026-07-28T01:00:00.000Z'),
+    };
+    const noData = {
+      name: 'Source B',
+      status: 'no_data' as const,
+      lastUpdate: null,
+    };
+    const stale = {
+      name: 'Source C',
+      status: 'very_stale' as const,
+      lastUpdate: new Date('2026-07-27T01:00:00.000Z'),
+    };
+
+    assert.equal(
+      deriveCommodityNodeMapLayerHealth('natural', 'webgl', [fresh, noData]).state,
+      'partial',
+    );
+    assert.equal(
+      deriveCommodityNodeMapLayerHealth('natural', 'webgl', [stale]).state,
+      'stale',
+    );
+    assert.equal(
+      deriveCommodityNodeMapLayerHealth('natural', 'webgl', [noData]).state,
+      'unavailable',
+    );
+    assert.equal(
+      deriveCommodityNodeMapLayerHealth('commodityEvents', 'svg').state,
+      'historical',
+    );
+    assert.equal(
+      deriveCommodityNodeMapLayerHealth('miningSites', 'svg').state,
+      'unavailable',
+    );
   });
 });

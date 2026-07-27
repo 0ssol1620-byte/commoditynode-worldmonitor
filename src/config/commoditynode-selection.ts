@@ -287,7 +287,7 @@ function eventSelection(): CommodityNodeSelection {
     sourceStatus: 'verified_historical_event',
     sourceLabel: 'Three reviewed primary-source evidence records',
     ...commodity,
-    layerId: 'miningSites',
+    layerId: 'commodityEvents',
     latitude: mine?.lat ?? null,
     longitude: mine?.lon ?? null,
     ...commodityResearchLink(commodity.commodityId),

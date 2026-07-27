@@ -94,7 +94,7 @@ export const COMMODITYNODE_LAYER_GROUPS = [
   {
     id: 'context',
     label: 'Market and event context',
-    layers: ['commodityHubs', 'natural'],
+    layers: ['commodityEvents', 'commodityHubs', 'natural'],
   },
 ] as const satisfies ReadonlyArray<{
   id: string;
@@ -121,6 +121,7 @@ export const COMMODITYNODE_MAP_PRESETS: readonly CommodityNodeMapPreset[] = [
       'miningSites',
       'processingPlants',
       'commodityPorts',
+      'commodityEvents',
       'tradeRoutes',
       'waterways',
     ],

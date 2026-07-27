@@ -45,6 +45,15 @@ describe('CommodityNode map selection contract', () => {
     assert.equal(route?.layerId, 'tradeRoutes');
     assert.equal(typeof route?.latitude, 'number');
     assert.equal(typeof route?.longitude, 'number');
+
+    const event = resolveCommodityNodeSelection(
+      'event-cobre-panama-halt-2023',
+      'commodity-events-layer',
+    );
+    assert.equal(event?.kind, 'event');
+    assert.equal(event?.layerId, 'commodityEvents');
+    assert.equal(event?.sourceStatus, 'verified_historical_event');
+    assert.equal(event?.eventHref, '/events/cobre-panama-production-halt/');
   });
 
   it('keeps unpublished commodity research links on the real catalog', () => {

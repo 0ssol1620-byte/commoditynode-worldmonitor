@@ -3,6 +3,10 @@ import { expect, test } from '@playwright/test';
 test.describe('CommodityNode live shell', () => {
   test('shows fork-safe identity, minimal panels, and a visible source offer', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const missionClose = page.getByRole('button', {
+      name: 'Close mission presets',
+    });
+    if (await missionClose.isVisible()) await missionClose.click();
 
     await expect(page.locator('html')).toHaveAttribute('data-variant', 'commoditynode');
     await expect(page.locator('.app-heading')).toContainText('CommodityNode Live');
@@ -27,6 +31,35 @@ test.describe('CommodityNode live shell', () => {
     await expect(
       page.locator('.layer-toggle[data-layer="pipelines"]'),
     ).not.toHaveClass(/active/);
+    await expect(
+      page.locator('.cn-map-layer-health[data-layer="commodityEvents"]'),
+    ).toHaveAttribute('data-state', 'historical');
+    await expect(
+      page.locator('.cn-map-layer-static-state[data-layer="tradeRoutes"]'),
+    ).toContainText('Status unavailable');
+    await expect(page.locator('.cn-map-event-marker')).toHaveCount(1);
+    await expect(page.locator('.cn-map-event-marker__ring')).toHaveCSS(
+      'animation-iteration-count',
+      '2',
+    );
+    const eventMarker = page.locator('.cn-map-event-marker');
+    await expect(eventMarker).toHaveCSS('z-index', '75');
+    await expect
+      .poll(() =>
+        eventMarker.evaluate((marker) => {
+          const rect = marker.getBoundingClientRect();
+          return document.elementFromPoint(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          )?.closest('.cn-map-event-marker') === marker;
+        }),
+      )
+      .toBe(true);
+    await eventMarker.dispatchEvent('click');
+    const eventDrawer = page.locator('.cn-map-detail-drawer');
+    await expect(eventDrawer).toHaveAttribute('data-kind', 'event');
+    await expect(eventDrawer).toContainText('Three reviewed primary-source evidence records');
+    await eventDrawer.getByRole('button', { name: 'Close map detail' }).click();
 
     await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
     await expect(page.locator('.cn-universe-graph-stage')).toBeVisible();
