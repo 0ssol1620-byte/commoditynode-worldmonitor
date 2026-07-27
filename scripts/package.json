@@ -29,6 +29,7 @@
   "overrides": {
     "esbuild": "0.28.1",
     "undici": "$undici",
+    "unzipper": "0.12.3",
     "ws": "$ws"
   },
   "engines": {

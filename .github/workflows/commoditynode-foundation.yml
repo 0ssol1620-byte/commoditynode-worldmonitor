@@ -55,10 +55,13 @@ jobs:
       - name: Verify license and deployed-source contracts
         run: npm run commoditynode:contracts
 
+      - name: Verify third-party software inventory
+        run: npm run commoditynode:licenses:check
+
       - name: Verify CommodityNode unit contracts
         run: |
-          npx tsx --test tests/commoditynode-variant.test.mts
-          node --test api/commoditynode-cors.test.mjs
+          npx tsx --test tests/commoditynode-variant.test.mts tests/commoditynode-data-contracts.test.mts
+          node --test api/commoditynode-cors.test.mjs tests/commoditynode-license-inventory.test.mjs
 
       - name: Type-check
         run: npm run typecheck

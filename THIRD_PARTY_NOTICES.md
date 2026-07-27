@@ -9,9 +9,11 @@ third-party data services.
   preserved in the root `LICENSE` and upstream source files.
 - Official thin clients under `cli/` and `sdk/` may carry their own MIT license
   files. Those exceptions apply only to the files identified by upstream.
-- JavaScript package licenses are recorded by `package-lock.json` and the
-  license files included with installed packages. Release automation must
-  generate a dependency-license inventory before a production tag.
+- JavaScript package licenses are recorded by `package-lock.json`, the license
+  files included with installed packages, and the generated
+  [`docs/commoditynode/third-party-software-inventory.json`](docs/commoditynode/third-party-software-inventory.json).
+  CI rejects lockfile drift until the inventory is regenerated. Entries marked
+  `NOASSERTION` require manual review before a production release.
 
 ## Data and services
 

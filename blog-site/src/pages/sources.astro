@@ -1,9 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
+import { COMMODITYNODE_DATA_SOURCES } from '../../../shared/commoditynode-data-source-registry';
 
 if (!isCommodityNode) return Astro.redirect('/blog/');
 const canonicalUrl = absoluteUrl('/sources/');
+const rightsLabel = {
+  approved: 'Approved for stated use',
+  review_required: 'Legal review required',
+  restricted: 'Restricted',
+  expired: 'Expired',
+  rejected: 'Rejected',
+} as const;
 ---
 
 <Base
@@ -20,22 +28,75 @@ const canonicalUrl = absoluteUrl('/sources/');
     </p>
 
     <h2>Source classes</h2>
-    <table>
-      <thead>
-        <tr><th>Class</th><th>Typical use</th><th>Required display</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Official statistics</td><td>Production, inventories, trade, capacity</td><td>Agency, series, unit, period, revision</td></tr>
-        <tr><td>Market reference</td><td>Benchmarks and published prices</td><td>Venue or publisher, symbol, delay, currency</td></tr>
-        <tr><td>Infrastructure</td><td>Assets, routes, ports, outages</td><td>Operator or registry, geography, update time</td></tr>
-        <tr><td>Event reporting</td><td>Disruptions, policy, weather, conflict</td><td>Publisher, headline, publication time, link</td></tr>
-        <tr><td>Derived indicator</td><td>Exposure, concentration, path scoring</td><td>Inputs, calculation version, generated time</td></tr>
-      </tbody>
-    </table>
+    <div class="table-scroll" role="region" aria-label="Source class requirements" tabindex="0">
+      <table>
+        <caption>
+          Source classes and the provenance fields shown to readers
+          <span class="table-hint">Swipe horizontally for all columns.</span>
+        </caption>
+        <thead>
+          <tr><th>Class</th><th>Typical use</th><th>Required display</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Official statistics</td><td>Production, inventories, trade, capacity</td><td>Agency, series, unit, period, revision</td></tr>
+          <tr><td>Market reference</td><td>Benchmarks and published prices</td><td>Venue or publisher, symbol, delay, currency</td></tr>
+          <tr><td>Infrastructure</td><td>Assets, routes, ports, outages</td><td>Operator or registry, geography, update time</td></tr>
+          <tr><td>Event reporting</td><td>Disruptions, policy, weather, conflict</td><td>Publisher, headline, publication time, link</td></tr>
+          <tr><td>Derived indicator</td><td>Exposure, concentration, path scoring</td><td>Inputs, calculation version, generated time</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h2>Rights and attribution</h2>
     <p>
       Each upstream dataset keeps its own terms. CommodityNode does not relicense third-party data. Where redistribution is restricted, the product stores or displays only the permitted fields and links to the publisher.
+    </p>
+
+    <div class="table-scroll" role="region" aria-label="Reviewed source registry" tabindex="0">
+      <table>
+        <caption>
+          Reviewed source registry — rights review dated 28 July 2026
+          <span class="table-hint">Swipe horizontally for all columns.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Source</th>
+            <th scope="col">Cadence</th>
+            <th scope="col">Public use</th>
+            <th scope="col">Attribution and limits</th>
+          </tr>
+        </thead>
+        <tbody>
+          {COMMODITYNODE_DATA_SOURCES.map((source) => (
+            <tr>
+              <th scope="row">
+                <a href={source.homepageUrl} rel="external">{source.name}</a>
+                <span>{source.publisher}</span>
+              </th>
+              <td>{source.cadence}</td>
+              <td>
+                <strong data-rights-status={source.rights.status}>
+                  {rightsLabel[source.rights.status]}
+                </strong>
+                <span>{source.rights.license ?? 'No redistribution licence recorded'}</span>
+              </td>
+              <td>
+                <span>{source.attribution}</span>
+                <a href={source.rights.termsUrl} rel="external">Reviewed terms</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Market quote boundary</h2>
+    <p>
+      Yahoo Finance is recorded as a discovery and prototype source, not as a
+      publication-approved market-data licence. CommodityNode must not redistribute
+      its quotes publicly until a licensed provider agreement covers display,
+      caching, attribution, and commercial use. Research pages can still identify
+      the intended benchmark without publishing an unlicensed live value.
     </p>
 
     <h2>Corrections</h2>
@@ -48,3 +109,59 @@ const canonicalUrl = absoluteUrl('/sources/');
     </p>
   </article>
 </Base>
+
+<style>
+  .table-scroll {
+    margin: 1.25rem 0 2.5rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-gutter: stable;
+    border-block: 1px solid var(--border);
+  }
+
+  .table-scroll table {
+    min-width: 44rem;
+  }
+
+  .table-scroll:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  caption {
+    padding: 0.85rem 0;
+    text-align: left;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .table-hint {
+    display: none;
+  }
+
+  th span,
+  td span,
+  td a {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+
+  [data-rights-status='approved'] {
+    color: var(--text);
+  }
+
+  [data-rights-status='review_required'] {
+    color: var(--warning, #d8a84e);
+  }
+
+  @media (max-width: 44rem) {
+    .table-hint {
+      display: block;
+      margin-top: 0.3rem;
+      color: var(--text);
+    }
+  }
+</style>

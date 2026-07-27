@@ -20,21 +20,24 @@ fields below are complete and the publication state is `approved`.
 | Review date | Last rights and methodology review |
 | Publication state | candidate, review, approved, suspended, or retired |
 
-## Initial registry
+## Implemented registry
 
-The following entries are implementation candidates, not blanket publication
-approval.
+The typed source, rights, benchmark, claim, freshness, and publication contracts
+live in:
 
-| Provider or source family | Intended use | Initial state | Required action |
-|---|---|---|---|
-| USGS | Mineral and facility context | review | Confirm dataset-specific terms and attribution |
-| U.S. EIA | Energy inventories and flows | review | Record API terms, units, revisions, and cadence |
-| USDA | Agriculture production and inventory | review | Record series-level methodology and revisions |
-| World Bank | Macro and commodity context | review | Record indicator license and transformation |
-| Official exchanges/providers | Benchmark and proxy quotes | review | Verify redistribution, delay, instrument, unit |
-| Company filings and releases | Event evidence | review | Store exact filing/page locator and quotation scope |
-| Port/operator/regulator notices | Route and asset status | review | Store primary locator, validity window, correction path |
-| Curated RSS publishers | Event discovery | candidate | Link to originals; no full-text republication |
+- [`shared/commoditynode-data-contracts.ts`](shared/commoditynode-data-contracts.ts)
+- [`shared/commoditynode-data-source-registry.ts`](shared/commoditynode-data-source-registry.ts)
+
+The first reviewed records are USGS NMIC, U.S. EIA, FAOSTAT, and Yahoo Finance.
+USGS and EIA U.S.-government content is recorded as public domain with explicit
+third-party-media exceptions. FAOSTAT is recorded under CC BY 4.0 plus its
+statistical-database terms and dataset-level exceptions. Yahoo Finance remains
+`review_required`, with public display and redistribution disabled until a
+licensed provider agreement is recorded.
+
+USDA, World Bank, exchanges, filings, operator notices, RSS publishers, and
+other source families remain candidates until each exact dataset receives a
+registry entry. A source-family name alone never grants publication rights.
 
 No source in `candidate` or `review` state may silently become public. Missing
 or suspended sources produce a module-level `unavailable` or `partial` state;

@@ -83,6 +83,8 @@
     "prebuild:commoditynode": "npm run commoditynode:tokens && npm run product:facts && npm run build:commoditynode:research && node scripts/generate-commoditynode-build-info.mjs && node scripts/check-commoditynode-contracts.mjs",
     "build:commoditynode": "npm run security:vite-env-secrets -- --strict-local && npm run build:openapi && npm run build:agent-skills && cross-env-shell VITE_VARIANT=commoditynode \"tsc && vite build\"",
     "commoditynode:contracts": "node scripts/generate-commoditynode-build-info.mjs && node scripts/check-commoditynode-contracts.mjs",
+    "commoditynode:licenses": "node scripts/generate-commoditynode-license-inventory.mjs",
+    "commoditynode:licenses:check": "node scripts/generate-commoditynode-license-inventory.mjs --check",
     "commoditynode:performance": "node scripts/check-commoditynode-performance-budget.mjs",
     "typecheck": "tsc --noEmit",
     "typecheck:api": "tsc --noEmit -p tsconfig.api.json && node scripts/audit-convex-string-calls.cjs",
@@ -230,6 +232,7 @@
     "node-forge": "^1.4.0",
     "srvx": "^0.11.13",
     "protobufjs": "^7.6.2",
+    "unzipper": "0.12.3",
     "ws": "$ws",
     "shell-quote": "^1.8.4"
   }
