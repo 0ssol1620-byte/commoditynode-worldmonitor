@@ -601,8 +601,8 @@ describe('welcome landing page routing', () => {
     }
     assert.equal(
       variantUrls.commoditynode,
-      'https://live.commoditynode.com/',
-      'the independently deployed CommodityNode variant owns its live root canonical',
+      'https://commoditynode.com/live/',
+      'the CommodityNode variant owns the live path on the canonical apex',
     );
   });
 

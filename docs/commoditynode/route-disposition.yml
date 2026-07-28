@@ -5,9 +5,9 @@ surfaces:
     framework: astro
     indexable: true
   live:
-    origin: https://live.commoditynode.com
+    origin: https://commoditynode.com/live/
     framework: vite
-    indexable: true
+    indexable: false
 routes:
   /:
     surface: research
@@ -37,9 +37,9 @@ routes:
     surface: research
     action: keep
   /live/:
-    surface: research
-    action: redirect
-    target: https://live.commoditynode.com/
+    surface: live
+    action: keep
+    target: https://commoditynode.com/live/
   /source/:
     surface: live
     action: keep

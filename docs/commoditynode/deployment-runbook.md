@@ -8,7 +8,7 @@ the upstream World Monitor deployment.
 | Surface | Project | Domain | Build |
 | --- | --- | --- | --- |
 | Research | existing CommodityNode research project | `commoditynode.com` | Astro project build |
-| Live | `commoditynode-live` | `live.commoditynode.com` | `npm run build:commoditynode` |
+| Live | `commoditynode-live` | `commoditynode.com/live/` | `npm run build:commoditynode` |
 | API | initially co-located with Live; split after contract freeze | `api.commoditynode.com` | Vercel functions / Sebuf |
 
 Deploy the live surface with:
@@ -44,9 +44,23 @@ same commit, the immutable upstream base SHA, and the AGPL license path.
 2. Deploy a branch preview using `vercel.commoditynode.json`.
 3. Run smoke, accessibility, source-contract, CORS, and responsive checks on
    the immutable preview URL.
-4. Add `live.commoditynode.com` only after the DNS owner confirms the record.
-5. Promote the already-tested deployment; do not rebuild a different commit.
-6. Verify the domain, source offer, build record, headers, and rollback target.
+4. Route `commoditynode.com/live/` to the live shell from the canonical apex
+   project configuration.
+5. Keep `live.commoditynode.com` only as a permanent compatibility redirect.
+6. Promote the already-tested deployment; do not rebuild a different commit.
+7. Verify the apex path, redirect, source offer, build record, headers, and
+   rollback target.
+
+The repeatable origin check is:
+
+```powershell
+npm run commoditynode:production
+```
+
+It fails when `commoditynode.com/live/` does not serve the live shell, when
+either deployed surface does not match the checked-out commit, when a Korean
+browser preference changes the English product response, or when a retired
+search URL falls through to a `200` dashboard shell.
 
 ## Rollback
 

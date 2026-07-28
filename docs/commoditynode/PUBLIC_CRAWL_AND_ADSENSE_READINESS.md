@@ -39,6 +39,31 @@ The July 28, 2026 production build passes the gate with:
 The gate runs immediately after the CommodityNode production build in the
 foundation workflow, so a crawl regression cannot ship unnoticed.
 
+## Production origin audit
+
+After deployment, run:
+
+```bash
+npm run commoditynode:production
+```
+
+This verifies the apex research origin, the canonical
+`commoditynode.com/live/` product path, and the Vercel fallback against the
+current Git commit. It checks
+reviewed pages, the capability API, immutable source provenance, English-only
+responses under a Korean `Accept-Language` header, and representative retired
+URLs that must return `410` with `noindex`.
+
+The narrower fallback command can validate the same live build directly
+through its Vercel project URL:
+
+```bash
+npm run commoditynode:production:fallback
+```
+
+The fallback command is not a launch substitute. The release gate remains red
+until the unmodified production command passes on the canonical apex path.
+
 ## Advertising activation remains fail-closed
 
 Passing the public crawl does not activate advertising. Production continues

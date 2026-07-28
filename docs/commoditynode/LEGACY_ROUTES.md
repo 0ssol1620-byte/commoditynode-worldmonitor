@@ -27,6 +27,14 @@ contains no advertising or analytics. It links only to the commodity directory a
 published event directory as optional navigation; it does not pretend those pages are
 equivalent replacements.
 
+The CommodityNode host also has a final document-route safety net before the
+shared World Monitor dashboard fallback. If a generated research file does not
+exist, the request reaches the same `410` handler instead of returning the live
+SPA shell with HTTP `200`. This covers retired top-level articles and obsolete
+dynamic entity URLs that predate this manifest, including old commodity and
+company slugs. API, discovery, documentation, and static-asset namespaces are
+excluded from that safety net.
+
 The executable single source of truth is
 `shared/commoditynode-legacy-routes.ts`. `vercel.json` mirrors that manifest with
 CommodityNode-host-only redirects and rewrites. World Monitor routes remain untouched.

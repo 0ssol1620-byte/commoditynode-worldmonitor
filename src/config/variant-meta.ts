@@ -131,7 +131,7 @@ export const VARIANT_META: { full: VariantMeta; [k: string]: VariantMeta } = {
     title: 'CommodityNode Live - Commodity Impact Intelligence',
     description: 'Evidence-linked commodity intelligence across benchmarks, physical assets, trade routes, supply disruptions, and market implications.',
     keywords: 'commodity intelligence, commodity impact map, commodity benchmarks, mining sites, processing plants, commodity ports, supply disruption, trade routes, chokepoints, evidence-linked market research',
-    url: 'https://live.commoditynode.com/',
+    url: 'https://commoditynode.com/live/',
     siteName: 'CommodityNode',
     shortName: 'CommodityNode',
     subject: 'Evidence-linked Commodity Market and Supply Intelligence',

@@ -62,7 +62,7 @@ async function bootEmbed(): Promise<void> {
     const attribution = document.createElement('a');
     attribution.className = 'wm-embed-attribution';
     attribution.href = buildWorldMonitorAttributionUrl(
-      new URL(params.variant === 'commoditynode' ? '/' : '/dashboard', window.location.origin).toString(),
+      new URL(params.variant === 'commoditynode' ? '/live/' : '/dashboard', window.location.origin).toString(),
       getReferrerHost(),
     );
     attribution.target = '_blank';

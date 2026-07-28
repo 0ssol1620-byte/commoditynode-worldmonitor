@@ -14,7 +14,7 @@ export const site = isCommodityNode
       rssPath: '/rss.xml',
       description:
         'Source-linked research on commodity benchmarks, physical supply, trade routes, disruptions, and market transmission.',
-      liveUrl: 'https://live.commoditynode.com',
+      liveUrl: 'https://commoditynode.com/live/',
       sourceUrl: 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor',
       markUrl: '/commoditynode-mark.svg',
       ogImageUrl: 'https://commoditynode.com/og/commoditynode-impact-universe.svg',

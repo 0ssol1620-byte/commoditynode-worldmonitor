@@ -250,7 +250,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
               <button type="button" class="footer-privacy-button" data-open-privacy-settings>
                 Privacy settings
               </button>
-              <a href={`${site.liveUrl.replace(/\/$/, '')}/source/`}>AGPL source</a>
+              <a href={new URL('/source/', site.origin).href}>AGPL source</a>
             </>
           ) : (
             <>

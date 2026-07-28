@@ -105,7 +105,7 @@ const rightsLabel = {
     </p>
 
     <p>
-      Inspect the <a href={`${site.liveUrl.replace(/\/$/, '')}/source/`}>deployed build provenance</a> or the <a href={site.sourceUrl}>public AGPL source repository</a>.
+      Inspect the <a href={new URL('/source/', site.origin).href}>deployed build provenance</a> or the <a href={site.sourceUrl}>public AGPL source repository</a>.
     </p>
   </article>
 </Base>

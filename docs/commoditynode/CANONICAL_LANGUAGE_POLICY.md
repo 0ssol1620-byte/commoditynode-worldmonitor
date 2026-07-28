@@ -16,12 +16,20 @@ emit speculative alternates for translations that do not exist.
 
 ## Live surface
 
-- The JavaScript dashboard canonical is `https://live.commoditynode.com/`.
+- The JavaScript dashboard canonical is `https://commoditynode.com/live/`.
 - The live shell emits English and x-default alternates to that URL.
+- CommodityNode defaults to reviewed English even when the browser or operating
+  system advertises another locale. A `ko-KR` browser therefore still receives
+  `lang="en"` and English analytical copy.
+- A language changes only through an explicit `?lang=` request or a language
+  choice saved by the user in Settings. Browser locale alone never changes the
+  CommodityNode product language.
 - The live dashboard remains `noindex, follow`; it supports research rather
   than competing with the substantive research inventory.
 - The research site links to the live surface as an analytical extension, not
   as a duplicate article.
+- The retired `live.commoditynode.com` hostname permanently redirects to the
+  matching canonical apex surface and never owns a second canonical.
 
 ## Legacy URLs
 

@@ -89,7 +89,7 @@ describe('CommodityNode additive variant contract', () => {
   it('uses CommodityNode identity and makes no upstream aggregate usage claims', () => {
     const meta = VARIANT_META.commoditynode;
     assert.equal(meta.siteName, 'CommodityNode');
-    assert.equal(meta.url, 'https://live.commoditynode.com/');
+    assert.equal(meta.url, 'https://commoditynode.com/live/');
     assert.doesNotMatch(meta.description, /\b(?:2M|500\+|190 countries|57 layers)\b/i);
     assert.doesNotMatch(meta.title, /World Monitor/i);
   });

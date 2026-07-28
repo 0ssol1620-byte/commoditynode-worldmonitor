@@ -15,20 +15,45 @@ function findRewrite(source, host) {
   );
 }
 
-function findRedirect(source) {
-  return config.redirects.find((redirect) => redirect.source === source);
+function findRedirect(source, host) {
+  return config.redirects.find(
+    (redirect) =>
+      redirect.source === source
+      && (
+        host === undefined
+        || redirect.has?.some((rule) => rule.type === 'host' && rule.value === host)
+      ),
+  );
 }
 
 describe('CommodityNode Vercel routing', () => {
-  it('serves research at the apex and live intelligence on its subdomain', () => {
+  it('serves research and live intelligence on distinct paths of the canonical apex', () => {
     const research = findRewrite('/', '^(?:www\\.)?commoditynode\\.com$');
-    const live = findRewrite('/', '^live\\.commoditynode\\.com$');
+    const live = findRewrite('/live/', '^(?:www\\.)?commoditynode\\.com$');
+    const liveDeepLink = findRewrite('/live/:path*', '^(?:www\\.)?commoditynode\\.com$');
     const fallback = findRewrite('/', '^commoditynode-live\\.vercel\\.app$');
     assert.equal(research?.destination, '/commoditynode-site/index.html');
     assert.equal(live?.destination, '/dashboard.html');
+    assert.equal(liveDeepLink?.destination, '/dashboard.html');
     assert.equal(fallback?.destination, '/dashboard.html');
     assert.ok(config.rewrites.indexOf(research) < config.rewrites.indexOf(live));
-    assert.ok(config.rewrites.indexOf(live) < config.rewrites.indexOf(fallback));
+    assert.ok(config.rewrites.indexOf(live) < config.rewrites.indexOf(liveDeepLink));
+  });
+
+  it('permanently consolidates the legacy live subdomain into the apex', () => {
+    const legacyHost = '^live\\.commoditynode\\.com$';
+    const root = findRedirect('/', legacyHost);
+    const embed = findRedirect('/embed', legacyHost);
+    const source = findRedirect('/source/:match*', legacyHost);
+    const fallback = findRedirect('/:match*', legacyHost);
+
+    assert.equal(root?.destination, 'https://commoditynode.com/live/');
+    assert.equal(embed?.destination, 'https://commoditynode.com/embed');
+    assert.equal(source?.destination, 'https://commoditynode.com/source/:match*');
+    assert.equal(fallback?.destination, 'https://commoditynode.com/live/');
+    for (const redirect of [root, embed, source, fallback]) {
+      assert.equal(redirect?.permanent, true);
+    }
   });
 
   it('does not redirect exact research utility pages into upstream documentation', () => {
