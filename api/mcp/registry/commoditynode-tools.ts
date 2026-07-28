@@ -1,10 +1,8 @@
 import { CANONICAL_COMMODITYNODE_ALERT_EVENTS } from '../../../convex/config/commodityNodeAlertCatalog';
 import {
-  COMMODITY_GROUP_LABELS,
-  COMMODITY_UNIVERSE_EDGES,
-  COMMODITY_UNIVERSE_NODES,
-} from '../../../src/config/commoditynode-universe';
-import { TRADE_ROUTES } from '../../../src/config/trade-routes';
+  listCommodityNodeBenchmarks,
+  listCommodityNodeRoutes,
+} from '../../../server/commoditynode/catalog-service';
 import {
   getCommodityNodeGraphEvidence,
   getCommodityNodeGraphSnapshot,
@@ -98,17 +96,7 @@ export const COMMODITYNODE_TOOLS: ToolDef[] = [
     _execute: async (params) => {
       const group = textArg(params.group);
       const commodityId = textArg(params.commodity_id);
-      const benchmarks = COMMODITY_UNIVERSE_NODES
-        .filter((node) => (!group || node.group === group) && (!commodityId || node.id === commodityId))
-        .map(({ x: _x, y: _y, ...node }) => ({
-          ...node,
-          groupLabel: COMMODITY_GROUP_LABELS[node.group],
-        }));
-      const visibleIds = new Set(benchmarks.map((node) => node.id));
-      const relationships = COMMODITY_UNIVERSE_EDGES.filter(
-        (edge) => visibleIds.has(edge.source) || visibleIds.has(edge.target),
-      );
-      return { benchmarks, relationships, total: benchmarks.length };
+      return listCommodityNodeBenchmarks(group, commodityId);
     },
     _apiPaths: [],
   },
@@ -151,10 +139,7 @@ export const COMMODITYNODE_TOOLS: ToolDef[] = [
     _execute: async (params) => {
       const category = textArg(params.category);
       const status = textArg(params.status);
-      const routes = TRADE_ROUTES.filter(
-        (route) => (!category || route.category === category) && (!status || route.status === status),
-      );
-      return { routes, total: routes.length, telemetryStatus: 'reference_registry' };
+      return listCommodityNodeRoutes(category, status);
     },
     _apiPaths: [],
   },

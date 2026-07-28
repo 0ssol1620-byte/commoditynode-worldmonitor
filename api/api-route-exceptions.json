@@ -17,6 +17,20 @@
       "removal_issue": null
     },
     {
+      "path": "api/commoditynode-analytics.ts",
+      "category": "internal-helper",
+      "reason": "First-party, privacy-minimal aggregate event sink used only by the CommodityNode research shell. It accepts a closed event allowlist, stores daily counters without identifiers, exposes no read API, and is not a user-facing data contract.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-legacy.ts",
+      "category": "non-json",
+      "reason": "HTML-only 410 Gone response for retired CommodityNode routes. It deliberately provides no JSON data API and exists to prevent misleading redirects from removed research pages.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
       "path": "api/mcp.ts",
       "category": "external-protocol",
       "reason": "MCP streamable-HTTP transport — JSON-RPC 2.0 envelope dictated by the Model Context Protocol spec, not something we can or should redefine as proto. After the api/mcp.ts → api/mcp/ structural split, this file is a thin re-export shim that preserves the Vercel edge route URL and the public export surface; the actual handler and supporting modules live under api/mcp/ (each listed below).",
@@ -90,6 +104,13 @@
       "path": "api/mcp/registry/rpc-tools.ts",
       "category": "external-protocol",
       "reason": "MCP TOOL_REGISTRY RPC-tool entries (with _execute, incl. describe_tool). Extracted from api/mcp.ts during the structural split; same external-protocol constraint as the parent shim.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
+      "path": "api/mcp/registry/commoditynode-tools.ts",
+      "category": "external-protocol",
+      "reason": "CommodityNode MCP TOOL_REGISTRY entries exposed only through the MCP JSON-RPC tools/list and tools/call methods. This module exports protocol tool definitions and read-only executors, not an HTTP product API route; the public envelope remains dictated by the MCP specification.",
       "owner": "@SebastienMelki",
       "removal_issue": null
     },

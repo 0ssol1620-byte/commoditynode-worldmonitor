@@ -44,4 +44,3 @@ npx tsx --test tests/commoditynode-privacy-analytics.test.mts
 npm run build:commoditynode
 node --test tests/commoditynode-research-build.test.mjs
 ```
-

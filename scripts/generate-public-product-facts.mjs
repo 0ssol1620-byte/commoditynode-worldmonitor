@@ -185,6 +185,10 @@ emit('public/product-facts.json', json(facts));
 emit('shared/product-catalog.generated.json', json(catalogBundle));
 emit('scripts/shared/product-catalog.generated.json', json(catalogBundle));
 
+const agentView = readJson('public/agent-view.json');
+agentView.endpoints.mcp.tools = mcpToolCount;
+emit('public/agent-view.json', json(agentView));
+
 const edgeModule = `// AUTO-GENERATED from convex/config/productCatalog.ts and the MCP registry.
 // Do not edit manually. Run: npm run product:facts
 // @ts-check
@@ -312,6 +316,19 @@ const proLocalePaths = readdirSync(join(ROOT, 'pro-test/src/locales'))
 for (const path of proLocalePaths) {
   transform(path, (source) => {
     const locale = JSON.parse(source);
+    const countKeys = [
+      ['depth', 's12v'],
+      ['agents', 'b1'],
+      ['agents', 'promise'],
+      ['pricing', 'proF4'],
+      ['faq', 'a7'],
+    ];
+    for (const [section, key] of countKeys) {
+      const value = locale.welcome?.[section]?.[key];
+      if (typeof value === 'string') {
+        locale.welcome[section][key] = value.replace(/\d+/, String(mcpToolCount));
+      }
+    }
     delete locale.nav?.reserveAccess;
     delete locale.hero?.reserveEarlyAccess;
     delete locale.hero?.emailPlaceholder;
