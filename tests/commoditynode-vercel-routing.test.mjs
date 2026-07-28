@@ -32,16 +32,17 @@ describe('CommodityNode Vercel routing', () => {
       rewrite.source.startsWith('/((?!api|mcp|a2a|ask|oauth|assets|blog|docs'),
     );
     assert.ok(catchAllIndex > 0);
-    for (const source of [
+    const pageSources = [
       '/posts/:path*',
       '/authors/:path*',
       '/commodities/:path*',
       '/events/:path*',
+      '/companies/:path*',
+      '/glossary/:path*',
       '/editorial-policy/:path*',
       '/corrections/:path*',
       '/contact/:path*',
       '/search/:path*',
-      '/search-index.json',
       '/methodology/:path*',
       '/sources/:path*',
       '/about/:path*',
@@ -49,6 +50,9 @@ describe('CommodityNode Vercel routing', () => {
       '/brief/:path*',
       '/developers/:path*',
       '/plans/:path*',
+    ];
+    const assetSources = [
+      '/search-index.json',
       '/rss.xml',
       '/llms.txt',
       '/robots.txt',
@@ -59,10 +63,18 @@ describe('CommodityNode Vercel routing', () => {
       '/images/:path*',
       '/og/:path*',
       '/commoditynode-mark.svg',
-    ]) {
+    ];
+    for (const source of [...pageSources, ...assetSources]) {
       const rewrite = findRewrite(source, '^(?:www\\.)?commoditynode\\.com$');
       assert.ok(rewrite, `${source} CommodityNode rewrite is missing`);
       assert.ok(config.rewrites.indexOf(rewrite) < catchAllIndex);
+    }
+    for (const source of pageSources) {
+      const rewrite = findRewrite(source, '^(?:www\\.)?commoditynode\\.com$');
+      assert.ok(
+        rewrite.destination.endsWith('/:path*/index.html'),
+        `${source} must resolve Astro directory routes to their generated index.html`,
+      );
     }
   });
 });
