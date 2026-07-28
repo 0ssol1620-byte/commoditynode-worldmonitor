@@ -86,6 +86,7 @@
     { "source": "/og/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/og/:path*" },
     { "source": "/commoditynode-mark.svg", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/commoditynode-mark.svg" },
     { "source": "/", "has": [{ "type": "host", "value": "^live\\.commoditynode\\.com$" }], "destination": "/dashboard.html" },
+    { "source": "/", "has": [{ "type": "host", "value": "^commoditynode-live\\.vercel\\.app$" }], "destination": "/dashboard.html" },
     { "source": "/docs/mcp", "destination": "/api/docs-mcp" },
     { "source": "/docs/:match*", "destination": "https://worldmonitor.mintlify.dev/docs/:match*" },
     { "source": "/index.md", "destination": "/home.md" },

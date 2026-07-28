@@ -19,9 +19,12 @@ describe('CommodityNode Vercel routing', () => {
   it('serves research at the apex and live intelligence on its subdomain', () => {
     const research = findRewrite('/', '^(?:www\\.)?commoditynode\\.com$');
     const live = findRewrite('/', '^live\\.commoditynode\\.com$');
+    const fallback = findRewrite('/', '^commoditynode-live\\.vercel\\.app$');
     assert.equal(research?.destination, '/commoditynode-site/index.html');
     assert.equal(live?.destination, '/dashboard.html');
+    assert.equal(fallback?.destination, '/dashboard.html');
     assert.ok(config.rewrites.indexOf(research) < config.rewrites.indexOf(live));
+    assert.ok(config.rewrites.indexOf(live) < config.rewrites.indexOf(fallback));
   });
 
   it('routes canonical research assets before the shared SPA catch-all', () => {
