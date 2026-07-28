@@ -47,10 +47,28 @@ describe('CommodityNode Vercel routing', () => {
   });
 
   it('routes canonical research assets before the shared SPA catch-all', () => {
-    const catchAllIndex = config.rewrites.findIndex((rewrite) =>
-      rewrite.source.startsWith('/((?!api|mcp|a2a|ask|oauth|assets|blog|docs'),
+    const catchAllIndexes = config.rewrites
+      .map((rewrite, index) => ({ rewrite, index }))
+      .filter(({ rewrite }) =>
+        rewrite.source.startsWith('/((?!api|mcp|a2a|ask|oauth|assets|blog|docs'),
+      );
+    const commodityNodeRetiredIndex = catchAllIndexes.find(
+      ({ rewrite }) => rewrite.has?.some(
+        (rule) =>
+          rule.type === 'host'
+          && rule.value === '^(?:www\\.)?commoditynode\\.com$',
+      ),
+    )?.index ?? -1;
+    const sharedSpaIndex = catchAllIndexes.find(
+      ({ rewrite }) => !rewrite.has?.some((rule) => rule.type === 'host'),
+    )?.index ?? -1;
+    assert.ok(commodityNodeRetiredIndex > 0);
+    assert.ok(sharedSpaIndex > commodityNodeRetiredIndex);
+    assert.equal(
+      config.rewrites[commodityNodeRetiredIndex]?.destination,
+      '/api/commoditynode-legacy',
     );
-    assert.ok(catchAllIndex > 0);
+    const catchAllIndex = commodityNodeRetiredIndex;
     const pageSources = [
       '/posts/:path*',
       '/authors/:path*',
@@ -126,5 +144,24 @@ describe('CommodityNode Vercel routing', () => {
       );
       assert.ok(config.rewrites.indexOf(rewrite) < catchAllIndex);
     }
+  });
+
+  it('returns 410 for unknown CommodityNode documents before the shared dashboard fallback', () => {
+    const catches = config.rewrites.filter((rewrite) =>
+      rewrite.source.startsWith('/((?!api|mcp|a2a|ask|oauth|assets|blog|docs'),
+    );
+    const retired = catches.find((rewrite) =>
+      rewrite.has?.some(
+        (rule) =>
+          rule.type === 'host'
+          && rule.value === '^(?:www\\.)?commoditynode\\.com$',
+      ),
+    );
+    const dashboard = catches.find((rewrite) => !rewrite.has);
+
+    assert.equal(retired?.destination, '/api/commoditynode-legacy');
+    assert.equal(dashboard?.destination, '/dashboard.html');
+    assert.ok(config.rewrites.indexOf(retired) < config.rewrites.indexOf(dashboard));
+    assert.match(retired.source, /^\/\(\(\?!api\|mcp\|a2a\|ask\|oauth/);
   });
 });
