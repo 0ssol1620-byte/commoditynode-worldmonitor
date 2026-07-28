@@ -126,6 +126,30 @@ describe("CommodityNode account product primitives", () => {
     expect((await asUser.query(product.listAlertDeliveries, {}))[0]?.readAt).toBeTypeOf("number");
   });
 
+  test("canonical alert sync does not fabricate delivery for an unsupported legacy email rule", async () => {
+    const t = convexTest(schema, modules);
+    const asUser = t.withIdentity(USER);
+    await t.run(async (ctx) => {
+      await ctx.db.insert("commodityNodeAlertRules", {
+        userId: USER.subject,
+        scopeType: "event_pulse",
+        scopeId: "cobre-panama-production-halt",
+        channel: "email",
+        minimumMateriality: "material",
+        dedupeWindowMinutes: 360,
+        enabled: true,
+        createdAt: Date.UTC(2023, 0, 1),
+        updatedAt: Date.UTC(2023, 0, 1),
+      });
+    });
+
+    expect(await t.mutation(product.syncCanonicalAlertEvents, {})).toEqual({
+      eventsInserted: 1,
+      deliveriesInserted: 0,
+    });
+    expect(await asUser.query(product.listAlertDeliveries, {})).toEqual([]);
+  });
+
   test("failed confirmation delivery can roll back only its pending token", async () => {
     const t = convexTest(schema, modules);
     const token = "a".repeat(64);

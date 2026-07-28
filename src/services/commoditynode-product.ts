@@ -14,7 +14,7 @@ export interface CommodityNodeAlertRule {
   _id: string;
   scopeType: CommodityNodeEntityType | 'event_pulse';
   scopeId: string;
-  channel: 'email' | 'in_app';
+  channel: 'in_app';
   minimumMateriality: 'notable' | 'material' | 'critical';
   enabled: boolean;
   updatedAt: number;
@@ -33,7 +33,32 @@ export interface CommodityNodeAlertDelivery {
   } | null;
 }
 
+export function hasCommodityNodeAccountService(config: {
+  convexUrl?: string;
+  clerkPublishableKey?: string;
+}): boolean {
+  return Boolean(config.convexUrl?.trim() && config.clerkPublishableKey?.trim());
+}
+
+export function isCommodityNodeAccountServiceConfigured(): boolean {
+  const env = (
+    import.meta as ImportMeta & {
+      env?: {
+        VITE_CONVEX_URL?: string;
+        VITE_CLERK_PUBLISHABLE_KEY?: string;
+      };
+    }
+  ).env;
+  return hasCommodityNodeAccountService({
+    convexUrl: env?.VITE_CONVEX_URL,
+    clerkPublishableKey: env?.VITE_CLERK_PUBLISHABLE_KEY,
+  });
+}
+
 async function authenticatedClient() {
+  if (!isCommodityNodeAccountServiceConfigured()) {
+    throw new Error('ACCOUNT_SERVICE_UNAVAILABLE');
+  }
   if (!getAuthState().user) throw new Error('SIGN_IN_REQUIRED');
   const [client, api] = await Promise.all([getConvexClient(), getConvexApi()]);
   if (!client || !api) throw new Error('ACCOUNT_SERVICE_UNAVAILABLE');

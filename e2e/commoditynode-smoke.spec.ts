@@ -190,6 +190,12 @@ test.describe('CommodityNode live shell', () => {
     await eventResult.click();
     await expect(drawer).toHaveAttribute('data-kind', 'event');
     await expect(drawer).toContainText('Three reviewed primary-source evidence records');
+    await expect(
+      drawer.getByRole('button', { name: 'Enable impact alert' }),
+    ).toBeDisabled();
+    await expect(drawer).toContainText(
+      'Account alerts are not available on this deployment.',
+    );
     await expect
       .poll(() => new URL(page.url()).searchParams.get('mapEntity'))
       .toBe('event:event-cobre-panama-halt-2023');
@@ -234,6 +240,12 @@ test.describe('CommodityNode live shell', () => {
     await expect(
       page.getByRole('button', { name: 'All 23', exact: true }),
     ).toHaveCSS('min-height', '44px');
+    await expect(
+      universeInspector.getByRole('button', { name: 'Save commodity' }),
+    ).toBeDisabled();
+    await expect(universeInspector).toContainText(
+      'Account watchlists are not available on this deployment.',
+    );
 
     await expect(page.locator('.cn-map-detail-drawer')).toBeAttached();
     await page.evaluate(() => {
@@ -259,14 +271,16 @@ test.describe('CommodityNode live shell', () => {
       .focus();
     await page.keyboard.press('Tab');
     await expect(
-      mobileDrawer.getByRole('button', { name: 'Save item' }),
-    ).toBeFocused();
-    await mobileDrawer
-      .getByRole('button', { name: 'Enable impact alert' })
-      .focus();
-    await page.keyboard.press('Tab');
-    await expect(
       mobileDrawer.getByRole('button', { name: 'Close map detail' }),
     ).toBeFocused();
+    await expect(
+      mobileDrawer.getByRole('button', { name: 'Save item' }),
+    ).toBeDisabled();
+    await expect(
+      mobileDrawer.getByRole('button', { name: 'Enable impact alert' }),
+    ).toBeHidden();
+    await expect(mobileDrawer).toContainText(
+      'Account watchlists are not available on this deployment.',
+    );
   });
 });

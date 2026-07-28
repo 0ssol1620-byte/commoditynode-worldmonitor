@@ -6,6 +6,7 @@ import {
 import { getAuthState } from '@/services/auth-state';
 import { openSignIn } from '@/services/clerk';
 import {
+  isCommodityNodeAccountServiceConfigured,
   listCommodityNodeSavedEntities,
   listCommodityNodeAlertRules,
   setCommodityNodeAlertRule,
@@ -176,10 +177,12 @@ export class CommodityMapDetailDrawer {
     this.saveButton.type = 'button';
     this.saveButton.className = 'cn-map-detail-save';
     this.saveButton.textContent = 'Save item';
+    this.saveButton.setAttribute('aria-describedby', 'cn-map-detail-save-status');
     this.alertButton = document.createElement('button');
     this.alertButton.type = 'button';
     this.alertButton.className = 'cn-map-detail-alert';
     this.alertButton.textContent = 'Enable impact alert';
+    this.alertButton.setAttribute('aria-describedby', 'cn-map-detail-alert-status');
     actions.append(
       this.researchLink,
       this.eventLink,
@@ -189,9 +192,11 @@ export class CommodityMapDetailDrawer {
       this.alertButton,
     );
     this.saveStatus = createTextElement('p', 'cn-map-detail-save-status', '');
+    this.saveStatus.id = 'cn-map-detail-save-status';
     this.saveStatus.setAttribute('role', 'status');
     this.saveStatus.setAttribute('aria-live', 'polite');
     this.alertStatus = createTextElement('p', 'cn-map-detail-alert-status', '');
+    this.alertStatus.id = 'cn-map-detail-alert-status';
     this.alertStatus.setAttribute('role', 'status');
     this.alertStatus.setAttribute('aria-live', 'polite');
 
@@ -254,14 +259,24 @@ export class CommodityMapDetailDrawer {
     this.universeButton.hidden = !selection.commodityId;
     const saveTarget = this.savedTarget(selection);
     this.saveButton.hidden = !saveTarget;
-    this.saveStatus.textContent = '';
+    this.saveStatus.textContent =
+      saveTarget && !isCommodityNodeAccountServiceConfigured()
+        ? 'Account watchlists are not available on this deployment.'
+        : '';
     this.updateSaveButton();
-    if (saveTarget) void this.hydrateSavedItems();
+    if (saveTarget && isCommodityNodeAccountServiceConfigured()) {
+      void this.hydrateSavedItems();
+    }
     const alertTarget = this.alertTarget(selection);
     this.alertButton.hidden = !alertTarget;
-    this.alertStatus.textContent = '';
+    this.alertStatus.textContent =
+      alertTarget && !isCommodityNodeAccountServiceConfigured()
+        ? 'Account alerts are not available on this deployment.'
+        : '';
     this.updateAlertButton();
-    if (alertTarget) void this.hydrateAlertRules();
+    if (alertTarget && isCommodityNodeAccountServiceConfigured()) {
+      void this.hydrateAlertRules();
+    }
 
     this.researchLink.href = selection.researchHref;
     this.researchLink.textContent = selection.researchLabel;
@@ -370,6 +385,10 @@ export class CommodityMapDetailDrawer {
   }
 
   private async hydrateSavedItems(): Promise<void> {
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.updateSaveButton();
+      return;
+    }
     const accountId = getAuthState().user?.id ?? null;
     if (!accountId) {
       this.savedKeys.clear();
@@ -397,6 +416,12 @@ export class CommodityMapDetailDrawer {
   private async toggleSavedSelection(): Promise<void> {
     const target = this.savedTarget();
     if (!target || this.savePending) return;
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.saveStatus.textContent =
+        'Account watchlists are not available on this deployment.';
+      this.updateSaveButton();
+      return;
+    }
     if (!getAuthState().user) {
       this.saveStatus.textContent = 'Sign in to save this item across devices.';
       openSignIn();
@@ -435,7 +460,8 @@ export class CommodityMapDetailDrawer {
     const target = this.savedTarget();
     if (!target) return;
     const saved = this.savedKeys.has(this.savedKey(target));
-    this.saveButton.disabled = this.savePending;
+    this.saveButton.disabled =
+      this.savePending || !isCommodityNodeAccountServiceConfigured();
     this.saveButton.setAttribute('aria-pressed', String(saved));
     this.saveButton.textContent = saved ? 'Saved item' : 'Save item';
   }
@@ -443,16 +469,7 @@ export class CommodityMapDetailDrawer {
   private alertTarget(
     selection = this.currentSelection,
   ): { scopeType: 'event_pulse' | 'route'; scopeId: string } | null {
-    if (!selection || (selection.kind !== 'event' && selection.kind !== 'route')) {
-      return null;
-    }
-    const scopeId = selection.entityId.includes(':')
-      ? selection.entityId.slice(selection.entityId.indexOf(':') + 1)
-      : selection.entityId;
-    return {
-      scopeType: selection.kind === 'event' ? 'event_pulse' : 'route',
-      scopeId,
-    };
+    return selection?.alertScope ?? null;
   }
 
   private alertKey(target: {
@@ -463,6 +480,10 @@ export class CommodityMapDetailDrawer {
   }
 
   private async hydrateAlertRules(): Promise<void> {
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.updateAlertButton();
+      return;
+    }
     const accountId = getAuthState().user?.id ?? null;
     if (!accountId) {
       this.alertKeys.clear();
@@ -492,6 +513,12 @@ export class CommodityMapDetailDrawer {
   private async toggleAlertSelection(): Promise<void> {
     const target = this.alertTarget();
     if (!target || this.alertPending) return;
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.alertStatus.textContent =
+        'Account alerts are not available on this deployment.';
+      this.updateAlertButton();
+      return;
+    }
     if (!getAuthState().user) {
       this.alertStatus.textContent = 'Sign in to create an in-app impact alert.';
       openSignIn();
@@ -534,7 +561,8 @@ export class CommodityMapDetailDrawer {
     const target = this.alertTarget();
     if (!target) return;
     const enabled = this.alertKeys.has(this.alertKey(target));
-    this.alertButton.disabled = this.alertPending;
+    this.alertButton.disabled =
+      this.alertPending || !isCommodityNodeAccountServiceConfigured();
     this.alertButton.setAttribute('aria-pressed', String(enabled));
     this.alertButton.textContent = enabled ? 'Impact alert enabled' : 'Enable impact alert';
   }

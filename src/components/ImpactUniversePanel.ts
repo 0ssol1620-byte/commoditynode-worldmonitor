@@ -22,6 +22,7 @@ import { CommodityUniverseWebGLRenderer } from './commodity-universe-webgl';
 import { getAuthState } from '@/services/auth-state';
 import { openSignIn } from '@/services/clerk';
 import {
+  isCommodityNodeAccountServiceConfigured,
   listCommodityNodeSavedEntities,
   setCommodityNodeEntitySaved,
 } from '@/services/commoditynode-product';
@@ -570,15 +571,21 @@ export class ImpactUniversePanel extends Panel {
     const saveButton = document.createElement('button');
     saveButton.type = 'button';
     saveButton.dataset.universeSave = node.id;
+    saveButton.setAttribute('aria-describedby', 'cn-universe-action-status');
     saveButton.setAttribute('aria-pressed', String(this.savedCommodityIds.has(node.id)));
     saveButton.textContent = this.savedCommodityIds.has(node.id)
       ? 'Saved to watchlist'
       : 'Save commodity';
     const actionStatus = document.createElement('p');
+    actionStatus.id = 'cn-universe-action-status';
     actionStatus.className = 'cn-universe-action-status';
     actionStatus.dataset.universeActionStatus = '';
     actionStatus.setAttribute('role', 'status');
     actionStatus.setAttribute('aria-live', 'polite');
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      actionStatus.textContent =
+        'Account watchlists are not available on this deployment.';
+    }
     actions.append(saveButton, actionStatus);
 
     const relatedTitle = document.createElement('h4');
@@ -618,6 +625,13 @@ export class ImpactUniversePanel extends Panel {
   }
 
   private async hydrateSavedCommodityState(): Promise<void> {
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.updateSavedAction();
+      this.setSavedActionStatus(
+        'Account watchlists are not available on this deployment.',
+      );
+      return;
+    }
     const accountId = getAuthState().user?.id ?? null;
     if (!accountId) {
       this.savedCommodityIds.clear();
@@ -650,6 +664,13 @@ export class ImpactUniversePanel extends Panel {
 
   private async toggleSavedCommodity(commodityId: string): Promise<void> {
     if (this.savedActionPending) return;
+    if (!isCommodityNodeAccountServiceConfigured()) {
+      this.setSavedActionStatus(
+        'Account watchlists are not available on this deployment.',
+      );
+      this.updateSavedAction();
+      return;
+    }
     if (!getAuthState().user) {
       this.setSavedActionStatus('Sign in to keep a watchlist across devices.');
       openSignIn();
@@ -686,7 +707,8 @@ export class ImpactUniversePanel extends Panel {
     if (!button) return;
     const commodityId = button.dataset.universeSave ?? '';
     const saved = this.savedCommodityIds.has(commodityId);
-    button.disabled = disabled;
+    button.disabled =
+      disabled || !isCommodityNodeAccountServiceConfigured();
     button.setAttribute('aria-pressed', String(saved));
     button.textContent = saved ? 'Saved to watchlist' : 'Save commodity';
   }

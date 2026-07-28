@@ -57,6 +57,10 @@ export interface CommodityNodeSelection {
   researchLabel: string;
   eventHref: string | null;
   eventLabel: string | null;
+  alertScope?: {
+    scopeType: 'event_pulse' | 'route';
+    scopeId: string;
+  };
 }
 
 export type CommodityNodeSearchCategory =
@@ -293,6 +297,10 @@ function eventSelection(): CommodityNodeSelection {
     ...commodityResearchLink(commodity.commodityId),
     eventHref: '/events/cobre-panama-production-halt/',
     eventLabel: 'Open complete Event Pulse',
+    alertScope: {
+      scopeType: 'event_pulse',
+      scopeId: 'cobre-panama-production-halt',
+    },
   };
 }
 

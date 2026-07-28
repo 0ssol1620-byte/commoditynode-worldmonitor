@@ -294,7 +294,7 @@ export const upsertAlertRule = mutation({
       v.literal("event_pulse"),
     ),
     scopeId: v.string(),
-    channel: v.union(v.literal("email"), v.literal("in_app")),
+    channel: v.literal("in_app"),
     minimumMateriality: v.union(
       v.literal("notable"),
       v.literal("material"),
@@ -422,6 +422,7 @@ export const syncCanonicalAlertEvents = internalMutation({
           )
           .take(500);
         for (const rule of rules) {
+          if (rule.channel !== "in_app") continue;
           if (rule.createdAt > event.publishedAt) continue;
           if (
             MATERIALITY_RANK[event.materiality]
@@ -439,7 +440,7 @@ export const syncCanonicalAlertEvents = internalMutation({
             ruleId: rule._id,
             eventFingerprint: event.fingerprint,
             alertEventId: stored._id,
-            channel: "in_app",
+            channel: rule.channel,
             deliveredAt: Date.now(),
           });
           deliveriesInserted += 1;

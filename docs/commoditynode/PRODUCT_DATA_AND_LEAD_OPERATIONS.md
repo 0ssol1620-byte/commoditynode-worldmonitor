@@ -12,6 +12,8 @@ workflows are advertised as available:
 - `CONVEX_SITE_URL`: production Convex HTTP Actions origin. It may be derived
   from `CONVEX_URL`, but an explicit value is preferred in production.
 - `VITE_CONVEX_URL`: the same production deployment for signed-in browser calls.
+- `VITE_CLERK_PUBLISHABLE_KEY`: the production Clerk browser key paired with
+  the Convex auth configuration.
 - `COMMODITYNODE_PRODUCT_GATEWAY_SECRET`: a dedicated random secret of at least
   32 characters, configured with the same value in Vercel and Convex. It must
   not be reused by WorldMonitor relays or billing.
@@ -63,10 +65,21 @@ bypass edge validation or distributed rate limits.
 ## Saved entities and alerts
 
 - Every query and mutation requires a valid Clerk identity at Convex.
+- The browser advertises saved items and alerts only when both public Convex
+  and Clerk configuration are present. Otherwise the controls remain visible
+  but disabled with an accessible deployment-status explanation; they never
+  open a broken sign-in flow.
 - Saved entities are unique by account, entity type, and canonical entity ID;
   each account is capped at 100.
 - Alert rules are unique by account and scope and capped at 50.
 - Delivery records are unique by rule and canonical event fingerprint.
+- The UI exposes an alert control only when the reviewed selection registry
+  declares a canonical scope that exactly matches the release alert catalog.
+  Unpublished route scopes do not render a dead alert control.
+- The current release supports only `in_app` alert rules. Legacy `email` rules
+  are retained for schema compatibility but are not projected into misleading
+  in-app deliveries. Email alert creation remains disabled until a reviewed
+  delivery transport exists.
 - UI success is shown only after the authoritative mutation resolves.
 
 ## Export, deletion, and retention audit

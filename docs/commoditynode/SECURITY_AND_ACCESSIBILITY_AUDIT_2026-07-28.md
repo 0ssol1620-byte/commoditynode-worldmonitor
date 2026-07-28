@@ -38,6 +38,12 @@ World Monitor controls inherited by the fork.
 - Vite-prefixed secret names and plaintext Vercel environment dumps are
   release-blocking. Provider error text redacts query-string credentials and
   token-shaped values.
+- Account controls fail closed when either browser Convex or Clerk
+  configuration is absent. Disabled controls expose the reason through
+  `aria-describedby` and cannot invoke an unconfigured sign-in path.
+- Alert creation is currently in-app only. Unsupported legacy email rules are
+  skipped by canonical event projection instead of being silently relabeled as
+  in-app deliveries.
 - HTML interpolation escapes by default. Raw fragments require an explicit
   audit reason, unsafe URL protocols are rejected, and widget HTML is
   sanitized before storage or display.
@@ -75,6 +81,8 @@ verifies:
 - roving keyboard navigation and focus restoration in settings;
 - Escape-to-close, focus wrapping, and 44 px touch targets in the mobile map
   drawer;
+- disabled account controls whose explanatory live regions are programmatically
+  associated with the unavailable action;
 - bounded event animation and reduced-motion handling;
 - an accessible Impact Universe table with a caption and the same filtered
   entities exposed by the graph view;
@@ -96,6 +104,7 @@ npm run typecheck:all
 npm run build:commoditynode
 ```
 
-The security gate currently covers 386 assertions, with one Windows-only
+The security gate currently covers 408 assertions, with one Windows-only
 symlink test skipped when Developer Mode privileges are unavailable. The same
-test runs normally in Linux CI.
+test runs normally in Linux CI. The Convex product gate adds 11 authenticated
+data-path tests.

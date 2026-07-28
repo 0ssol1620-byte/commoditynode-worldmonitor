@@ -685,6 +685,10 @@
   text-decoration: none;
 }
 
+[data-variant='commoditynode'] .cn-map-detail-actions [hidden] {
+  display: none;
+}
+
 [data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-primary {
   color: var(--cn-color-canvas);
   background: var(--cn-color-signal-strong);
