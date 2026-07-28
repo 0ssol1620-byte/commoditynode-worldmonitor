@@ -1,5 +1,6 @@
 {
   "ignoreCommand": "bash scripts/vercel-ignore.sh",
+  "installCommand": "npm ci",
   "crons": [
     {
       "path": "/api/commoditynode-alert-sync",

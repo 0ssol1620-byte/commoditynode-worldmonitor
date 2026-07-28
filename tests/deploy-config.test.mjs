@@ -169,6 +169,12 @@ const getVariantUrls = () => {
 };
 
 
+describe('Vercel dependency installation contract', () => {
+  it('installs the committed lockfile without dependency-tree mutation', () => {
+    assert.equal(vercelConfig.installCommand, 'npm ci');
+  });
+});
+
 describe('crawlable content corpus deployment contracts', () => {
   const staticCorpusPaths = [
     '/countries/ukraine/',
