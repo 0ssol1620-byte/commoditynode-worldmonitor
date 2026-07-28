@@ -67,6 +67,7 @@ const commodities = defineCollection({
     productionRegions: z.array(z.string()).min(1),
     supplyStages: z.array(z.string()).min(2),
     demandSectors: z.array(z.string()).min(1),
+    marketContext: z.string().min(160),
     evidence: z.array(evidenceRef).min(1),
     reviewedBy: z.string(),
     reviewedAt: z.coerce.date(),

@@ -18,6 +18,7 @@
   "productionRegions": ["China", "Australia", "Russia", "Canada", "United States"],
   "supplyStages": ["Mine", "Processor", "Refinery", "Vault", "Exchange", "Fabricator"],
   "demandSectors": ["Investment", "Jewelry", "Central banks", "Technology"],
+  "marketContext": "Read the futures benchmark beside real yields, major currencies, exchange positioning, fund flows, central-bank activity, mine output, recycling, and local physical premiums. These channels do not always point in the same direction. A price move alone does not identify whether investment demand, macro conditions, or physical availability led it.",
   "evidence": [
     {
       "label": "USGS Gold Statistics and Information",

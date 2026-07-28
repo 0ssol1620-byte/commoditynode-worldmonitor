@@ -18,6 +18,7 @@
   "productionRegions": ["Chile", "Peru", "Democratic Republic of the Congo", "China"],
   "supplyStages": ["Mine", "Concentrator", "Smelter", "Refinery", "Port", "Fabricator"],
   "demandSectors": ["Electrical equipment", "Construction", "Transport", "Industrial machinery"],
+  "marketContext": "Read the futures benchmark beside mine disruptions, treatment charges, exchange inventories, freight conditions, and demand from construction and electrical equipment. Those indicators move on different schedules. A quote can react before a physical shortage is documented, or move for macro reasons while the supply chain remains unchanged.",
   "evidence": [
     {
       "label": "USGS Copper Statistics and Information",

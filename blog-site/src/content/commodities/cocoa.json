@@ -18,6 +18,7 @@
   "productionRegions": ["Côte d’Ivoire", "Ghana", "Ecuador", "Nigeria", "Cameroon"],
   "supplyStages": ["Farm", "Cooperative", "Warehouse", "Port", "Grinder", "Manufacturer"],
   "demandSectors": ["Chocolate", "Food manufacturing", "Cosmetics"],
+  "marketContext": "Read the futures benchmark beside crop arrivals, weather, disease reports, farm incentives, port movement, certified stocks, grindings, and origin differentials. Production evidence and contract pricing update on different calendars. A sharp futures move can therefore precede confirmed crop data or reflect positioning as well as physical supply.",
   "evidence": [
     {
       "label": "FAOSTAT Crops and livestock products",

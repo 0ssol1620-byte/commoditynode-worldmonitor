@@ -252,6 +252,7 @@
     "node-forge": "^1.4.0",
     "srvx": "^0.11.13",
     "protobufjs": "^7.6.2",
+    "sharp": "^0.35.3",
     "unzipper": "0.12.3",
     "ws": "$ws",
     "shell-quote": "^1.8.4"

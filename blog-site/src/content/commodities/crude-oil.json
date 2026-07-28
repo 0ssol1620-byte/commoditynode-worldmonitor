@@ -18,6 +18,7 @@
   "productionRegions": ["United States", "Saudi Arabia", "Russia", "Canada", "Iraq"],
   "supplyStages": ["Field", "Gathering system", "Pipeline", "Storage", "Port", "Refinery"],
   "demandSectors": ["Road transport", "Aviation", "Petrochemicals", "Industry"],
+  "marketContext": "Read WTI beside Brent, regional physical grades, inventories, refinery runs, pipeline constraints, tanker routes, and producer policy. A disruption may matter differently by location and delivery month. The benchmark can also move with currencies, interest rates, or broad risk positioning even when physical flows have not changed.",
   "evidence": [
     {
       "label": "World Oil Transit Chokepoints",

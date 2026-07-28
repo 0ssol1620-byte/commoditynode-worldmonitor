@@ -192,6 +192,22 @@ function panelChunkForComponentId(id: string): PanelManualChunkName | null {
 }
 
 function brotliPrecompressPlugin(): Plugin {
+  const concurrency = 8;
+
+  async function compressFile(outDir: string, fileName: string): Promise<void> {
+    const extension = extname(fileName).toLowerCase();
+    if (!BROTLI_EXTENSIONS.has(extension)) return;
+
+    const sourcePath = resolve(outDir, fileName);
+    const compressedPath = `${sourcePath}.br`;
+    const sourceBuffer = await readFile(sourcePath);
+    if (sourceBuffer.length < 1024) return;
+
+    const compressedBuffer = await brotliCompressAsync(sourceBuffer);
+    await mkdir(dirname(compressedPath), { recursive: true });
+    await writeFile(compressedPath, compressedBuffer);
+  }
+
   return {
     name: 'brotli-precompress',
     apply: 'build',
@@ -199,19 +215,14 @@ function brotliPrecompressPlugin(): Plugin {
       const outDir = outputOptions.dir;
       if (!outDir) return;
 
-      await Promise.all(Object.keys(bundle).map(async (fileName) => {
-        const extension = extname(fileName).toLowerCase();
-        if (!BROTLI_EXTENSIONS.has(extension)) return;
-
-        const sourcePath = resolve(outDir, fileName);
-        const compressedPath = `${sourcePath}.br`;
-        const sourceBuffer = await readFile(sourcePath);
-        if (sourceBuffer.length < 1024) return;
-
-        const compressedBuffer = await brotliCompressAsync(sourceBuffer);
-        await mkdir(dirname(compressedPath), { recursive: true });
-        await writeFile(compressedPath, compressedBuffer);
-      }));
+      const fileNames = Object.keys(bundle);
+      for (let index = 0; index < fileNames.length; index += concurrency) {
+        await Promise.all(
+          fileNames
+            .slice(index, index + concurrency)
+            .map((fileName) => compressFile(outDir, fileName)),
+        );
+      }
     },
   };
 }
