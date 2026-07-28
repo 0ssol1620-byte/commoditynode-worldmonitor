@@ -88,7 +88,7 @@ Live tier/price/product-ID data (JSON): `GET https://www.worldmonitor.app/api/pr
       "price_usd_monthly": 0,
       "signup_required": false,
       "features": [
-        "56 map layers",
+        "57 map layers",
         "500+ feeds",
         "country briefs",
         "chokepoints",
