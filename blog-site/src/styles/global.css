@@ -2074,10 +2074,178 @@ button:focus-visible {
   font-size: .8125rem;
 }
 
+.footer-privacy-button,
+.inline-privacy-button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--site-signal-strong);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .2em;
+  cursor: pointer;
+}
+
+.privacy-banner {
+  position: fixed;
+  z-index: var(--cn-z-modal);
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  width: min(680px, calc(100vw - 48px));
+  padding: 20px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  border: 1px solid var(--site-border-strong);
+  background: var(--site-canvas-alt);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 35%);
+}
+
+.privacy-banner[hidden] {
+  display: none;
+}
+
+.privacy-banner h2,
+.privacy-dialog h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  letter-spacing: -.01em;
+}
+
+.privacy-banner p,
+.privacy-dialog p {
+  margin: 0 0 8px;
+  color: var(--site-text-secondary);
+  font-size: .875rem;
+  line-height: 1.55;
+}
+
+.privacy-banner a {
+  font-size: .8125rem;
+}
+
+.privacy-banner-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.privacy-primary,
+.privacy-secondary,
+.privacy-link,
+.privacy-close {
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid var(--site-border-strong);
+  background: var(--site-surface);
+  color: var(--site-text);
+  font: 600 .8125rem/1 var(--site-font-ui);
+  cursor: pointer;
+}
+
+.privacy-primary {
+  border-color: var(--site-signal);
+  background: var(--site-signal);
+  color: var(--site-canvas);
+}
+
+.privacy-link,
+.privacy-close {
+  border-color: transparent;
+  background: transparent;
+  color: var(--site-text-secondary);
+}
+
+.privacy-dialog {
+  width: min(560px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--site-border-strong);
+  background: var(--site-canvas-alt);
+  color: var(--site-text);
+}
+
+.privacy-dialog::backdrop {
+  background: rgb(0 0 0 / 70%);
+}
+
+.privacy-dialog form {
+  display: grid;
+  padding: 24px;
+  gap: 18px;
+}
+
+.privacy-dialog header,
+.privacy-dialog label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.privacy-dialog label {
+  padding-top: 14px;
+  border-top: 1px solid var(--site-border);
+}
+
+.privacy-dialog label span {
+  display: grid;
+  gap: 2px;
+}
+
+.privacy-dialog label small {
+  color: var(--site-text-muted);
+}
+
+.privacy-dialog input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--site-signal);
+}
+
+.commoditynode-ad-slot {
+  min-height: 250px;
+  margin: 48px auto;
+  padding: 12px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+}
+
+.commoditynode-ad-slot > span {
+  display: block;
+  color: var(--site-text-muted);
+  font: 600 .6875rem/1 var(--site-font-data);
+  letter-spacing: .08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .footer-copy {
   grid-column: 1 / -1;
   color: var(--site-text-muted);
   font-size: .75rem;
+}
+
+@media (max-width: 680px) {
+  .privacy-banner {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-banner-actions {
+    justify-content: stretch;
+  }
+
+  .privacy-primary,
+  .privacy-secondary {
+    flex: 1 1 130px;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

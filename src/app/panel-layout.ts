@@ -998,6 +998,7 @@ export class PanelLayoutManager implements AppModule {
         <div class="mobile-menu-footer-links">
           ${isCommodityNode ? `
             <a href="https://commoditynode.com" target="_blank" rel="noopener">Research</a>
+            <a href="https://commoditynode.com/privacy/?settings=privacy" target="_blank" rel="noopener">Privacy</a>
             <a href="/source/">Source Code</a>
             <a href="/SOURCE-OFFER.md" target="_blank" rel="noopener">Source Offer</a>
             <a href="${sourceRepositoryUrl}" target="_blank" rel="noopener">GitHub</a>

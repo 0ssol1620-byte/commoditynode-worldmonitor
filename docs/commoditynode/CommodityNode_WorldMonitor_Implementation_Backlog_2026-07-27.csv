@@ -84,7 +84,7 @@ CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNW
 CNWM-083,6,Table parity,Provide accessible path list/table equivalent to graph.,P0,CNWM-076,complete
 CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,complete
 CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,planned
-CNWM-086,7,Analytics,Define privacy-aware event taxonomy across research and live surfaces.,P1,CNWM-020,planned
+CNWM-086,7,Analytics,Define privacy-aware event taxonomy across research and live surfaces.,P1,CNWM-020,complete
 CNWM-087,7,Watchlists,"Enable account-based saved commodities, companies and routes.",P2,CNWM-057,planned
 CNWM-088,7,Alerts,Enable deduplicated Event Pulse and route alerts.,P2,CNWM-086,planned
 CNWM-089,7,Pro contracts,"Define validated paid entitlements: historical replay, exports, advanced paths and API.",P2,CNWM-086,planned
@@ -99,8 +99,8 @@ CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex
 CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,complete
 CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,complete
 CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete
-CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,planned
-CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictions and ad stack.,P0,CNWM-099,planned
+CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,complete
+CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictions and ad stack.,P0,CNWM-099,complete
 CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,in_progress
 CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after migration.,P1,CNWM-094,planned
 CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned

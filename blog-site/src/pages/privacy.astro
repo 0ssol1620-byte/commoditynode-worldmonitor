@@ -16,22 +16,50 @@ const canonicalUrl = absoluteUrl('/privacy/');
     <p class="section-label">Trust</p>
     <h1>Privacy</h1>
     <p class="article-dek">
-      The public research site is designed to work without an account and currently ships without third-party audience analytics.
+      CommodityNode works without an account, advertising identifier, or optional
+      measurement. Necessary storage remembers only the privacy choice you make.
     </p>
 
     <h2>Data the site receives</h2>
     <p>
-      Hosting and security providers may process ordinary request data such as IP address, user agent, requested path, time, and error details. CommodityNode does not ask for personal information on this site.
+      Hosting and security providers may process ordinary request data such as IP
+      address, user agent, requested path, time, and error details. These records
+      support delivery, abuse prevention, and incident response. CommodityNode does
+      not create an account or advertising profile from a public research visit.
     </p>
 
-    <h2>Advertising and measurement</h2>
+    <h2>Optional aggregate measurement</h2>
     <p>
-      Advertising is not enabled by default. If measurement or advertising is introduced, consent, provider identity, retention, and opt-out controls must be documented here before the scripts are deployed.
+      If you allow analytics, the browser may send a bounded event name, product
+      surface, route type, and approved placement label. The event excludes email,
+      name, account or session identifiers, free text, URL queries, and referrer.
+      Events are stored only as daily aggregate counters and expire after 400 days.
+      Declining analytics does not reduce access or functionality.
+    </p>
+
+    <h2>Advertising</h2>
+    <p>
+      Advertising is currently disabled site-wide. The advertising preference is a
+      fail-closed control for future, manually reviewed inventory; choosing it does
+      not load an ad today. CommodityNode will not enable advertising until the
+      provider, retention terms, jurisdictional consent requirements, and eligible
+      page list are documented and tested.
+    </p>
+
+    <h2>Your controls</h2>
+    <p>
+      You can reject optional storage on the first prompt or reopen
+      <button type="button" class="inline-privacy-button" data-open-privacy-settings>
+        privacy settings
+      </button>
+      at any time. A new consent-policy version invalidates the previous choice and
+      asks again.
     </p>
 
     <h2>Contact and corrections</h2>
     <p>
       Privacy or source-attribution issues can be reported through the public repository. Do not include confidential information in a public issue.
     </p>
+    <p>Policy version 1 · Effective July 28, 2026</p>
   </article>
 </Base>

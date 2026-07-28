@@ -1,0 +1,143 @@
+---
+import { isCommodityNode } from '../lib/site-variant';
+---
+
+{isCommodityNode && (
+  <div class="privacy-controls" data-commoditynode-privacy hidden>
+    <section
+      class="privacy-banner"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="privacy-banner-title"
+      aria-describedby="privacy-banner-description"
+      data-privacy-banner
+    >
+      <div>
+        <h2 id="privacy-banner-title">Your privacy choices</h2>
+        <p id="privacy-banner-description">
+          CommodityNode works without optional tracking. Anonymous, aggregate measurement helps us
+          improve the research. Advertising storage remains off unless you choose it.
+        </p>
+        <a href="/privacy/">Read the privacy policy</a>
+      </div>
+      <div class="privacy-banner-actions">
+        <button type="button" class="privacy-secondary" data-consent="necessary">
+          Necessary only
+        </button>
+        <button type="button" class="privacy-primary" data-consent="all">
+          Allow optional
+        </button>
+        <button type="button" class="privacy-link" data-consent="customize">
+          Customize
+        </button>
+      </div>
+    </section>
+
+    <dialog class="privacy-dialog" data-privacy-dialog aria-labelledby="privacy-dialog-title">
+      <form method="dialog">
+        <header>
+          <h2 id="privacy-dialog-title">Privacy settings</h2>
+          <button type="button" class="privacy-close" data-consent="close" aria-label="Close privacy settings">
+            Close
+          </button>
+        </header>
+        <p>
+          Necessary storage keeps your choice. Analytics is aggregate and excludes account,
+          session, URL query, referrer, and free-text data. Advertising is currently disabled
+          site-wide even if you permit the category.
+        </p>
+        <label>
+          <span><strong>Necessary</strong><small>Always on</small></span>
+          <input type="checkbox" checked disabled />
+        </label>
+        <label>
+          <span><strong>Analytics</strong><small>Anonymous daily event totals</small></span>
+          <input type="checkbox" name="analytics" />
+        </label>
+        <label>
+          <span><strong>Advertising</strong><small>Reserved for reviewed ad inventory</small></span>
+          <input type="checkbox" name="advertising" />
+        </label>
+        <button type="submit" class="privacy-primary" value="save" data-consent="save">
+          Save choices
+        </button>
+      </form>
+    </dialog>
+  </div>
+)}
+
+<script>
+  import {
+    COMMODITYNODE_CONSENT_EVENT,
+    COMMODITYNODE_CONSENT_STORAGE_KEY,
+    createCommodityNodeConsent,
+    parseCommodityNodeConsent,
+  } from '../../../shared/commoditynode-privacy';
+
+  const root = document.querySelector<HTMLElement>('[data-commoditynode-privacy]');
+  const banner = root?.querySelector<HTMLElement>('[data-privacy-banner]');
+  const dialog = root?.querySelector<HTMLDialogElement>('[data-privacy-dialog]');
+
+  function currentConsent() {
+    try {
+      const stored = parseCommodityNodeConsent(localStorage.getItem(COMMODITYNODE_CONSENT_STORAGE_KEY));
+      if (stored) return stored;
+      const cookie = document.cookie
+        .split('; ')
+        .find((part) => part.startsWith(`${COMMODITYNODE_CONSENT_STORAGE_KEY}=`))
+        ?.slice(COMMODITYNODE_CONSENT_STORAGE_KEY.length + 1);
+      return parseCommodityNodeConsent(cookie ? decodeURIComponent(cookie) : null);
+    } catch {
+      return null;
+    }
+  }
+
+  function broadcast(consent: ReturnType<typeof createCommodityNodeConsent>) {
+    window.dispatchEvent(new CustomEvent(COMMODITYNODE_CONSENT_EVENT, { detail: consent }));
+  }
+
+  function save(analytics: boolean, advertising: boolean, source: 'banner' | 'settings') {
+    const consent = createCommodityNodeConsent({ analytics, advertising, source });
+    try {
+      localStorage.setItem(COMMODITYNODE_CONSENT_STORAGE_KEY, JSON.stringify(consent));
+    } catch {
+      // Privacy controls still govern this document when storage is unavailable.
+    }
+    document.cookie = `${COMMODITYNODE_CONSENT_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(consent))}; Path=/; Domain=.commoditynode.com; Max-Age=31536000; SameSite=Lax; Secure`;
+    if (banner) banner.hidden = true;
+    if (dialog?.open) dialog.close();
+    broadcast(consent);
+  }
+
+  if (root && banner && dialog) {
+    root.hidden = false;
+    const consent = currentConsent();
+    banner.hidden = consent !== null;
+    dialog.querySelector<HTMLInputElement>('[name="analytics"]')!.checked = consent?.analytics ?? false;
+    dialog.querySelector<HTMLInputElement>('[name="advertising"]')!.checked = consent?.advertising ?? false;
+    if (consent) broadcast(consent);
+
+    root.addEventListener('click', (event) => {
+      const action = (event.target as HTMLElement).closest<HTMLElement>('[data-consent]')?.dataset.consent;
+      if (action === 'necessary') save(false, false, 'banner');
+      if (action === 'all') save(true, true, 'banner');
+      if (action === 'customize') dialog.showModal();
+      if (action === 'close') dialog.close();
+      if (action === 'save') {
+        event.preventDefault();
+        save(
+          dialog.querySelector<HTMLInputElement>('[name="analytics"]')!.checked,
+          dialog.querySelector<HTMLInputElement>('[name="advertising"]')!.checked,
+          'settings',
+        );
+      }
+    });
+
+    document.querySelectorAll<HTMLElement>('[data-open-privacy-settings]').forEach((button) => {
+      button.addEventListener('click', () => dialog.showModal());
+    });
+    if (new URLSearchParams(location.search).get('settings') === 'privacy') {
+      dialog.showModal();
+    }
+  }
+</script>

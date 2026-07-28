@@ -5,6 +5,8 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/600.css';
 import '../styles/global.css';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
+import CommodityNodeAnalytics from '../components/CommodityNodeAnalytics.astro';
+import CommodityNodePrivacyControls from '../components/CommodityNodePrivacyControls.astro';
 import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
 import {
   commodityNodeRobotsContent,
@@ -171,7 +173,14 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
           )}
         </ul>
         {isCommodityNode ? (
-          <a href={site.liveUrl} class="nav-cta">Open live intelligence</a>
+          <a
+            href={site.liveUrl}
+            class="nav-cta"
+            data-commoditynode-event="live_opened"
+            data-commoditynode-placement="header"
+          >
+            Open live intelligence
+          </a>
         ) : (
           <TrackedProductLink
             destination="pro"
@@ -212,6 +221,9 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
               <a href="/search/">Search</a>
               <a href="/about/">About</a>
               <a href="/privacy/">Privacy</a>
+              <button type="button" class="footer-privacy-button" data-open-privacy-settings>
+                Privacy settings
+              </button>
               <a href="/source/">AGPL source</a>
             </>
           ) : (
@@ -230,5 +242,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
         </div>
       </div>
     </footer>
+    <CommodityNodePrivacyControls />
+    <CommodityNodeAnalytics />
   </body>
 </html>

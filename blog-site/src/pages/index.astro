@@ -105,8 +105,22 @@ const jsonLd = {
           CommodityNode connects benchmarks, assets, routes, companies, and source evidence so each claim can be checked before it is used.
         </p>
         <div class="hero-actions">
-          <a class="primary-action" href={site.liveUrl}>Open live intelligence</a>
-          <a class="secondary-action" href="/events/">Read Event Pulse</a>
+          <a
+            class="primary-action"
+            href={site.liveUrl}
+            data-commoditynode-event="live_opened"
+            data-commoditynode-placement="home_hero"
+          >
+            Open live intelligence
+          </a>
+          <a
+            class="secondary-action"
+            href="/events/"
+            data-commoditynode-event="research_opened"
+            data-commoditynode-placement="home_hero"
+          >
+            Read Event Pulse
+          </a>
         </div>
       </>
     ) : (

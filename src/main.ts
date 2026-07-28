@@ -387,8 +387,14 @@ const chunkReloadStorageKey = installChunkReloadGuard(__APP_VERSION__);
 
 // Product analytics are secondary startup work; RUM starts once the trusted
 // dashboard entry executes so it can observe page-load vitals.
-void initAnalytics();
-initVercelAnalytics();
+if (SITE_VARIANT !== 'commoditynode') {
+  void initAnalytics();
+  initVercelAnalytics();
+} else {
+  void import('@/services/commoditynode-analytics')
+    .then(({ initCommodityNodeAnalytics }) => initCommodityNodeAnalytics())
+    .catch(() => {});
+}
 initDebugBearRum();
 
 // Initialize dynamic meta tags for sharing

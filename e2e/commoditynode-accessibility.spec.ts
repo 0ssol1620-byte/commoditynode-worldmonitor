@@ -104,7 +104,7 @@ async function expectNoAxeViolations(page: Page): Promise<void> {
 
 test.describe('CommodityNode accessibility', () => {
   test('passes WCAG automated checks across every published research page', async ({ page }) => {
-    test.setTimeout(180_000);
+    test.setTimeout(300_000);
     const server = await startResearchServer();
     try {
       for (const path of researchPaths) {

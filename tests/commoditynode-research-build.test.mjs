@@ -40,6 +40,10 @@ describe('CommodityNode research build', () => {
     assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication/);
     assert.match(html, /href="https:\/\/live\.commoditynode\.com"/);
     assert.match(html, /id="main-content"/);
+    assert.match(html, /data-commoditynode-privacy/);
+    assert.match(html, /data-open-privacy-settings/);
+    assert.match(html, /commoditynode:consent:v1/);
+    assert.match(html, /\/api\/commoditynode-analytics/);
     assert.doesNotMatch(html, /@worldmonitorai|abacus\.worldmonitor|>WORLD MONITOR<|>World Monitor</);
 
     const searchHtml = read('search/index.html');
@@ -140,6 +144,7 @@ describe('CommodityNode research build', () => {
       assert.match(html, /Reviewed by CommodityNode Editorial/);
       assert.match(html, /src="\/blog\/images\/blog\//);
       assert.doesNotMatch(html, /adsbygoogle|pagead2\.googlesyndication|data-ad-slot/);
+      assert.doesNotMatch(html, /data-commoditynode-ad-slot/);
     }
     const searchHtml = read('search/index.html');
     assert.match(searchHtml, /<meta name="robots" content="noindex, follow"/);
