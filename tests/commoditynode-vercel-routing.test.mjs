@@ -95,5 +95,36 @@ describe('CommodityNode Vercel routing', () => {
         `${source} must resolve Astro directory routes to their generated index.html`,
       );
     }
+    const canonicalTrailingRoutes = new Map([
+      ['/posts/:path*/', '/commoditynode-site/posts/:path*/index.html'],
+      ['/authors/:path*/', '/commoditynode-site/authors/:path*/index.html'],
+      ['/commodities/', '/commoditynode-site/commodities/index.html'],
+      ['/commodities/:path*/', '/commoditynode-site/commodities/:path*/index.html'],
+      ['/events/', '/commoditynode-site/events/index.html'],
+      ['/events/:path*/', '/commoditynode-site/events/:path*/index.html'],
+      ['/companies/', '/commoditynode-site/companies/index.html'],
+      ['/companies/:path*/', '/commoditynode-site/companies/:path*/index.html'],
+      ['/glossary/', '/commoditynode-site/glossary/index.html'],
+      ['/editorial-policy/', '/commoditynode-site/editorial-policy/index.html'],
+      ['/corrections/', '/commoditynode-site/corrections/index.html'],
+      ['/contact/', '/commoditynode-site/contact/index.html'],
+      ['/search/', '/commoditynode-site/search/index.html'],
+      ['/methodology/', '/commoditynode-site/methodology/index.html'],
+      ['/sources/', '/commoditynode-site/sources/index.html'],
+      ['/about/', '/commoditynode-site/about/index.html'],
+      ['/privacy/', '/commoditynode-site/privacy/index.html'],
+      ['/brief/', '/commoditynode-site/brief/index.html'],
+      ['/developers/', '/commoditynode-site/developers/index.html'],
+      ['/plans/', '/commoditynode-site/plans/index.html'],
+    ]);
+    for (const [source, destination] of canonicalTrailingRoutes) {
+      const rewrite = findRewrite(source, '^(?:www\\.)?commoditynode\\.com$');
+      assert.equal(
+        rewrite?.destination,
+        destination,
+        `${source} must map directly to its generated Astro file`,
+      );
+      assert.ok(config.rewrites.indexOf(rewrite) < catchAllIndex);
+    }
   });
 });
