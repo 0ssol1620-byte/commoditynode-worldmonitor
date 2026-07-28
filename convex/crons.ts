@@ -48,6 +48,13 @@ crons.daily(
   {},
 );
 
+crons.interval(
+  "commoditynode-canonical-alert-sync",
+  { minutes: 15 },
+  (internal as any).commodityNodeProduct.syncCanonicalAlertEvents,
+  {},
+);
+
 crons.daily(
   "broadcast-ramp-runner",
   { hourUTC: 13, minuteUTC: 0 },

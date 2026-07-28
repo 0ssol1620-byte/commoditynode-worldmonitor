@@ -2322,6 +2322,18 @@ button:focus-visible {
   opacity: .55;
 }
 
+.newsletter-signup form[aria-busy='false'][data-capability-ready='false'] button:disabled,
+.brief-form[aria-busy='false'][data-capability-ready='false'] button:disabled {
+  cursor: not-allowed;
+}
+
+.newsletter-signup input:disabled,
+.brief-form input:disabled,
+.brief-form textarea:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
 .form-status {
   min-height: 1.5em;
   color: var(--site-text-secondary);

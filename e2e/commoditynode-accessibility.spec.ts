@@ -121,6 +121,45 @@ test.describe('CommodityNode accessibility', () => {
     }
   });
 
+  test('keeps lead forms fail-closed until the product capability contract is available', async ({
+    page,
+  }) => {
+    const server = await startResearchServer();
+    try {
+      await page.goto(`${server.origin}/`, { waitUntil: 'load' });
+      const newsletter = page.locator('[data-newsletter-form]');
+      await expect(newsletter).toHaveAttribute('aria-busy', 'false');
+      await expect(newsletter).toHaveAttribute('data-capability-ready', 'false');
+      await expect(newsletter.getByRole('textbox', { name: 'Email address' })).toBeDisabled();
+      await expect(newsletter.getByRole('button', { name: 'Request confirmation' })).toBeDisabled();
+      await expect(newsletter.getByRole('status')).toHaveText(
+        'Weekly brief signup is currently unavailable.',
+      );
+
+      await page.route('**/api/commoditynode-capabilities', async (route) => {
+        await route.fulfill({
+          contentType: 'application/json',
+          json: {
+            version: 1,
+            newsletter: { available: true },
+            briefRequest: { available: true },
+            accountFeatures: { available: false },
+          },
+        });
+      });
+      await page.goto(`${server.origin}/brief/`, { waitUntil: 'load' });
+      const brief = page.locator('[data-brief-form]');
+      await expect(brief).toHaveAttribute('aria-busy', 'false');
+      await expect(brief).toHaveAttribute('data-capability-ready', 'true');
+      await expect(brief.getByRole('textbox', { name: 'Name' })).toBeEnabled();
+      await expect(brief.getByRole('button', { name: 'Submit request' })).toBeEnabled();
+      await expect(brief.getByRole('status')).toBeEmpty();
+    } finally {
+      await page.goto('about:blank');
+      await server.close();
+    }
+  });
+
   test('passes WCAG automated checks on the live shell and source offer', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const missionClose = page.getByRole('button', { name: 'Close mission presets' });

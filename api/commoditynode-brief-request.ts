@@ -1,5 +1,3 @@
-import { ConvexHttpClient } from 'convex/browser';
-
 // @ts-expect-error -- shared JavaScript CORS utility has no declaration file.
 import { isDisallowedOrigin } from './_cors.js';
 import { checkEndpointRateLimit } from '../server/_shared/rate-limit.js';
@@ -9,6 +7,10 @@ import {
   cleanCommodityNodeLeadField,
   normalizeCommodityNodeEmail,
 } from '../server/commoditynode/lead-contract.js';
+import {
+  callCommodityNodeProductGateway,
+  isCommodityNodeProductGatewayConfigured,
+} from '../server/commoditynode/product-gateway.js';
 
 export const config = { runtime: 'edge' };
 
@@ -114,32 +116,29 @@ export default async function handler(request: Request): Promise<Response> {
     || raw.consentVersion !== COMMODITYNODE_LEAD_CONSENT_VERSION
   ) return json(request, { error: 'invalid_brief_request' }, 400);
 
-  const convexUrl = process.env.CONVEX_URL;
   if (
-    !convexUrl
+    !isCommodityNodeProductGatewayConfigured()
     || !process.env.RESEND_API_KEY
     || !process.env.COMMODITYNODE_RESEND_FROM
     || !process.env.COMMODITYNODE_LEADS_TO
   ) return json(request, { error: 'brief_request_unavailable' }, 503);
 
   try {
-    const client = new ConvexHttpClient(convexUrl);
-    const result = await client.mutation('commodityNodeProduct:submitBriefRequest' as never, {
+    const result = await callCommodityNodeProductGateway<{
+      status: 'received';
+      requestId: string;
+    }>('submit_brief_request', {
       ...input,
       email: input.email,
       consentVersion: COMMODITYNODE_LEAD_CONSENT_VERSION,
       consentedAt: Date.now(),
       source: cleanCommodityNodeLeadField(raw.source, 64) || 'research',
-    } as never) as { status: 'received'; requestId: string };
+    });
     const notified = await notifyOperations({ ...input, email: input.email });
     if (!notified) {
       console.warn('[commoditynode-brief] operations notification delayed', result.requestId);
     }
-    return json(request, {
-      status: result.status,
-      requestId: result.requestId,
-      notification: notified ? 'sent' : 'delayed',
-    }, 202);
+    return json(request, { status: result.status }, 202);
   } catch {
     return json(request, { error: 'brief_request_unavailable' }, 503);
   }

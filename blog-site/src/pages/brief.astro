@@ -37,33 +37,39 @@ const canonicalUrl = absoluteUrl('/brief/');
         </p>
       </section>
 
-      <form class="brief-form" data-brief-form novalidate>
+      <form
+        class="brief-form"
+        data-brief-form
+        data-capability-ready="false"
+        aria-busy="true"
+        novalidate
+      >
         <div class="brief-form-grid">
           <label>
             <span>Name</span>
-            <input name="name" autocomplete="name" maxlength="120" required />
+            <input name="name" autocomplete="name" maxlength="120" required disabled />
           </label>
           <label>
             <span>Work email</span>
-            <input name="email" type="email" autocomplete="email" maxlength="254" required />
+            <input name="email" type="email" autocomplete="email" maxlength="254" required disabled />
           </label>
           <label>
             <span>Organization</span>
-            <input name="organization" autocomplete="organization" maxlength="160" required />
+            <input name="organization" autocomplete="organization" maxlength="160" required disabled />
           </label>
           <label>
             <span>Role <small>optional</small></span>
-            <input name="role" autocomplete="organization-title" maxlength="120" />
+            <input name="role" autocomplete="organization-title" maxlength="120" disabled />
           </label>
         </div>
 
         <fieldset>
           <legend>Commodity coverage</legend>
           <div class="brief-checkboxes">
-            <label><input type="checkbox" name="commodities" value="copper" /> Copper</label>
-            <label><input type="checkbox" name="commodities" value="crude-oil" /> Crude oil</label>
-            <label><input type="checkbox" name="commodities" value="gold" /> Gold</label>
-            <label><input type="checkbox" name="commodities" value="cocoa" /> Cocoa</label>
+            <label><input type="checkbox" name="commodities" value="copper" disabled /> Copper</label>
+            <label><input type="checkbox" name="commodities" value="crude-oil" disabled /> Crude oil</label>
+            <label><input type="checkbox" name="commodities" value="gold" disabled /> Gold</label>
+            <label><input type="checkbox" name="commodities" value="cocoa" disabled /> Cocoa</label>
           </div>
         </fieldset>
 
@@ -75,6 +81,7 @@ const canonicalUrl = absoluteUrl('/brief/');
             maxlength="1200"
             rows="6"
             required
+            disabled
             placeholder="Describe the operational, procurement, risk, or market question and the exposure that matters."
           ></textarea>
         </label>
@@ -84,11 +91,12 @@ const canonicalUrl = absoluteUrl('/brief/');
             name="timeframe"
             maxlength="120"
             required
+            disabled
             placeholder="For example: before the Q4 sourcing review"
           />
         </label>
         <label class="brief-consent">
-          <input type="checkbox" name="consent" required />
+          <input type="checkbox" name="consent" required disabled />
           <span>
             CommodityNode may use these details to assess and reply to this request.
             See the <a href="/privacy/">privacy policy</a>.
@@ -96,12 +104,14 @@ const canonicalUrl = absoluteUrl('/brief/');
         </label>
         <label class="form-honeypot" aria-hidden="true">
           Website
-          <input name="website" tabindex="-1" autocomplete="off" />
+          <input name="website" tabindex="-1" autocomplete="off" disabled />
         </label>
-        <button type="submit" class="primary-action">
+        <button type="submit" class="primary-action" disabled>
           Submit request
         </button>
-        <p class="form-status" data-brief-status role="status" aria-live="polite"></p>
+        <p class="form-status" data-brief-status role="status" aria-live="polite">
+          Checking request availability…
+        </p>
       </form>
     </div>
   </article>
@@ -111,6 +121,39 @@ const canonicalUrl = absoluteUrl('/brief/');
   const form = document.querySelector<HTMLFormElement>('[data-brief-form]');
   const status = form?.querySelector<HTMLElement>('[data-brief-status]');
   let started = false;
+
+  const setBriefAvailability = (available: boolean) => {
+    if (!form || !status) return;
+    form.dataset.capabilityReady = String(available);
+    form.setAttribute('aria-busy', 'false');
+    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement>(
+      'input, textarea, button',
+    ).forEach((control) => {
+      control.disabled = !available;
+    });
+    status.textContent = available
+      ? ''
+      : 'Custom brief requests are currently unavailable.';
+  };
+
+  const hydrateBriefCapability = async () => {
+    try {
+      const response = await fetch('/api/commoditynode-capabilities', {
+        credentials: 'omit',
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error('capability_unavailable');
+      const result = await response.json() as {
+        briefRequest?: { available?: boolean };
+      };
+      setBriefAvailability(result.briefRequest?.available === true);
+    } catch {
+      setBriefAvailability(false);
+    }
+  };
+
+  void hydrateBriefCapability();
+
   form?.addEventListener('focusin', () => {
     if (started) return;
     started = true;
@@ -127,6 +170,7 @@ const canonicalUrl = absoluteUrl('/brief/');
   });
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (form.dataset.capabilityReady !== 'true') return;
     if (!form.reportValidity() || !status) return;
     const data = new FormData(form);
     const commodityIds = data.getAll('commodities').map(String);

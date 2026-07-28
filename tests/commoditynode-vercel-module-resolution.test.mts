@@ -5,9 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const COMMODITYNODE_FUNCTIONS = [
-  'api/commoditynode-alert-sync.ts',
   'api/commoditynode-analytics.ts',
   'api/commoditynode-brief-request.ts',
+  'api/commoditynode-capabilities.ts',
   'api/commoditynode-graph.ts',
   'api/commoditynode-legacy.ts',
   'api/commoditynode-newsletter.ts',
@@ -19,6 +19,7 @@ const VERCEL_FUNCTION_CLOSURE = [
   'server/_shared/rate-limit.ts',
   'server/commoditynode/impact-graph-service.ts',
   'server/commoditynode/lead-contract.ts',
+  'server/commoditynode/product-gateway.ts',
   'shared/commoditynode-analytics.ts',
   'shared/commoditynode-cobre-panama-impact.ts',
   'shared/commoditynode-entity-resolution.ts',

@@ -15,13 +15,19 @@ const { placement } = Astro.props;
       exposed companies, evidence, and what remains unknown.
     </p>
   </div>
-  <form data-newsletter-form data-placement={placement} novalidate>
+  <form
+    data-newsletter-form
+    data-placement={placement}
+    data-capability-ready="false"
+    aria-busy="true"
+    novalidate
+  >
     <label>
       <span>Email address</span>
-      <input name="email" type="email" autocomplete="email" maxlength="254" required />
+      <input name="email" type="email" autocomplete="email" maxlength="254" required disabled />
     </label>
     <label class="newsletter-consent">
-      <input name="consent" type="checkbox" required />
+      <input name="consent" type="checkbox" required disabled />
       <span>
         Send me the Weekly Commodity Impact Brief. I understand that confirmation is
         required and I can unsubscribe from any issue. <a href="/privacy/">Privacy</a>
@@ -29,17 +35,56 @@ const { placement } = Astro.props;
     </label>
     <label class="form-honeypot" aria-hidden="true">
       Website
-      <input name="website" type="text" tabindex="-1" autocomplete="off" />
+      <input name="website" type="text" tabindex="-1" autocomplete="off" disabled />
     </label>
-    <button type="submit">
+    <button type="submit" disabled>
       Request confirmation
     </button>
-    <p class="form-status" data-newsletter-status role="status" aria-live="polite"></p>
+    <p class="form-status" data-newsletter-status role="status" aria-live="polite">
+      Checking signup availability…
+    </p>
   </form>
 </aside>
 
 <script>
-  document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]').forEach((form) => {
+  const newsletterForms = document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]');
+
+  const setNewsletterAvailability = (available: boolean) => {
+    newsletterForms.forEach((form) => {
+      form.dataset.capabilityReady = String(available);
+      form.setAttribute('aria-busy', 'false');
+      form.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input, button')
+        .forEach((control) => {
+          control.disabled = !available;
+        });
+      const status = form.querySelector<HTMLElement>('[data-newsletter-status]');
+      if (status) {
+        status.textContent = available
+          ? ''
+          : 'Weekly brief signup is currently unavailable.';
+      }
+    });
+  };
+
+  const hydrateNewsletterCapability = async () => {
+    try {
+      const response = await fetch('/api/commoditynode-capabilities', {
+        credentials: 'omit',
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error('capability_unavailable');
+      const result = await response.json() as {
+        newsletter?: { available?: boolean };
+      };
+      setNewsletterAvailability(result.newsletter?.available === true);
+    } catch {
+      setNewsletterAvailability(false);
+    }
+  };
+
+  void hydrateNewsletterCapability();
+
+  newsletterForms.forEach((form) => {
     let started = false;
     form.addEventListener('focusin', () => {
       if (started) return;
@@ -57,6 +102,7 @@ const { placement } = Astro.props;
     });
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if (form.dataset.capabilityReady !== 'true') return;
       const status = form.querySelector<HTMLElement>('[data-newsletter-status]');
       const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
       const data = new FormData(form);
@@ -77,13 +123,10 @@ const { placement } = Astro.props;
           }),
         });
         if (!response.ok) throw new Error('request_failed');
-        const result = await response.json() as { status?: string };
+        await response.json();
         form.reset();
-        status.textContent = result.status === 'already_active'
-          ? 'This address is already subscribed.'
-          : result.status === 'pending'
-            ? 'A confirmation request is already pending. Check your inbox.'
-            : 'Check your inbox. The confirmation link expires in 48 hours.';
+        status.textContent =
+          'If this address is eligible, check your inbox. The confirmation link expires in 48 hours.';
         window.dispatchEvent(new CustomEvent('commoditynode:analytics', {
           detail: {
             event: 'newsletter_signup_submitted',

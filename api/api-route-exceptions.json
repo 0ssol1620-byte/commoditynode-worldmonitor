@@ -815,11 +815,11 @@
       "removal_issue": null
     },
     {
-      "path": "api/commoditynode-alert-sync.ts",
-      "category": "ops-admin",
-      "reason": "CRON_SECRET-protected projection of the release-reviewed alert catalog into deduplicated in-app delivery records.",
+      "path": "api/commoditynode-capabilities.ts",
+      "category": "migration-pending",
+      "reason": "Read-only capability negotiation for fail-closed CommodityNode lead and account surfaces while the typed product service contract is finalized.",
       "owner": "@0ssol1620-byte",
-      "removal_issue": null
+      "removal_issue": "TBD"
     }
   ]
 }

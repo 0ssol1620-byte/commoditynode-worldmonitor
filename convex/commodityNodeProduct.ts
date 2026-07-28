@@ -36,7 +36,7 @@ async function actorHash(userId: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export const requestNewsletterSubscription = mutation({
+export const requestNewsletterSubscription = internalMutation({
   args: {
     email: v.string(),
     consentVersion: v.number(),
@@ -87,7 +87,7 @@ export const requestNewsletterSubscription = mutation({
   },
 });
 
-export const confirmNewsletterSubscription = mutation({
+export const confirmNewsletterSubscription = internalMutation({
   args: { confirmationTokenHash: v.string() },
   handler: async (ctx, args) => {
     if (!TOKEN_RE.test(args.confirmationTokenHash)) throw new ConvexError("INVALID_CONFIRMATION_TOKEN");
@@ -110,7 +110,7 @@ export const confirmNewsletterSubscription = mutation({
   },
 });
 
-export const unsubscribeNewsletter = mutation({
+export const unsubscribeNewsletter = internalMutation({
   args: { confirmationTokenHash: v.string() },
   handler: async (ctx, args) => {
     if (!TOKEN_RE.test(args.confirmationTokenHash)) {
@@ -141,7 +141,7 @@ export const unsubscribeNewsletter = mutation({
  * not accept the message. A compare-by-token delete cannot remove a newer
  * confirmation request created by a concurrent retry.
  */
-export const cancelNewsletterConfirmation = mutation({
+export const cancelNewsletterConfirmation = internalMutation({
   args: { confirmationTokenHash: v.string() },
   handler: async (ctx, args) => {
     if (!TOKEN_RE.test(args.confirmationTokenHash)) {
@@ -159,7 +159,7 @@ export const cancelNewsletterConfirmation = mutation({
   },
 });
 
-export const submitBriefRequest = mutation({
+export const submitBriefRequest = internalMutation({
   args: {
     name: v.string(),
     email: v.string(),
@@ -383,10 +383,11 @@ const MATERIALITY_RANK = {
 /**
  * Idempotently projects the release-reviewed catalog into durable events and
  * creates in-app deliveries for rules that existed before each publication.
- * Callers cannot provide event content, so this public mutation is safe for a
- * Vercel cron without an admin credential.
+ * This is internal-only and runs from Convex cron. Keeping the projection
+ * behind the internal namespace prevents external callers from forcing a
+ * potentially expensive full rule scan.
  */
-export const syncCanonicalAlertEvents = mutation({
+export const syncCanonicalAlertEvents = internalMutation({
   args: {},
   handler: async (ctx) => {
     let eventsInserted = 0;

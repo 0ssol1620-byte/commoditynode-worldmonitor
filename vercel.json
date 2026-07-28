@@ -1,12 +1,6 @@
 {
   "ignoreCommand": "bash scripts/vercel-ignore.sh",
   "installCommand": "npm ci",
-  "crons": [
-    {
-      "path": "/api/commoditynode-alert-sync",
-      "schedule": "17 4 * * *"
-    }
-  ],
   "redirects": [
     { "source": "/reports/from-chokepoint-event-to-market-impact", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "https://commoditynode.com/posts/from-chokepoint-event-to-market-impact/", "permanent": true },
     { "source": "/reports/cobre-panama-production-halt", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "https://commoditynode.com/events/cobre-panama-production-halt/", "permanent": true },

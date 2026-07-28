@@ -9,7 +9,12 @@ The following variables must exist in the Live/API Vercel project before lead
 workflows are advertised as available:
 
 - `CONVEX_URL`: production Convex HTTP endpoint.
+- `CONVEX_SITE_URL`: production Convex HTTP Actions origin. It may be derived
+  from `CONVEX_URL`, but an explicit value is preferred in production.
 - `VITE_CONVEX_URL`: the same production deployment for signed-in browser calls.
+- `COMMODITYNODE_PRODUCT_GATEWAY_SECRET`: a dedicated random secret of at least
+  32 characters, configured with the same value in Vercel and Convex. It must
+  not be reused by WorldMonitor relays or billing.
 - `RESEND_API_KEY`: restricted transactional-email key.
 - `COMMODITYNODE_RESEND_FROM`: a sender on a Resend-verified CommodityNode domain.
 - `COMMODITYNODE_LEADS_TO`: the private operations mailbox for custom brief notices.
@@ -19,6 +24,13 @@ Do not reuse a WorldMonitor sender identity. If any dependency is absent,
 newsletter signup fails with `503`; custom brief intake fails with `503`. A
 custom brief that is already durably stored still returns `202` if only the
 operations notification is delayed, preventing duplicate customer submissions.
+The research UI reads `/api/commoditynode-capabilities` and keeps both forms
+disabled until the entire dependency set is available.
+
+Vercel lead endpoints call the authenticated Convex HTTP Action at
+`/commoditynode/product`. Newsletter and brief mutations live only in the
+Convex internal namespace, so the public `VITE_CONVEX_URL` cannot be used to
+bypass edge validation or distributed rate limits.
 
 ## Newsletter contract
 
@@ -27,6 +39,9 @@ operations notification is delayed, preventing duplicate customer submissions.
   network bucket.
 - Confirmation tokens contain 256 bits of randomness; Convex stores only SHA-256.
 - Confirmation expires after 48 hours.
+- Confirmation and unsubscribe links render a review page on `GET`; only an
+  explicit `POST` mutates subscription state. This prevents email link scanners
+  from confirming or unsubscribing an address.
 - A failed Resend acceptance rolls back only the matching pending token.
 - An unfinished confirmation is pruned after 30 days.
 - The confirmation message includes the durable unsubscribe link.
@@ -72,9 +87,11 @@ record content, email, or free text.
 Before enabling the forms:
 
 1. Deploy Convex schema/functions and confirm the retention cron appears.
-2. Verify the Resend sending domain, SPF, DKIM, and DMARC.
-3. Submit a synthetic newsletter address and complete confirmation.
-4. Use the received link to unsubscribe and verify address anonymization.
-5. Submit one synthetic custom brief and verify both durable storage and mailbox delivery.
-6. Sign in, save/remove one commodity, export JSON, then delete synthetic account data.
-7. Review rate-limit counters and logs without printing addresses or tokens.
+2. Confirm the 15-minute `commoditynode-canonical-alert-sync` cron appears and
+   that no public alert-sync mutation or Vercel cron remains.
+3. Verify the Resend sending domain, SPF, DKIM, and DMARC.
+4. Submit a synthetic newsletter address and complete confirmation.
+5. Use the received link to unsubscribe and verify address anonymization.
+6. Submit one synthetic custom brief and verify both durable storage and mailbox delivery.
+7. Sign in, save/remove one commodity, export JSON, then delete synthetic account data.
+8. Review rate-limit counters and logs without printing addresses or tokens.

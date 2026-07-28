@@ -1,5 +1,3 @@
-import { ConvexHttpClient } from 'convex/browser';
-
 // @ts-expect-error -- shared JavaScript CORS utility has no declaration file.
 import { isDisallowedOrigin } from './_cors.js';
 import { checkEndpointRateLimit } from '../server/_shared/rate-limit.js';
@@ -10,6 +8,10 @@ import {
   randomHex,
   sha256Hex,
 } from '../server/commoditynode/lead-contract.js';
+import {
+  callCommodityNodeProductGateway,
+  isCommodityNodeProductGatewayConfigured,
+} from '../server/commoditynode/product-gateway.js';
 
 export const config = { runtime: 'edge' };
 
@@ -49,6 +51,10 @@ async function sendConfirmation(email: string, token: string): Promise<boolean> 
         from,
         to: [email],
         subject: 'Confirm the CommodityNode Weekly Impact Brief',
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
         text: [
           'Confirm your subscription to the CommodityNode Weekly Impact Brief.',
           '',
@@ -85,36 +91,40 @@ export default async function handler(request: Request): Promise<Response> {
     return json(request, { error: 'invalid_json' }, 400);
   }
   if (cleanCommodityNodeLeadField(input.website, 100)) {
-    return json(request, { status: 'confirmation_required' }, 202);
+    return json(request, { status: 'confirmation_requested' }, 202);
   }
   const email = normalizeCommodityNodeEmail(input.email);
   if (!email || input.consent !== true || input.consentVersion !== COMMODITYNODE_LEAD_CONSENT_VERSION) {
     return json(request, { error: 'valid_email_and_consent_required' }, 400);
   }
 
-  const convexUrl = process.env.CONVEX_URL;
-  if (!convexUrl || !process.env.RESEND_API_KEY || !process.env.COMMODITYNODE_RESEND_FROM) {
+  if (
+    !isCommodityNodeProductGatewayConfigured()
+    || !process.env.RESEND_API_KEY
+    || !process.env.COMMODITYNODE_RESEND_FROM
+  ) {
     return json(request, { error: 'newsletter_unavailable' }, 503);
   }
   const token = randomHex();
   const tokenHash = await sha256Hex(token);
-  const client = new ConvexHttpClient(convexUrl);
   try {
-    const result = await client.mutation('commodityNodeProduct:requestNewsletterSubscription' as never, {
+    const result = await callCommodityNodeProductGateway<{
+      status: 'already_active' | 'pending' | 'confirmation_required';
+    }>('request_newsletter_subscription', {
       email,
       consentVersion: COMMODITYNODE_LEAD_CONSENT_VERSION,
       consentedAt: Date.now(),
       source: cleanCommodityNodeLeadField(input.source, 64) || 'research',
       confirmationTokenHash: tokenHash,
-    } as never) as { status: 'already_active' | 'pending' | 'confirmation_required' };
+    });
 
     if (result.status === 'confirmation_required' && !(await sendConfirmation(email, token))) {
-      await client.mutation('commodityNodeProduct:cancelNewsletterConfirmation' as never, {
+      await callCommodityNodeProductGateway('cancel_newsletter_confirmation', {
         confirmationTokenHash: tokenHash,
-      } as never).catch(() => undefined);
+      }).catch(() => undefined);
       return json(request, { error: 'confirmation_delivery_failed' }, 503);
     }
-    return json(request, { status: result.status }, 202);
+    return json(request, { status: 'confirmation_requested' }, 202);
   } catch {
     return json(request, { error: 'newsletter_unavailable' }, 503);
   }
