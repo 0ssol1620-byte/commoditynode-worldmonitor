@@ -201,13 +201,22 @@ try {
   if (response.status !== 200) {
     fail(`${researchOrigin}${path}`, `expected HTTP 200, received ${response.status}`);
   }
-  if (body?.schemaVersion !== 1 || typeof body?.capabilities !== 'object') {
+  if (
+    body?.version !== 1
+    || typeof body?.newsletter?.available !== 'boolean'
+    || typeof body?.briefRequest?.available !== 'boolean'
+    || typeof body?.accountFeatures?.available !== 'boolean'
+  ) {
     fail(`${researchOrigin}${path}`, 'capability response contract is invalid');
   }
   observations.push({
     url: `${researchOrigin}${path}`,
     status: response.status,
-    capabilities: body?.capabilities ?? null,
+    capabilities: {
+      newsletter: body?.newsletter?.available ?? null,
+      briefRequest: body?.briefRequest?.available ?? null,
+      accountFeatures: body?.accountFeatures?.available ?? null,
+    },
   });
 } catch (error) {
   fail(
