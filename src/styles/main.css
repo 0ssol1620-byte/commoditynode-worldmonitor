@@ -5260,6 +5260,13 @@ body.playback-mode .status-dot {
   max-width: 300px;
 }
 
+.map-container.svg-mode .map-marker {
+  position: absolute;
+  width: max-content;
+  height: max-content;
+  transform: translate(-50%, -50%);
+}
+
 .layer-toggles:not(.deckgl-layer-toggles) .layer-toggle-row {
   display: flex;
   align-items: stretch;

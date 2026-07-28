@@ -2856,7 +2856,18 @@ export class MapComponent {
         const pos = projection([hub.lon, hub.lat]);
         if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) return;
 
-        const icon = hub.type === 'exchange' ? '📦' : hub.type === 'port' ? '🚢' : '⛽';
+        const icon =
+          SITE_VARIANT === 'commoditynode'
+            ? hub.type === 'exchange'
+              ? 'EX'
+              : hub.type === 'port'
+                ? 'PO'
+                : 'RF'
+            : hub.type === 'exchange'
+              ? '📦'
+              : hub.type === 'port'
+                ? '🚢'
+                : '⛽';
         const div = document.createElement('div');
         div.className = `map-marker commodity-hub-marker type-${hub.type}`;
         div.style.left = `${pos[0]}px`;

@@ -259,6 +259,13 @@ test.describe('CommodityNode live shell', () => {
       .focus();
     await page.keyboard.press('Tab');
     await expect(
+      mobileDrawer.getByRole('button', { name: 'Save item' }),
+    ).toBeFocused();
+    await mobileDrawer
+      .getByRole('button', { name: 'Enable impact alert' })
+      .focus();
+    await page.keyboard.press('Tab');
+    await expect(
       mobileDrawer.getByRole('button', { name: 'Close map detail' }),
     ).toBeFocused();
   });

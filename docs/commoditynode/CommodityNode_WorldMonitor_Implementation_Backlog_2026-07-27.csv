@@ -20,7 +20,7 @@ CNWM-018,1,Map defaults,Define desktop and mobile CommodityNode layer budgets.,P
 CNWM-019,1,Brand,Create shared CommodityNode design token source consumed by SPA and Astro.,P1,CNWM-015,complete
 CNWM-020,1,Shell,"Add CommodityNode global nav, cross-surface links and source attribution.",P1,CNWM-017,complete
 CNWM-021,1,CORS,Add CommodityNode apex/live/API/editorial origins to allowlists.,P0,CNWM-014,complete
-CNWM-022,1,Deployment,Create separate Vercel projects for research and live/API surfaces from one fork.,P0,CNWM-016,in_progress
+CNWM-022,1,Deployment,Create separate Vercel projects for research and live/API surfaces from one fork.,P0,CNWM-016,complete
 CNWM-023,1,Upstream sync,Create upstream-main mirror branch and automated sync PR workflow.,P1,CNWM-001,complete
 CNWM-024,1,Patch ledger,Track direct modifications to upstream hot files and conflict owners.,P1,CNWM-021,complete
 CNWM-025,2,Research surface,Expand the existing Astro blog-site into the CommodityNode apex research product.,P0,CNWM-020,complete
@@ -58,7 +58,7 @@ CNWM-056,4,Performance,Lazy-load globe and non-default layers; keep flat map as 
 CNWM-057,4,Mobile,Create mobile bottom-sheet workflow and reduced default layers.,P1,CNWM-048,complete
 CNWM-058,4,Unavailable states,Implement source-specific stale/unavailable/partial map states.,P1,CNWM-044,complete
 CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets first.",P1,CNWM-048,complete
-CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,in_progress
+CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,complete
 CNWM-061,5,News ingestion,Curate commodity-specific RSS/official/filing source catalog.,P0,CNWM-036,complete
 CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,complete
 CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,complete

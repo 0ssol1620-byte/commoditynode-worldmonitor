@@ -223,10 +223,55 @@
 }
 
 [data-variant='commoditynode'] .layer-toggles:not(.deckgl-layer-toggles) {
-  max-height: calc(100% - 20px);
+  top: 54px;
+  bottom: auto;
+  left: 12px;
+  display: block;
+  width: min(220px, calc(100% - 24px));
+  max-height: calc(100% - 66px);
+  padding: 8px;
   overflow-y: auto;
+  background: color-mix(in srgb, var(--cn-color-surface) 96%, transparent);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: var(--cn-radius-control);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+
+[data-variant='commoditynode'] .svg-mode .commodity-hub-marker {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--cn-color-signal);
+  background: color-mix(in srgb, var(--cn-color-surface) 92%, transparent);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(7, 22, 29, .75);
+  font: 700 7px/1 var(--cn-font-data);
+  letter-spacing: -.02em;
+}
+
+[data-variant='commoditynode'] .layer-toggles:not(.deckgl-layer-toggles) .cn-map-presets {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: -8px -8px 8px;
+}
+
+[data-variant='commoditynode'] .globe-mode .globe-beta-badge {
+  display: none;
+}
+
+[data-variant='commoditynode'] .globe-mode .deckgl-layer-toggles .toggle-icon {
+  width: 24px;
+  min-width: 24px;
+  height: 18px;
+  color: var(--cn-color-signal);
+  font: 700 8px/18px var(--cn-font-data);
+  letter-spacing: .04em;
+  background: var(--cn-color-surface-selected);
+  border: 1px solid var(--cn-color-border-subtle);
+  border-radius: 2px;
 }
 
 [data-variant='commoditynode'] .cn-map-presets {
