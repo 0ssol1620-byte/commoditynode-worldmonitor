@@ -2,7 +2,7 @@ import {
   COMMODITY_ONTOLOGY_VERSION,
   type CommodityImpactEvent,
   type GraphSnapshot,
-} from './commodity-impact-ontology';
+} from './commodity-impact-ontology.js';
 
 const REVIEWER = 'CommodityNode Editorial';
 const REVIEWED_AT = '2026-07-28T00:00:00.000Z';

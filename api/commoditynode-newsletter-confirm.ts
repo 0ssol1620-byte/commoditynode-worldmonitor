@@ -3,7 +3,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import {
   COMMODITYNODE_TOKEN_RE,
   sha256Hex,
-} from '../server/commoditynode/lead-contract';
+} from '../server/commoditynode/lead-contract.js';
 
 function html(title: string, message: string, status: number, token?: string): Response {
   const unsubscribe = token

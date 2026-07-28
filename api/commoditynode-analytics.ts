@@ -5,8 +5,8 @@ import { isDisallowedOrigin } from './_cors.js';
 import {
   commodityNodeAnalyticsAggregateKey,
   parseCommodityNodeAnalyticsPayload,
-} from '../shared/commoditynode-analytics';
-import { checkRateLimit } from '../server/_shared/rate-limit';
+} from '../shared/commoditynode-analytics.js';
+import { checkRateLimit } from '../server/_shared/rate-limit.js';
 
 const RETENTION_SECONDS = 400 * 24 * 60 * 60;
 const BASE_HEADERS = {

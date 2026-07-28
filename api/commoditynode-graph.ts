@@ -6,8 +6,8 @@ import {
   getCommodityNodeImpactPaths,
   getCommodityNodeSubgraph,
   resolveCommodityNodeGraphEntity,
-} from '../server/commoditynode/impact-graph-service';
-import { checkRateLimit } from '../server/_shared/rate-limit';
+} from '../server/commoditynode/impact-graph-service.js';
+import { checkRateLimit } from '../server/_shared/rate-limit.js';
 
 const CACHE_CONTROL = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
 const MAX_TEXT_PARAMETER_LENGTH = 160;

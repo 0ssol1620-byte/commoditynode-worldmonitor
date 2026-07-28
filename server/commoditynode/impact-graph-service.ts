@@ -1,7 +1,7 @@
 import {
   COBRE_PANAMA_GRAPH_SNAPSHOT,
   COBRE_PANAMA_IMPACT_EVENT,
-} from '../../shared/commoditynode-cobre-panama-impact';
+} from '../../shared/commoditynode-cobre-panama-impact.js';
 import {
   validateGraphSnapshot,
   type CommodityEntity,
@@ -9,12 +9,12 @@ import {
   type ImpactEvidence,
   type ImpactPath,
   type PublishedImpactEdge,
-} from '../../shared/commodity-impact-ontology';
+} from '../../shared/commodity-impact-ontology.js';
 import {
   resolveCommodityNodeEntity,
   type CommodityNodeEntityResolution,
-} from '../../shared/commoditynode-entity-resolution';
-import { findImpactPaths } from '../../src/services/commodity-impact-graph';
+} from '../../shared/commoditynode-entity-resolution.js';
+import { findImpactPaths } from '../../src/services/commodity-impact-graph.js';
 
 export interface CommodityNodeSubgraph {
   snapshotId: string;

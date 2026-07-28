@@ -1,4 +1,4 @@
-import type { CommodityEntity } from './commodity-impact-ontology';
+import type { CommodityEntity } from './commodity-impact-ontology.js';
 
 export interface CommodityNodeEntityResolution {
   status: 'resolved' | 'ambiguous' | 'unresolved';
@@ -48,4 +48,3 @@ export function resolveCommodityNodeEntity(
     candidates,
   };
 }
-

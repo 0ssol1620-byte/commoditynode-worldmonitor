@@ -2,14 +2,14 @@ import { ConvexHttpClient } from 'convex/browser';
 
 // @ts-expect-error -- shared JavaScript CORS utility has no declaration file.
 import { isDisallowedOrigin } from './_cors.js';
-import { checkEndpointRateLimit } from '../server/_shared/rate-limit';
+import { checkEndpointRateLimit } from '../server/_shared/rate-limit.js';
 import {
   COMMODITYNODE_LEAD_CONSENT_VERSION,
   cleanCommodityNodeLeadField,
   normalizeCommodityNodeEmail,
   randomHex,
   sha256Hex,
-} from '../server/commoditynode/lead-contract';
+} from '../server/commoditynode/lead-contract.js';
 
 const PATH = '/api/commoditynode-newsletter';
 

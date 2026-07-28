@@ -6,7 +6,7 @@ import {
   type ImpactPathRelevance,
   type ImpactStrengthBand,
   type PublishedImpactEdge,
-} from '../../shared/commodity-impact-ontology';
+} from '../../shared/commodity-impact-ontology.js';
 
 const STRENGTH_WEIGHT: Record<ImpactStrengthBand, number> = {
   low: 0.45,
