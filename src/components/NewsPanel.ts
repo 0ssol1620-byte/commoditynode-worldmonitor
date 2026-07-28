@@ -20,7 +20,10 @@ type SortMode = 'relevance' | 'newest';
 
 function cleanHeadline(value: string): string {
   return value
-    .replace(/&nbsp;|&#160;|&#xA0;/gi, ' ')
+    // Google News can return non-breaking spaces after one or more rounds of
+    // entity escaping (for example "&amp;nbsp;"). Normalize every form before
+    // escaping the headline for HTML output so entity text never reaches users.
+    .replace(/&(?:amp;)*(?:nbsp|#(?:160|xA0));|\u00A0/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
