@@ -17,7 +17,7 @@ indexable: true
 adEligible: false
 editorialPurpose: "Help analysts distinguish observation time, source publication time, and collection time before they rely on a commodity chart."
 site: "commoditynode"
-heroImage: "/blog/images/blog/commodity-data-needs-two-timestamps.jpg"
+heroImage: "/images/blog/commodity-data-needs-two-timestamps.jpg"
 pinned: true
 ---
 

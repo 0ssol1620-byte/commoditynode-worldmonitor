@@ -65,6 +65,27 @@
   color: var(--text-muted);
 }
 
+[data-variant='commoditynode'] .cn-research-home {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--cn-color-text-secondary);
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-research-home:hover {
+    color: var(--cn-color-signal-strong);
+    border-color: var(--cn-color-border-strong);
+  }
+}
+
 [data-variant='commoditynode'] .variant-switcher {
   min-height: 30px;
   padding: 0 3px;
@@ -105,6 +126,73 @@
   box-shadow: none;
 }
 
+[data-variant='commoditynode'] .cn-workspace-guide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(0, 1.4fr);
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--cn-color-border);
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide > div {
+  display: grid;
+  gap: 4px;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide__label {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide > div strong {
+  color: var(--cn-color-text);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: var(--cn-color-border-subtle);
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 2px 7px;
+  padding: 7px 9px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li > span {
+  grid-row: 1 / 3;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: var(--cn-color-signal-strong);
+  border: 1px solid var(--cn-color-border-strong);
+  font: 650 9px/1 var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li strong {
+  color: var(--cn-color-text-secondary);
+  font-size: 10px;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li small {
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+}
+
 [data-variant='commoditynode'] .panel {
   border-radius: var(--cn-radius-surface);
 }
@@ -129,6 +217,162 @@
 [data-variant='commoditynode'] .commodity-price,
 [data-variant='commoditynode'] .commodity-change {
   font-family: var(--font-mono);
+}
+
+[data-variant='commoditynode'] .commodity-reference-state,
+[data-variant='commoditynode'] .cn-reference-panel,
+[data-variant='commoditynode'] .cn-implication-reference {
+  display: grid;
+  gap: 10px;
+  color: var(--cn-color-text-secondary);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .commodity-reference-notice,
+[data-variant='commoditynode'] .cn-reference-panel__intro,
+[data-variant='commoditynode'] .cn-implication-reference__status {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--cn-color-border-subtle);
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .commodity-reference-notice strong,
+[data-variant='commoditynode'] .cn-reference-panel__intro strong,
+[data-variant='commoditynode'] .cn-implication-reference__status strong {
+  color: var(--cn-color-text);
+  font-size: 12px;
+}
+
+[data-variant='commoditynode'] .commodity-reference-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .commodity-reference-row strong,
+[data-variant='commoditynode'] .cn-reference-panel__grid span,
+[data-variant='commoditynode'] .cn-implication-reference__path span {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1.2 var(--cn-font-data);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid > div,
+[data-variant='commoditynode'] .cn-implication-reference__path > div {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid strong,
+[data-variant='commoditynode'] .cn-implication-reference__path strong {
+  color: var(--cn-color-text);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid small,
+[data-variant='commoditynode'] .cn-reference-panel__foot,
+[data-variant='commoditynode'] .cn-implication-reference__limit {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-implication-reference__path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-implication-reference__path > div:not(:last-child) {
+  border-right: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .monitor-starter-title {
+  margin-top: 12px;
+  color: var(--cn-color-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+[data-variant='commoditynode'] .monitor-starter-copy {
+  margin: 5px 0 8px;
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .monitor-starter-ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+[data-variant='commoditynode'] .monitor-starter-button {
+  min-height: 32px;
+  padding: 0 9px;
+  color: var(--cn-color-text-secondary);
+  border: 1px solid var(--cn-color-border);
+  background: var(--cn-color-canvas-alt);
+  border-radius: var(--cn-radius-control);
+  font-size: 10px;
+}
+
+[data-variant='commoditynode'] .cn-event-reference {
+  display: grid;
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro,
+[data-variant='commoditynode'] .cn-event-reference a {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  color: var(--cn-color-text-secondary);
+  background: var(--cn-color-surface);
+  text-decoration: none;
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro {
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro strong,
+[data-variant='commoditynode'] .cn-event-reference a strong {
+  color: var(--cn-color-text);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro span,
+[data-variant='commoditynode'] .cn-event-reference a small {
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-event-reference a > span {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 
 [data-variant='commoditynode'] button:focus-visible,
@@ -192,6 +436,25 @@
     letter-spacing: -.02em;
   }
 
+  [data-variant='commoditynode'] .cn-research-home {
+    min-height: 44px;
+    padding-inline: 8px;
+  }
+
+  [data-variant='commoditynode'] .cn-reference-panel__grid,
+  [data-variant='commoditynode'] .cn-implication-reference__path {
+    grid-template-columns: 1fr;
+  }
+
+  [data-variant='commoditynode'] .cn-workspace-guide {
+    grid-template-columns: 1fr;
+    margin: 8px 8px 0;
+  }
+
+  [data-variant='commoditynode'] .cn-workspace-guide ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   [data-variant='commoditynode'] .panels-grid {
     gap: 8px;
     padding: 8px;
@@ -230,6 +493,12 @@
   [data-variant='commoditynode'] .region-sheet-backdrop,
   [data-variant='commoditynode'] .region-bottom-sheet {
     display: block;
+  }
+}
+
+@media (min-width: 1600px) {
+  [data-variant='commoditynode'] .cn-workspace-guide {
+    display: none;
   }
 }
 

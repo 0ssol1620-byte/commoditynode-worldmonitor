@@ -63,7 +63,8 @@ test.describe('CommodityNode live shell', () => {
 
     await expect(page.locator('[data-panel="impact-universe"] .cn-universe-graph [data-universe-node]')).toHaveCount(23);
     await expect(page.locator('.cn-universe-graph-stage')).toBeVisible();
-    await expect(page.locator('.cn-universe-webgl-canvas')).toBeAttached();
+    await expect(page.locator('.cn-universe-webgl-canvas')).toHaveCount(0);
+    await expect(page.locator('.cn-universe-primary-path-list li')).toHaveCount(4);
     await expect(page.locator('[data-panel="impact-universe"]')).not.toContainText(/\bRL\b/);
     await expect(page.locator('#cn-universe-case-title')).toHaveText(
       'Verified historical impact path',

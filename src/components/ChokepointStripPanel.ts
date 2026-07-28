@@ -59,6 +59,25 @@ export class ChokepointStripPanel extends Panel {
       title: options.title ?? t('components.chokepointStrip.title'),
       infoTooltip: t('components.chokepointStrip.infoTooltip'),
     });
+    this.showReferenceState();
+  }
+
+  private showReferenceState(): void {
+    this.setDataBadge('cached', 'reference');
+    this.setSafeContent(safeHtml`
+      <div class="cn-reference-panel">
+        <div class="cn-reference-panel__intro">
+          <strong>Four structural routes are ready to inspect.</strong>
+          <span>Current transit and disruption claims appear only after a valid route feed is available.</span>
+        </div>
+        <div class="cn-reference-panel__grid">
+          <div><span>Oil</span><strong>Hormuz</strong><small>Gulf export route</small></div>
+          <div><span>Asia</span><strong>Malacca</strong><small>Energy and bulk transit</small></div>
+          <div><span>Europe</span><strong>Suez</strong><small>Asia-Europe corridor</small></div>
+          <div><span>Americas</span><strong>Panama</strong><small>Canal routing reference</small></div>
+        </div>
+      </div>
+    `);
   }
 
   public async fetchData(): Promise<void> {
@@ -81,13 +100,13 @@ export class ChokepointStripPanel extends Panel {
     } catch (err) {
       if (this.isAbortError(err)) return;
       if (!this.element?.isConnected) return;
-      this.showError(t('components.chokepointStrip.errors.unavailable'), () => void this.fetchData());
+      this.showReferenceState();
     }
   }
 
   private render(): void {
     if (!this.data?.chokepoints?.length) {
-      this.showError(t('components.chokepointStrip.errors.noData'), () => void this.fetchData());
+      this.showReferenceState();
       return;
     }
 

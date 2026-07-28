@@ -112,6 +112,7 @@ export class HeatmapPanel extends Panel {
         this._render();
       }
     });
+    if (SITE_VARIANT === 'commoditynode') this._render();
   }
 
   public renderHeatmap(
@@ -528,6 +529,31 @@ export class CommoditiesPanel extends Panel {
       (d) => typeof d.price === 'number' && Number.isFinite(d.price) && !d.symbol?.endsWith('=X'),
     );
     if (validData.length === 0) {
+      if (SITE_VARIANT === 'commoditynode') {
+        const groups: Array<readonly [string, string]> = [
+          ['Energy', 'Crude oil · Natural gas · Gasoline · Heating oil'],
+          ['Metals', 'Copper · Aluminum · Lithium · Uranium'],
+          ['Precious', 'Gold · Silver · Platinum · Palladium'],
+          ['Agriculture', 'Wheat · Corn · Soybeans · Rice · Sugar · Coffee · Cocoa · Cotton'],
+        ];
+        const coverage = groups.map(([group, names]) => `
+          <div class="commodity-reference-row">
+            <strong>${escapeHtml(group)}</strong>
+            <span>${escapeHtml(names)}</span>
+          </div>
+        `).join('');
+        this.setDataBadge('unavailable');
+        this.setSafeContent(unsafeRawHtml(`
+          <div class="commodity-reference-state">
+            <div class="commodity-reference-notice">
+              <strong>Live quotes are temporarily unavailable.</strong>
+              <span>The instrument directory remains available; no stale price is shown as current.</span>
+            </div>
+            ${coverage}
+          </div>
+        `, 'static CommodityNode coverage fallback'));
+        return;
+      }
       if (!hasFx) {
         this.showRetrying(t('common.failedCommodities'));
         return;

@@ -102,6 +102,93 @@
   border-bottom: 1px solid var(--cn-color-border-subtle);
 }
 
+[data-variant='commoditynode'] .cn-universe-primary-path {
+  display: grid;
+  grid-template-columns: minmax(240px, .72fr) minmax(0, 1.8fr);
+  gap: var(--cn-space-5);
+  padding: var(--cn-space-4) var(--cn-space-5);
+  background: var(--cn-color-canvas-alt);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading {
+  display: grid;
+  align-content: center;
+  gap: var(--cn-space-1);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading h3 {
+  margin: 0;
+  color: var(--cn-color-text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading p {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list li {
+  position: relative;
+  display: grid;
+  min-height: 92px;
+  align-content: center;
+  gap: 5px;
+  padding: 12px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list li:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--cn-color-signal-strong);
+  border-right: 1px solid var(--cn-color-signal-strong);
+  background: var(--cn-color-surface);
+  content: '';
+  transform: translateY(-50%) rotate(45deg);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-kind {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list [data-kind='exposure'] .cn-universe-path-kind {
+  color: var(--cn-color-attention);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-name {
+  color: var(--cn-color-text);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-status {
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
 [data-variant='commoditynode'] .cn-universe-clusters,
 [data-variant='commoditynode'] .cn-universe-views {
   display: flex;
@@ -149,8 +236,8 @@
 
 [data-variant='commoditynode'] .cn-universe-graph-stage {
   position: relative;
-  height: 620px;
-  min-height: 500px;
+  height: 480px;
+  min-height: 420px;
   overflow: hidden;
   background: var(--cn-color-map-canvas);
   border-right: 1px solid var(--cn-color-border-subtle);
@@ -289,7 +376,7 @@
 }
 
 [data-variant='commoditynode'] .cn-universe-inspector {
-  max-height: 620px;
+  max-height: 480px;
   overflow-y: auto;
   padding: var(--cn-space-5);
   background: var(--cn-color-surface);
@@ -874,6 +961,27 @@
     flex-direction: column;
     justify-content: stretch;
     padding-inline: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path {
+    grid-template-columns: 1fr;
+    padding: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list {
+    grid-template-columns: 1fr;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list li {
+    min-height: 0;
+    padding: 12px 14px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list li:not(:last-child)::after {
+    top: auto;
+    right: 50%;
+    bottom: -6px;
+    transform: translateX(50%) rotate(135deg);
   }
 
   [data-variant='commoditynode'] .cn-universe-cluster-button,

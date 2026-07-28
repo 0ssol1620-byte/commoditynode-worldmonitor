@@ -4,109 +4,75 @@ interface Props {
 }
 
 const { liveUrl } = Astro.props;
-const embedUrl = new URL('/embed', liveUrl);
-embedUrl.searchParams.set(
-  'layers',
-  'miningSites,processingPlants,commodityPorts,commodityHubs,tradeRoutes,waterways,pipelines',
-);
-embedUrl.searchParams.set('center', '15,10');
-embedUrl.searchParams.set('zoom', '1.2');
-embedUrl.searchParams.set('theme', 'dark');
-embedUrl.searchParams.set('variant', 'commoditynode');
 ---
 
-<section class="home-live-teaser" aria-labelledby="live-map-teaser-title" data-live-map-teaser>
+<section class="home-live-teaser" aria-labelledby="live-map-teaser-title">
   <header>
     <div>
       <p class="section-label">Live workspace</p>
-      <h2 id="live-map-teaser-title">Move from a reviewed claim to the operating map.</h2>
+      <h2 id="live-map-teaser-title">See how a material event can reach a commodity market.</h2>
     </div>
     <p>
-      The research surface explains what is known. The live workspace adds spatial context,
-      source state, and linked entities without turning an unavailable feed into a fact.
+      Start with a verified event, locate the affected asset, then inspect the physical
+      constraint, benchmark exposure, and the evidence behind each link.
     </p>
   </header>
 
-  <div class="live-teaser-frame" data-live-frame data-state="preview">
-    <div class="live-teaser-preview" aria-hidden="true">
-      <div class="preview-grid"></div>
-      <div class="preview-route route-a"></div>
-      <div class="preview-route route-b"></div>
-      <span class="preview-node node-mine"></span>
-      <span class="preview-node node-port"></span>
-      <span class="preview-node node-route"></span>
-      <span class="preview-node node-market"></span>
-      <div class="preview-legend">
-        <span>Reviewed asset</span>
-        <span>Verified event</span>
-        <span>Impact path</span>
+  <div class="live-teaser-frame">
+    <div class="live-teaser-preview">
+      <div class="live-teaser-question">
+        <span>Reviewed historical case</span>
+        <strong>What did the Cobre Panama production halt put at risk?</strong>
+        <p>Read left to right. Every step separates evidence from inference.</p>
       </div>
-      <p>Interface preview · not a live data claim</p>
+      <ol class="live-teaser-path" aria-label="Cobre Panama impact path">
+        <li data-kind="event">
+          <span>01 · Event</span>
+          <strong>Production halted</strong>
+          <small>Verified historical event</small>
+        </li>
+        <li data-kind="asset">
+          <span>02 · Asset</span>
+          <strong>Cobre Panama mine</strong>
+          <small>Colon, Panama</small>
+        </li>
+        <li data-kind="flow">
+          <span>03 · Physical flow</span>
+          <strong>Copper concentrate</strong>
+          <small>Export supply removed</small>
+        </li>
+        <li data-kind="market">
+          <span>04 · Market exposure</span>
+          <strong>Copper benchmarks</strong>
+          <small>Inference, not a forecast</small>
+        </li>
+      </ol>
+      <div class="live-teaser-evidence">
+        <div>
+          <span>Evidence state</span>
+          <strong>Reviewed</strong>
+        </div>
+        <div>
+          <span>Inference distance</span>
+          <strong>3 links</strong>
+        </div>
+        <div>
+          <span>Live quote state</span>
+          <strong>Shown only when available</strong>
+        </div>
+      </div>
     </div>
-    <iframe
-      title="CommodityNode live commodity intelligence preview"
-      data-src={embedUrl.toString()}
-      loading="lazy"
-      referrerpolicy="strict-origin-when-cross-origin"
-      sandbox="allow-scripts allow-same-origin allow-popups"
-      tabindex="-1"
-    ></iframe>
     <div class="live-teaser-rail">
       <div>
-        <span class="live-teaser-state" data-live-state>Preview</span>
-        <p>Interactive loading is deferred on small screens and data-saving connections.</p>
+        <span class="live-teaser-state">Instant preview</span>
+        <p>The full map loads only after you choose to open the workspace.</p>
       </div>
-      <a class="primary-action" href={liveUrl}>Open the live workspace</a>
+      <a
+        class="primary-action"
+        href={liveUrl}
+        data-commoditynode-event="live_opened"
+        data-commoditynode-placement="home_explainer"
+      >Open the live workspace</a>
     </div>
   </div>
 </section>
-
-<script>
-  const teasers = document.querySelectorAll<HTMLElement>('[data-live-map-teaser]');
-
-  for (const teaser of teasers) {
-    const frame = teaser.querySelector<HTMLElement>('[data-live-frame]');
-    const iframe = teaser.querySelector<HTMLIFrameElement>('iframe[data-src]');
-    const state = teaser.querySelector<HTMLElement>('[data-live-state]');
-    if (!frame || !iframe || !state) continue;
-
-    const connection = (
-      navigator as Navigator & {
-        connection?: { saveData?: boolean };
-      }
-    ).connection;
-    const shouldDeferPermanently =
-      window.matchMedia('(max-width: 760px)').matches
-      || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      || connection?.saveData === true;
-
-    if (shouldDeferPermanently) {
-      frame.dataset.state = 'preview';
-      state.textContent = 'Light preview';
-      continue;
-    }
-
-    const loadFrame = () => {
-      const source = iframe.dataset.src;
-      if (!source || iframe.src) return;
-      frame.dataset.state = 'loading';
-      state.textContent = 'Loading live view';
-      iframe.addEventListener('load', () => {
-        frame.dataset.state = 'ready';
-        state.textContent = 'Live workspace';
-      }, { once: true });
-      iframe.src = source;
-    };
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        loadFrame();
-      }, { rootMargin: '320px 0px' });
-      observer.observe(teaser);
-    } else {
-      loadFrame();
-    }
-  }
-</script>

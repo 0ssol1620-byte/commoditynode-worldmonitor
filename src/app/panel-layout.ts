@@ -903,6 +903,7 @@ export class PanelLayoutManager implements AppModule {
             </a>`;
       })()}</div>
           <span class="logo">${productWordmark}</span><span class="logo-mobile">${productName}</span><span class="version">v${__APP_VERSION__}</span>${BETA_MODE ? '<span class="beta-badge">BETA</span>' : ''}
+          ${isCommodityNode ? '<a href="https://commoditynode.com/" class="cn-research-home" aria-label="Back to CommodityNode research home">← Research home</a>' : ''}
           ${isCommodityNode ? '' : `<a href="https://x.com/eliehabib" target="_blank" rel="noopener" class="credit-link">
             <svg class="x-logo" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             <span class="credit-text">@eliehabib</span>
@@ -915,7 +916,7 @@ export class PanelLayoutManager implements AppModule {
           </button>
           <div class="status-indicator">
             <span class="status-dot"></span>
-            <span>${t('header.live')}</span>
+            <span>${isCommodityNode ? 'WORKSPACE' : t('header.live')}</span>
           </div>
           <div class="region-selector">
             <select id="regionSelect" class="region-select" aria-label="${t('header.selectRegion')}">
@@ -1034,6 +1035,20 @@ export class PanelLayoutManager implements AppModule {
       </div>
       <div class="dashboard-tabs-mount" id="panelTabsMount"></div>
       <main id="main" tabindex="-1" class="main-content${this.ctx.isDesktopApp ? ' desktop-grid' : ''}">
+        ${isCommodityNode ? `
+          <section class="cn-workspace-guide" aria-labelledby="cn-workspace-guide-title">
+            <div>
+              <span class="cn-workspace-guide__label">How to read this workspace</span>
+              <strong id="cn-workspace-guide-title">Trace an event to physical flow, then test market exposure.</strong>
+            </div>
+            <ol>
+              <li><span>1</span><strong>Event</strong><small>Confirm source and time</small></li>
+              <li><span>2</span><strong>Map</strong><small>Locate asset and route</small></li>
+              <li><span>3</span><strong>Impact path</strong><small>Follow named links</small></li>
+              <li><span>4</span><strong>Evidence</strong><small>Stop where facts end</small></li>
+            </ol>
+          </section>
+        ` : ''}
         <div class="map-section${mapStartsCollapsed ? ' collapsed' : ''}" id="mapSection">
           <div class="panel-header">
             <div class="panel-header-left">
@@ -1597,6 +1612,8 @@ export class PanelLayoutManager implements AppModule {
         } else {
           panel.renderNews(filteredItems);
         }
+      } else if (SITE_VARIANT === 'commoditynode' && panelKey === 'event-pulse') {
+        panel.showCommodityNodeReferenceState();
       }
       return panel;
     });

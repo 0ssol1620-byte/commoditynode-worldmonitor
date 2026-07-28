@@ -18,7 +18,6 @@ import {
 } from '../../shared/commoditynode-cobre-panama-impact';
 import type { PublishedImpactEdge } from '../../shared/commodity-impact-ontology';
 import { findImpactPaths } from '@/services/commodity-impact-graph';
-import { CommodityUniverseWebGLRenderer } from './commodity-universe-webgl';
 import { getAuthState } from '@/services/auth-state';
 import { openSignIn } from '@/services/clerk';
 import {
@@ -81,7 +80,6 @@ export class ImpactUniversePanel extends Panel {
   private view: UniverseView;
   private focusedGroup: UniverseFocus = 'all';
   private timelineIndex = COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1;
-  private webglRenderer: CommodityUniverseWebGLRenderer | null = null;
   private savedCommodityIds = new Set<string>();
   private savedStateAccountId: string | null = null;
   private savedStateRequest = 0;
@@ -113,8 +111,6 @@ export class ImpactUniversePanel extends Panel {
   }
 
   override destroy(): void {
-    this.webglRenderer?.destroy();
-    this.webglRenderer = null;
     window.removeEventListener('commoditynode:map-selection', this.mapSelectionHandler);
     super.destroy();
   }
@@ -242,11 +238,9 @@ export class ImpactUniversePanel extends Panel {
   }
 
   private render(): void {
-    this.webglRenderer?.destroy();
-    this.webglRenderer = null;
     const shell = document.createElement('div');
     shell.className = 'cn-universe-shell';
-    shell.append(this.buildIntro(), this.buildToolbar());
+    shell.append(this.buildIntro(), this.buildPrimaryPath(), this.buildToolbar());
 
     const body = document.createElement('div');
     body.className = `cn-universe-body is-${this.view}`;
@@ -257,18 +251,6 @@ export class ImpactUniversePanel extends Panel {
 
     this.content.replaceChildren(shell);
     void this.hydrateSavedCommodityState();
-    const canvas = this.content.querySelector<HTMLCanvasElement>(
-      '.cn-universe-webgl-canvas',
-    );
-    if (canvas) {
-      try {
-        this.webglRenderer = new CommodityUniverseWebGLRenderer(canvas);
-        this.webglRenderer.update(this.selectedId, this.focusedGroup);
-        canvas.closest('.cn-universe-graph-stage')?.classList.add('is-webgl');
-      } catch {
-        canvas.hidden = true;
-      }
-    }
   }
 
   private buildIntro(): HTMLElement {
@@ -276,11 +258,11 @@ export class ImpactUniversePanel extends Panel {
     intro.className = 'cn-universe-intro';
     const copy = document.createElement('div');
     copy.append(
-      textElement('cn-universe-eyebrow', 'RELATIONSHIP MODEL · 23 INSTRUMENTS'),
-      textElement('cn-universe-title', 'The full commodity universe'),
+      textElement('cn-universe-eyebrow', 'IMPACT PATHS · 23 TRACKED INSTRUMENTS'),
+      textElement('cn-universe-title', 'Where can a physical disruption travel next?'),
       textElement(
         'cn-universe-description',
-        'Select any commodity to inspect its benchmark type, live quote coverage, and named links. Position and node size carry no market-value meaning.',
+        'Read the reviewed impact path first, then use the universe as an instrument directory. A line means a named relationship; missing links are never implied by proximity.',
       ),
     );
     const legend = document.createElement('div');
@@ -293,6 +275,45 @@ export class ImpactUniversePanel extends Panel {
     }
     intro.append(copy, legend);
     return intro;
+  }
+
+  private buildPrimaryPath(): HTMLElement {
+    const section = document.createElement('section');
+    section.className = 'cn-universe-primary-path';
+    section.setAttribute('aria-labelledby', 'cn-universe-primary-path-title');
+
+    const heading = document.createElement('div');
+    heading.className = 'cn-universe-primary-path-heading';
+    const label = textElement('cn-universe-eyebrow', 'REVIEWED HISTORICAL CASE');
+    const title = document.createElement('h3');
+    title.id = 'cn-universe-primary-path-title';
+    title.textContent = 'Cobre Panama: from production halt to copper exposure';
+    const note = document.createElement('p');
+    note.textContent =
+      'Evidence-backed facts end at the physical supply impact. Benchmark response remains an inference to test, not a prediction.';
+    heading.append(label, title, note);
+
+    const path = document.createElement('ol');
+    path.className = 'cn-universe-primary-path-list';
+    const steps: Array<readonly [string, string, string]> = [
+      ['Event', 'Production halted', 'Verified historical event'],
+      ['Asset', 'Cobre Panama mine', 'Named producing asset'],
+      ['Flow', 'Copper concentrate', 'Physical supply removed'],
+      ['Exposure', 'Copper benchmarks', 'Inference requiring validation'],
+    ];
+    for (const [kind, name, status] of steps) {
+      const item = document.createElement('li');
+      item.dataset.kind = kind.toLowerCase();
+      item.append(
+        textElement('cn-universe-path-kind', kind),
+        textElement('cn-universe-path-name', name),
+        textElement('cn-universe-path-status', status),
+      );
+      path.appendChild(item);
+    }
+
+    section.append(heading, path);
+    return section;
   }
 
   private buildToolbar(): HTMLElement {
@@ -337,9 +358,6 @@ export class ImpactUniversePanel extends Panel {
   private buildGraph(): HTMLElement {
     const stage = document.createElement('div');
     stage.className = 'cn-universe-graph-stage';
-    const canvas = document.createElement('canvas');
-    canvas.className = 'cn-universe-webgl-canvas';
-    canvas.setAttribute('aria-hidden', 'true');
 
     const svg = svgElement('svg', {
       class: 'cn-universe-graph',
@@ -409,7 +427,7 @@ export class ImpactUniversePanel extends Panel {
       nodeLayer.appendChild(this.buildGraphNode(node, selectedEdges));
     }
     svg.appendChild(nodeLayer);
-    stage.append(canvas, svg);
+    stage.append(svg);
     return stage;
   }
 

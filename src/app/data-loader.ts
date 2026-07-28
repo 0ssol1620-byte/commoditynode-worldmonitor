@@ -1383,7 +1383,9 @@ export class DataLoaderManager implements AppModule {
         if (items.length === 0) {
           const failures = getFeedFailures();
           const failedFeeds = fallbackFeeds.filter(f => failures.has(f.name));
-          if (failedFeeds.length > 0) {
+          if (SITE_VARIANT === 'commoditynode' && category === 'commodity-news') {
+            panel.showCommodityNodeReferenceState();
+          } else if (failedFeeds.length > 0) {
             const names = failedFeeds.map(f => f.name).join(', ');
             panel.showError(`${t('common.noNewsAvailable')} (${names} failed)`);
           }
@@ -3553,11 +3555,14 @@ export class DataLoaderManager implements AppModule {
       if (totalItems > 0) {
         dataFreshness.recordUpdate('supply_chain', totalItems);
       } else if (anyUnavailable) {
+        scPanel.showReferenceState();
         dataFreshness.recordError('supply_chain', 'Supply chain upstream temporarily unavailable');
+      } else {
+        scPanel.showReferenceState();
       }
     } catch (e) {
       console.error('[App] Supply chain failed:', e);
-      this.callPanel('supply-chain', 'showError', undefined, () => void this.loadSupplyChain());
+      scPanel.showReferenceState();
       this.ctx.statusPanel?.updateApi('SupplyChain', { status: 'error' });
       dataFreshness.recordError('supply_chain', String(e));
     }

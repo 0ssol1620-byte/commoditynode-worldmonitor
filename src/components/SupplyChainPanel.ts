@@ -75,6 +75,26 @@ export class SupplyChainPanel extends Panel {
         this.render();
       }
     });
+    this.showReferenceState();
+  }
+
+  public showReferenceState(): void {
+    this.setDataBadge('cached', 'reference');
+    this.setSafeContent(unsafeRawHtml(`
+      <div class="cn-reference-panel">
+        <div class="cn-reference-panel__intro">
+          <strong>Route watchlist ready; live status is unavailable.</strong>
+          <span>These are structural commodity corridors, not claims about current disruption.</span>
+        </div>
+        <div class="cn-reference-panel__grid">
+          <div><span>Energy</span><strong>Hormuz · Bab el-Mandeb</strong><small>Crude and refined-product flows</small></div>
+          <div><span>Asia trade</span><strong>Malacca Strait</strong><small>Energy and bulk commodity transit</small></div>
+          <div><span>Europe route</span><strong>Suez Canal</strong><small>Asia-Europe shipping exposure</small></div>
+          <div><span>Americas</span><strong>Panama Canal</strong><small>Dry-bulk and container routing</small></div>
+        </div>
+        <p class="cn-reference-panel__foot">Reference view · Open a route only after a current source record is available.</p>
+      </div>
+    `, 'static CommodityNode supply-chain reference state'));
   }
 
   private clearTransitChart(): void {

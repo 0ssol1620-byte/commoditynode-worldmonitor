@@ -42,6 +42,45 @@ export class MonitorPanel extends Panel {
     this.content.appendChild(monitorsResults);
 
     this.renderMonitorsList();
+    this.renderStarterIdeas();
+  }
+
+  private renderStarterIdeas(): void {
+    const results = this.content.querySelector<HTMLElement>('#monitorsResults');
+    if (!results) return;
+    if (this.monitors.length > 0) {
+      results.querySelectorAll('.monitor-starter-title, .monitor-starter-copy, .monitor-starter-ideas')
+        .forEach((element) => element.remove());
+      return;
+    }
+    if (results.querySelector('.monitor-starter-ideas')) return;
+    const title = h('div', { className: 'monitor-starter-title' }, 'Start with a material question');
+    const description = h(
+      'p',
+      { className: 'monitor-starter-copy' },
+      'Add one focused watch instead of a broad topic. Live matches appear here when source feeds are available.',
+    );
+    const ideas = h(
+      'div',
+      { className: 'monitor-starter-ideas' },
+      ...['copper mine closure', 'Hormuz crude exports', 'Panama Canal drought'].map((label) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            className: 'monitor-starter-button',
+            onClick: () => {
+              const input = this.content.querySelector<HTMLInputElement>('#monitorKeywords');
+              if (!input) return;
+              input.value = label;
+              input.focus();
+            },
+          },
+          label,
+        ),
+      ),
+    );
+    results.append(title, description, ideas);
   }
 
   private addMonitor(): void {
@@ -59,6 +98,7 @@ export class MonitorPanel extends Panel {
     this.monitors.push(monitor);
     input.value = '';
     this.renderMonitorsList();
+    this.renderStarterIdeas();
     this.onMonitorsChange?.(this.monitors);
   }
 

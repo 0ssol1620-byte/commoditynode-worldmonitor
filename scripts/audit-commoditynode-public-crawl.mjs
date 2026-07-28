@@ -6,6 +6,7 @@ const root = resolve(import.meta.dirname, '..');
 const siteRoot = resolve(root, 'public', 'commoditynode-site');
 const canonicalOrigin = 'https://commoditynode.com';
 const sitemapPath = resolve(siteRoot, 'sitemap-0.xml');
+const deployMountedRoutes = new Set(['/live', '/live/', '/source', '/source/']);
 
 const failures = [];
 const pages = [];
@@ -63,6 +64,7 @@ function resolveInternalTarget(rawHref, route) {
   }
   if (url.origin !== canonicalOrigin) return null;
   const pathname = decodeURIComponent(url.pathname);
+  if (deployMountedRoutes.has(pathname)) return null;
   if (pathname.includes('\0')) return { error: `NUL in href ${JSON.stringify(rawHref)}` };
   const candidates = [];
   if (pathname.endsWith('/')) {

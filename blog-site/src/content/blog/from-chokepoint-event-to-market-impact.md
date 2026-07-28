@@ -17,7 +17,7 @@ indexable: true
 adEligible: false
 editorialPurpose: "Give supply-chain and market teams a repeatable way to test how a verified route disruption can affect physical flows and market proxies."
 site: "commoditynode"
-heroImage: "/blog/images/blog/from-chokepoint-event-to-market-impact.jpg"
+heroImage: "/images/blog/from-chokepoint-event-to-market-impact.jpg"
 ---
 
 A route-disruption headline supplies only the starting fact. The same chokepoint can constrain one flow and leave another largely unaffected. A commodity conclusion has to pass through the physical system before it reaches a price proxy.

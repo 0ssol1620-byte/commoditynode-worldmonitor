@@ -105,6 +105,7 @@
     { "source": "/image-sitemap.xml", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/image-sitemap.xml" },
     { "source": "/_astro/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/_astro/:path*" },
     { "source": "/images/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/images/:path*" },
+    { "source": "/blog/images/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/images/:path*" },
     { "source": "/og/:path*", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/og/:path*" },
     { "source": "/commoditynode-mark.svg", "has": [{ "type": "host", "value": "^(?:www\\.)?commoditynode\\.com$" }], "destination": "/commoditynode-site/commoditynode-mark.svg" },
     { "source": "/", "has": [{ "type": "host", "value": "^commoditynode-live\\.vercel\\.app$" }], "destination": "/dashboard.html" },
