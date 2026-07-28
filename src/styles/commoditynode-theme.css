@@ -627,6 +627,31 @@
   border-color: var(--cn-color-signal-strong);
 }
 
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-save[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-alert[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-save-status,
+[data-variant='commoditynode'] .cn-map-detail-alert-status {
+  min-height: 1.4em;
+  margin: -12px 20px 18px;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-alert-status {
+  margin-top: -16px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   [data-variant='commoditynode'] .cn-map-detail-close:hover,
   [data-variant='commoditynode'] .cn-map-detail-actions button:hover,

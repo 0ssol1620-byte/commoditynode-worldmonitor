@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/plans/');
+---
+
+<Base
+  title="Access"
+  metaTitle="CommodityNode Access and Commercial Policy"
+  description="What CommodityNode provides publicly, what professional capabilities are being validated, and why checkout remains disabled."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Access</p>
+    <h1>Public research is available. Professional access is not yet for sale.</h1>
+    <p class="article-dek">
+      CommodityNode does not put a price on an unfinished product or route a
+      buyer into WorldMonitor billing. Checkout remains disabled until the
+      advertised capability, legal, privacy, support, refund, and payment
+      operations are independently verified.
+    </p>
+
+    <h2>Available now</h2>
+    <ul>
+      <li>Published commodity research and evidence-backed Event Pulse pages.</li>
+      <li>CommodityNode Live, benchmark tape, map, and three-hop published graph.</li>
+      <li>Account-based saved commodities, companies, and routes.</li>
+      <li>Deduplicated in-app alerts for new verified material Event Pulse and route updates.</li>
+      <li>Read-only public graph endpoint and four MCP tools.</li>
+      <li>Weekly brief double opt-in and custom exposure brief requests.</li>
+    </ul>
+
+    <h2>Professional candidate</h2>
+    <p>
+      The product contract under validation specifies ten years of historical
+      replay, six-hop advanced paths, JSON/CSV/PNG graph export, and higher API
+      quotas. These are acceptance targets, not currently purchasable features.
+      No price is published.
+    </p>
+
+    <h2>What opens checkout</h2>
+    <ol>
+      <li>Displayed product facts and limits match the runtime.</li>
+      <li>Every paid feature passes end-to-end tests.</li>
+      <li>Legal terms and the production privacy workflow are verified.</li>
+      <li>A named operator owns support and refunds.</li>
+      <li>Production payment webhooks and reconciliation pass.</li>
+    </ol>
+
+    <p>
+      Organizations that need a decision-specific exposure analysis can request
+      a scoped brief now. Intake does not imply acceptance, a subscription, or a
+      promise of coverage.
+    </p>
+    <p>
+      <a
+        href="/brief/"
+        data-commoditynode-event="pro_interest_opened"
+        data-commoditynode-placement="plans_brief"
+        data-commoditynode-conversion="pro"
+      >Request a custom exposure brief</a>
+    </p>
+  </article>
+</Base>

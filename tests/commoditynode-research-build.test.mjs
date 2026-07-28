@@ -27,6 +27,7 @@ describe('CommodityNode research build', () => {
     );
     assert.match(html, /Trace commodity shocks from source event to market exposure\./);
     assert.match(html, /data-live-map-teaser/);
+    assert.match(html, /data-newsletter-form/);
     assert.match(
       html,
       /data-src="https:\/\/live\.commoditynode\.com\/embed\?[^"]*variant=commoditynode/,
@@ -105,6 +106,9 @@ describe('CommodityNode research build', () => {
       'search',
       'about',
       'privacy',
+      'brief',
+      'developers',
+      'plans',
       'authors/commoditynode-editorial',
     ]) {
       assert.ok(existsSync(resolve(researchRoot, page, 'index.html')), `${page} page is missing`);
@@ -148,6 +152,15 @@ describe('CommodityNode research build', () => {
     }
     const searchHtml = read('search/index.html');
     assert.match(searchHtml, /<meta name="robots" content="noindex, follow"/);
+    const briefHtml = read('brief/index.html');
+    assert.match(briefHtml, /Request a commodity exposure brief/);
+    assert.match(briefHtml, /data-brief-form/);
+    assert.match(briefHtml, /<meta name="robots" content="noindex, follow"/);
+    assert.doesNotMatch(read('sitemap-0.xml'), /\/brief\//);
+    assert.match(read('sitemap-0.xml'), /\/developers\//);
+    assert.match(read('sitemap-0.xml'), /\/plans\//);
+    assert.match(read('developers/index.html'), /commoditynode_list_events/);
+    assert.match(read('plans/index.html'), /Professional access is not yet for sale/);
     const authorHtml = read('authors/commoditynode-editorial/index.html');
     assert.match(authorHtml, /It does not represent a fabricated person/);
     assert.match(authorHtml, /"@type":"ProfilePage"/);

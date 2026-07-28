@@ -156,12 +156,14 @@ export function getCommodityNodeGraphEvidence(
   if (!snapshot) return null;
   const edge = snapshot.edges.find((item) => item.id === id) ?? null;
   const entity = snapshot.entities.find((item) => item.id === id) ?? null;
-  if (!edge && !entity) return null;
+  const directEvidence = snapshot.evidence.find((item) => item.id === id) ?? null;
+  if (!edge && !entity && !directEvidence) return null;
   const evidenceIds = new Set(edge?.evidenceIds ?? []);
   return {
     edge,
     entity,
-    evidence: snapshot.evidence.filter((item) => evidenceIds.has(item.id)),
+    evidence: directEvidence
+      ? [directEvidence]
+      : snapshot.evidence.filter((item) => evidenceIds.has(item.id)),
   };
 }
-

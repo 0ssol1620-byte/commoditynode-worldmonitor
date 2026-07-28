@@ -2224,6 +2224,168 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
+.newsletter-signup {
+  display: grid;
+  width: min(100% - 40px, var(--site-wide));
+  margin: 64px auto;
+  padding: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .8fr);
+  gap: 48px;
+  border-top: 1px solid var(--site-border-strong);
+  border-bottom: 1px solid var(--site-border-strong);
+  background: var(--site-surface);
+}
+
+.newsletter-signup h2 {
+  max-width: 620px;
+  margin: 6px 0 8px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -.025em;
+  line-height: 1.15;
+}
+
+.newsletter-signup p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--site-text-secondary);
+}
+
+.newsletter-signup form,
+.brief-form {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.newsletter-signup label,
+.brief-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--site-text-secondary);
+  font-size: .8125rem;
+}
+
+.newsletter-signup input[type='email'],
+.brief-form input:not([type='checkbox']),
+.brief-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--site-border-strong);
+  border-radius: 0;
+  background: var(--site-canvas);
+  color: var(--site-text);
+  font: 1rem/1.4 var(--site-font-ui);
+}
+
+.brief-form textarea {
+  resize: vertical;
+}
+
+.newsletter-signup input:focus,
+.brief-form input:focus,
+.brief-form textarea:focus {
+  border-color: var(--site-signal);
+  outline: 2px solid color-mix(in srgb, var(--site-signal) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.newsletter-consent,
+.brief-consent {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.newsletter-consent input,
+.brief-consent input,
+.brief-checkboxes input {
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--site-signal);
+}
+
+.newsletter-signup button[type='submit'],
+.brief-form button[type='submit'] {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--site-signal);
+  background: var(--site-signal);
+  color: var(--site-canvas);
+  font: 700 .875rem/1 var(--site-font-ui);
+  cursor: pointer;
+}
+
+.newsletter-signup button:disabled,
+.brief-form button:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.form-status {
+  min-height: 1.5em;
+  color: var(--site-text-secondary);
+  font-size: .8125rem;
+}
+
+.form-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.brief-page {
+  width: min(100% - 40px, var(--site-wide));
+}
+
+.brief-layout {
+  display: grid;
+  margin-top: 48px;
+  grid-template-columns: minmax(260px, .7fr) minmax(0, 1.3fr);
+  gap: 64px;
+}
+
+.brief-layout > section {
+  color: var(--site-text-secondary);
+}
+
+.brief-form {
+  padding: 28px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+}
+
+.brief-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.brief-form fieldset {
+  margin: 6px 0;
+  padding: 14px;
+  border: 1px solid var(--site-border);
+}
+
+.brief-form legend {
+  padding: 0 6px;
+  color: var(--site-text-secondary);
+  font-size: .8125rem;
+}
+
+.brief-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+
+.brief-checkboxes label {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
 .footer-copy {
   grid-column: 1 / -1;
   color: var(--site-text-muted);
@@ -2245,6 +2407,26 @@ button:focus-visible {
   .privacy-primary,
   .privacy-secondary {
     flex: 1 1 130px;
+  }
+
+  .newsletter-signup,
+  .brief-layout,
+  .brief-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-signup {
+    width: calc(100% - 24px);
+    padding: 20px;
+    gap: 24px;
+  }
+
+  .brief-layout {
+    gap: 32px;
+  }
+
+  .brief-form {
+    padding: 20px;
   }
 }
 

@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 import TrackedProductLink from '../components/TrackedProductLink.astro';
 import CommodityNodeAdSlot from '../components/CommodityNodeAdSlot.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import { coverWebpSources } from '../lib/cover-webp';
 import { absoluteUrl, isCommodityNode, postPath, site } from '../lib/site-variant';
 import { resolveCommodityNodeRoutePolicy } from '../../../shared/commoditynode-route-policy';
@@ -277,6 +278,7 @@ const faqLd = extractFaqLd(rawBody);
       placement="article-end"
       enabled={Boolean(isCommodityNode && editorialRoutePolicy?.adEligible && adEligible)}
     />
+    {isCommodityNode && <NewsletterSignup placement="article" />}
     {relatedPosts.length > 0 && (
       <nav class="related-posts" aria-labelledby="related-posts-title">
         <h2 id="related-posts-title">Related research</h2>

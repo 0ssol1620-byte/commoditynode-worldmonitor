@@ -25171,6 +25171,133 @@ body.map-width-resizing {
 }
 
 /* ── Payment / Upgrade UI ── */
+.commoditynode-data-controls {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.commoditynode-data-controls h3,
+.commoditynode-data-controls h4,
+.commoditynode-data-controls p {
+  margin: 0;
+}
+
+.commoditynode-data-controls h3 {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.commoditynode-data-controls h4 {
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.commoditynode-saved-items ul {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commoditynode-saved-items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding-block: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.commoditynode-saved-items li span {
+  display: grid;
+  gap: 2px;
+}
+
+.commoditynode-saved-items li small {
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.commoditynode-alerts-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.commoditynode-alert-inbox ul {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commoditynode-alert-inbox li {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.commoditynode-alert-inbox li.is-unread {
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+.commoditynode-alert-inbox a {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.commoditynode-alert-inbox a span,
+.commoditynode-alert-inbox a small {
+  color: var(--text-secondary);
+}
+
+.commoditynode-data-controls p,
+.commoditynode-data-controls label,
+.commoditynode-data-controls a {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.commoditynode-data-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.commoditynode-delete-confirmation {
+  display: grid;
+  gap: 6px;
+}
+
+.commoditynode-delete-confirmation input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.commoditynode-data-delete {
+  justify-self: start;
+}
+
+.commoditynode-data-status {
+  min-height: 1.5em;
+}
+
 .upgrade-pro-section {
   margin-top: 16px;
   padding: 16px;

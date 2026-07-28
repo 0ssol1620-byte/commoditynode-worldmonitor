@@ -20,7 +20,7 @@ Live tier/price/product-ID data (JSON): `GET https://www.worldmonitor.app/api/pr
 - Annual price: $399.99/year
 - Annual savings: 2 months free versus monthly billing
 - Best for: Investors, analysts, researchers, traders and operators who need the decision layer on top of the free dashboard
-- Includes: WM Analyst chat across 30+ live services with citations, Scenario Engine, Route Explorer, personal AI digest, custom widget builder, MCP access and 42 tools under one key
+- Includes: WM Analyst chat across 30+ live services with citations, Scenario Engine, Route Explorer, personal AI digest, custom widget builder, MCP access and 46 tools under one key
 - License: Personal use
 - Limits: 10 custom dashboards, MCP + SDK 50 calls/day
 - Digest cadence: Daily, twice-daily or weekly

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import LiveMapTeaser from '../components/LiveMapTeaser.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import { getCollection } from 'astro:content';
 import { coverWebpSources } from '../lib/cover-webp';
 import {
@@ -188,6 +189,8 @@ const jsonLd = {
           ))}
         </div>
       </section>
+
+      <NewsletterSignup placement="home" />
 
       <section class="home-transmission" aria-labelledby="home-transmission-title">
         <div class="home-section-heading">

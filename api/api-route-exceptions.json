@@ -764,6 +764,41 @@
       "reason": "Compatibility endpoint for the first governed CommodityNode graph slice while the equivalent typed impact-graph sebuf service is generated and adopted by clients in this feature branch.",
       "owner": "@0ssol1620-byte",
       "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-newsletter.ts",
+      "category": "migration-pending",
+      "reason": "Consent-gated double-opt-in command endpoint. It is independently rate limited and will move to the typed CommodityNode product service before the public API contract is frozen.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-brief-request.ts",
+      "category": "migration-pending",
+      "reason": "Consent-gated B2B intake command endpoint with a bounded anti-abuse envelope. It will move to the typed CommodityNode product service before the public API contract is frozen.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-newsletter-confirm.ts",
+      "category": "non-json",
+      "reason": "Human-facing HTML confirmation landing page reached from a transactional email.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-newsletter-unsubscribe.ts",
+      "category": "non-json",
+      "reason": "Human-facing HTML unsubscribe landing page reached from a transactional email.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-alert-sync.ts",
+      "category": "ops-admin",
+      "reason": "CRON_SECRET-protected projection of the release-reviewed alert catalog into deduplicated in-app delivery records.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": null
     }
   ]
 }

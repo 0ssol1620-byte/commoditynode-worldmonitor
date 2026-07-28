@@ -19,6 +19,13 @@ import {
 import type { PublishedImpactEdge } from '../../shared/commodity-impact-ontology';
 import { findImpactPaths } from '@/services/commodity-impact-graph';
 import { CommodityUniverseWebGLRenderer } from './commodity-universe-webgl';
+import { getAuthState } from '@/services/auth-state';
+import { openSignIn } from '@/services/clerk';
+import {
+  listCommodityNodeSavedEntities,
+  setCommodityNodeEntitySaved,
+} from '@/services/commoditynode-product';
+import { trackCommodityNodeEvent } from '@/services/commoditynode-analytics';
 
 export interface ImpactUniverseQuote {
   symbol?: string;
@@ -74,6 +81,10 @@ export class ImpactUniversePanel extends Panel {
   private focusedGroup: UniverseFocus = 'all';
   private timelineIndex = COBRE_PANAMA_PLAYBACK_SNAPSHOTS.length - 1;
   private webglRenderer: CommodityUniverseWebGLRenderer | null = null;
+  private savedCommodityIds = new Set<string>();
+  private savedStateAccountId: string | null = null;
+  private savedStateRequest = 0;
+  private savedActionPending = false;
   private readonly mapSelectionHandler = ((event: CustomEvent<{ commodityId?: string }>) => {
     const id = event.detail?.commodityId;
     if (id && getCommodityUniverseNode(id)) {
@@ -118,6 +129,12 @@ export class ImpactUniversePanel extends Panel {
 
   private handleClick(event: Event): void {
     const target = event.target as Element;
+    const saveButton = target.closest<HTMLButtonElement>('[data-universe-save]');
+    if (saveButton?.dataset.universeSave) {
+      void this.toggleSavedCommodity(saveButton.dataset.universeSave);
+      return;
+    }
+
     const viewButton = target.closest<HTMLElement>('[data-universe-view]');
     const nextView = viewButton?.dataset.universeView;
     if (nextView === 'graph' || nextView === 'table') {
@@ -238,6 +255,7 @@ export class ImpactUniversePanel extends Panel {
     shell.appendChild(body);
 
     this.content.replaceChildren(shell);
+    void this.hydrateSavedCommodityState();
     const canvas = this.content.querySelector<HTMLCanvasElement>(
       '.cn-universe-webgl-canvas',
     );
@@ -547,6 +565,22 @@ export class ImpactUniversePanel extends Panel {
     note.className = 'cn-universe-coverage-note';
     note.textContent = node.coverageNote;
 
+    const actions = document.createElement('div');
+    actions.className = 'cn-universe-product-actions';
+    const saveButton = document.createElement('button');
+    saveButton.type = 'button';
+    saveButton.dataset.universeSave = node.id;
+    saveButton.setAttribute('aria-pressed', String(this.savedCommodityIds.has(node.id)));
+    saveButton.textContent = this.savedCommodityIds.has(node.id)
+      ? 'Saved to watchlist'
+      : 'Save commodity';
+    const actionStatus = document.createElement('p');
+    actionStatus.className = 'cn-universe-action-status';
+    actionStatus.dataset.universeActionStatus = '';
+    actionStatus.setAttribute('role', 'status');
+    actionStatus.setAttribute('aria-live', 'polite');
+    actions.append(saveButton, actionStatus);
+
     const relatedTitle = document.createElement('h4');
     relatedTitle.textContent = 'Named relationships';
     const list = document.createElement('ul');
@@ -577,10 +611,89 @@ export class ImpactUniversePanel extends Panel {
     methodology.rel = 'noopener';
     methodology.textContent = 'Read graph methodology';
 
-    inspector.append(heading, metrics, note);
+    inspector.append(heading, metrics, note, actions);
     if (node.id === 'copper') inspector.appendChild(this.buildCopperEvidenceCase());
     inspector.append(relatedTitle, list, methodology);
     return inspector;
+  }
+
+  private async hydrateSavedCommodityState(): Promise<void> {
+    const accountId = getAuthState().user?.id ?? null;
+    if (!accountId) {
+      this.savedCommodityIds.clear();
+      this.savedStateAccountId = null;
+      this.updateSavedAction();
+      return;
+    }
+    if (this.savedStateAccountId === accountId) {
+      this.updateSavedAction();
+      return;
+    }
+    const request = ++this.savedStateRequest;
+    this.setSavedActionStatus('Loading saved commodities…');
+    try {
+      const entities = await listCommodityNodeSavedEntities();
+      if (request !== this.savedStateRequest || getAuthState().user?.id !== accountId) return;
+      this.savedCommodityIds = new Set(
+        entities
+          .filter((entity) => entity.entityType === 'commodity')
+          .map((entity) => entity.entityId),
+      );
+      this.savedStateAccountId = accountId;
+      this.updateSavedAction();
+      this.setSavedActionStatus('');
+    } catch {
+      if (request !== this.savedStateRequest) return;
+      this.setSavedActionStatus('Saved items are unavailable right now.');
+    }
+  }
+
+  private async toggleSavedCommodity(commodityId: string): Promise<void> {
+    if (this.savedActionPending) return;
+    if (!getAuthState().user) {
+      this.setSavedActionStatus('Sign in to keep a watchlist across devices.');
+      openSignIn();
+      return;
+    }
+    const shouldSave = !this.savedCommodityIds.has(commodityId);
+    this.savedActionPending = true;
+    this.updateSavedAction(true);
+    this.setSavedActionStatus(shouldSave ? 'Saving…' : 'Removing…');
+    try {
+      await setCommodityNodeEntitySaved('commodity', commodityId, shouldSave);
+      if (shouldSave) this.savedCommodityIds.add(commodityId);
+      else this.savedCommodityIds.delete(commodityId);
+      this.savedStateAccountId = getAuthState().user?.id ?? null;
+      this.setSavedActionStatus(shouldSave ? 'Saved across your signed-in devices.' : 'Removed from your watchlist.');
+      trackCommodityNodeEvent(
+        shouldSave ? 'watchlist_item_saved' : 'watchlist_item_removed',
+        {
+          routeType: 'live_application',
+          placement: 'impact_universe_inspector',
+          entityType: 'commodity',
+        },
+      );
+    } catch {
+      this.setSavedActionStatus('Could not update the watchlist. Try again.');
+    } finally {
+      this.savedActionPending = false;
+      this.updateSavedAction();
+    }
+  }
+
+  private updateSavedAction(disabled = false): void {
+    const button = this.content.querySelector<HTMLButtonElement>('[data-universe-save]');
+    if (!button) return;
+    const commodityId = button.dataset.universeSave ?? '';
+    const saved = this.savedCommodityIds.has(commodityId);
+    button.disabled = disabled;
+    button.setAttribute('aria-pressed', String(saved));
+    button.textContent = saved ? 'Saved to watchlist' : 'Save commodity';
+  }
+
+  private setSavedActionStatus(message: string): void {
+    const status = this.content.querySelector<HTMLElement>('[data-universe-action-status]');
+    if (status) status.textContent = message;
   }
 
   private buildCopperEvidenceCase(): HTMLElement {

@@ -353,6 +353,42 @@
   line-height: 1.5;
 }
 
+[data-variant='commoditynode'] .cn-universe-product-actions {
+  display: grid;
+  gap: var(--cn-space-2);
+  margin: 0 0 var(--cn-space-5);
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button {
+  min-height: 38px;
+  padding: 8px 12px;
+  color: var(--cn-color-text);
+  background: var(--cn-color-canvas-alt);
+  border: 1px solid var(--cn-color-border);
+  border-radius: 3px;
+  font: 650 12px var(--cn-font-ui);
+  text-align: left;
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+[data-variant='commoditynode'] .cn-universe-action-status {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 [data-variant='commoditynode'] .cn-universe-inspector h4 {
   margin: 0 0 var(--cn-space-2);
   color: var(--cn-color-text);
@@ -791,7 +827,8 @@
   }
 
   [data-variant='commoditynode'] .cn-universe-path-list button:hover,
-  [data-variant='commoditynode'] .cn-universe-table button:hover {
+  [data-variant='commoditynode'] .cn-universe-table button:hover,
+  [data-variant='commoditynode'] .cn-universe-product-actions button:hover:not(:disabled) {
     color: var(--cn-color-signal-strong);
   }
 }

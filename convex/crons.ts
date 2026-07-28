@@ -42,6 +42,13 @@ crons.daily(
 );
 
 crons.daily(
+  "commoditynode-product-retention-prune",
+  { hourUTC: 4, minuteUTC: 52 },
+  (internal as any).commodityNodeProduct.pruneExpiredProductData,
+  {},
+);
+
+crons.daily(
   "broadcast-ramp-runner",
   { hourUTC: 13, minuteUTC: 0 },
   internal.broadcast.rampRunner.runDailyRamp,

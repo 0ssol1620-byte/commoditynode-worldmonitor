@@ -17,6 +17,8 @@ describe('CommodityNode route index and advertising policy', () => {
       '/posts/read-commodity-relationship-graph/',
       '/methodology/',
       '/sources/',
+      '/developers/',
+      '/plans/',
       '/authors/commoditynode-editorial/',
     ]) {
       const policy = resolveCommodityNodeRoutePolicy(path);
@@ -30,6 +32,7 @@ describe('CommodityNode route index and advertising policy', () => {
   it('keeps internal search, source offer, live app, API and unknown routes out of the index', () => {
     const expectations = new Map([
       ['/search/?q=copper', 'noindex, follow'],
+      ['/brief/', 'noindex, follow'],
       ['/source/', 'noindex, follow'],
       ['/live/', 'noindex, nofollow'],
       ['/api/health', 'noindex, nofollow'],

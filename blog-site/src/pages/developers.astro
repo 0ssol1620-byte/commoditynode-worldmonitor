@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/developers/');
+---
+
+<Base
+  title="Developers"
+  metaTitle="CommodityNode Developer Access"
+  description="Read-only CommodityNode MCP tools, public graph endpoint, identifiers, evidence limits, and current access boundaries."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Developer access</p>
+    <h1>Query the published graph without losing its evidence boundaries.</h1>
+    <p class="article-dek">
+      CommodityNode exposes reviewed records for inspection and integration.
+      Draft editorial data, fixtures, private lead records, saved items, and
+      account alerts are not part of the public data surface.
+    </p>
+
+    <h2>Model Context Protocol</h2>
+    <p>
+      The MCP endpoint is <code>https://commoditynode.com/mcp</code>. Four
+      CommodityNode tools are read-only and idempotent:
+    </p>
+    <ul>
+      <li><code>commoditynode_list_events</code> — published Event Pulse records.</li>
+      <li><code>commoditynode_list_benchmarks</code> — benchmarks, proxies, and named relationships.</li>
+      <li><code>commoditynode_list_routes</code> — reviewed route-reference records.</li>
+      <li><code>commoditynode_get_evidence</code> — one entity, edge, or evidence record.</li>
+    </ul>
+    <p>
+      Route status is registry metadata, not vessel telemetry. Relationship edges
+      identify an analytical connection, not a price forecast.
+    </p>
+
+    <h2>Public graph endpoint</h2>
+    <p>
+      <code>/api/commoditynode-graph</code> supports the bounded operations
+      <code>snapshot</code>, <code>resolve</code>, <code>subgraph</code>,
+      <code>path</code>, and <code>evidence</code>. Text parameters are limited
+      to 160 characters; hop, node, and edge limits are clamped by the graph
+      service. Responses include only the published snapshot.
+    </p>
+    <pre><code>GET /api/commoditynode-graph?op=evidence&amp;id=evidence-panama-court-law-406</code></pre>
+
+    <h2>Identifiers and versioning</h2>
+    <p>
+      Commodity, route, event, entity, edge, evidence, snapshot, and ontology
+      identifiers are stable within a published version. Consumers should store
+      the snapshot ID and ontology version with derived work. A correction may
+      supersede a claim without rewriting the historical publication record.
+    </p>
+
+    <h2>Keys and paid scopes</h2>
+    <p>
+      CommodityNode API keys and paid scopes are not for sale. The candidate
+      contract defines history, export, and advanced-path scopes, but none is
+      advertised as available until feature, legal, privacy, support, and payment
+      reconciliation gates all pass.
+    </p>
+    <p>
+      <a
+        href="/brief/"
+        data-commoditynode-event="api_docs_opened"
+        data-commoditynode-placement="developers_brief"
+        data-commoditynode-conversion="api"
+      >Discuss a bounded integration or data brief</a>
+    </p>
+  </article>
+</Base>

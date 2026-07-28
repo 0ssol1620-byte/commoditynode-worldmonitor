@@ -541,6 +541,127 @@ export default defineSchema({
     normalizedEmail: v.optional(v.string()),
   }).index("by_normalized_email_received", ["normalizedEmail", "receivedAt"]),
 
+  commodityNodeNewsletterSubscriptions: defineTable({
+    email: v.string(),
+    normalizedEmail: v.string(),
+    status: v.union(v.literal("pending"), v.literal("active"), v.literal("unsubscribed")),
+    consentVersion: v.number(),
+    consentedAt: v.number(),
+    source: v.string(),
+    confirmationTokenHash: v.optional(v.string()),
+    confirmationRequestedAt: v.number(),
+    confirmedAt: v.optional(v.number()),
+    unsubscribedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_normalized_email", ["normalizedEmail"])
+    .index("by_confirmation_hash", ["confirmationTokenHash"]),
+
+  commodityNodeSavedEntities: defineTable({
+    userId: v.string(),
+    entityType: v.union(
+      v.literal("commodity"),
+      v.literal("company"),
+      v.literal("route"),
+    ),
+    entityId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_entity", ["userId", "entityType", "entityId"]),
+
+  commodityNodeAlertRules: defineTable({
+    userId: v.string(),
+    scopeType: v.union(
+      v.literal("commodity"),
+      v.literal("company"),
+      v.literal("route"),
+      v.literal("event_pulse"),
+    ),
+    scopeId: v.string(),
+    channel: v.union(v.literal("email"), v.literal("in_app")),
+    minimumMateriality: v.union(
+      v.literal("notable"),
+      v.literal("material"),
+      v.literal("critical"),
+    ),
+    dedupeWindowMinutes: v.number(),
+    enabled: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_scope", ["userId", "scopeType", "scopeId"])
+    .index("by_scope_enabled", ["scopeType", "scopeId", "enabled"]),
+
+  commodityNodeAlertEvents: defineTable({
+    fingerprint: v.string(),
+    eventId: v.string(),
+    eventType: v.union(v.literal("event_pulse"), v.literal("route")),
+    title: v.string(),
+    summary: v.string(),
+    evidenceHref: v.string(),
+    materiality: v.union(
+      v.literal("notable"),
+      v.literal("material"),
+      v.literal("critical"),
+    ),
+    publishedAt: v.number(),
+    syncedAt: v.number(),
+  })
+    .index("by_fingerprint", ["fingerprint"])
+    .index("by_published", ["publishedAt"]),
+
+  commodityNodeAlertDeliveries: defineTable({
+    userId: v.string(),
+    ruleId: v.id("commodityNodeAlertRules"),
+    eventFingerprint: v.string(),
+    alertEventId: v.id("commodityNodeAlertEvents"),
+    channel: v.union(v.literal("email"), v.literal("in_app")),
+    deliveredAt: v.number(),
+    readAt: v.optional(v.number()),
+  })
+    .index("by_rule_fingerprint", ["ruleId", "eventFingerprint"])
+    .index("by_user", ["userId"])
+    .index("by_user_delivered", ["userId", "deliveredAt"]),
+
+  commodityNodeBriefRequests: defineTable({
+    name: v.string(),
+    email: v.string(),
+    normalizedEmail: v.string(),
+    organization: v.string(),
+    role: v.optional(v.string()),
+    commodityIds: v.array(v.string()),
+    decision: v.string(),
+    timeframe: v.string(),
+    consentVersion: v.number(),
+    consentedAt: v.number(),
+    source: v.string(),
+    status: v.union(
+      v.literal("new"),
+      v.literal("qualified"),
+      v.literal("closed"),
+      v.literal("rejected"),
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_normalized_email_created", ["normalizedEmail", "createdAt"])
+    .index("by_created", ["createdAt"])
+    .index("by_status_created", ["status", "createdAt"]),
+
+  commodityNodePrivacyAudit: defineTable({
+    actorHash: v.string(),
+    action: v.union(
+      v.literal("exported"),
+      v.literal("deleted"),
+    ),
+    summary: v.string(),
+    createdAt: v.number(),
+    retentionUntil: v.number(),
+  }).index("by_retention", ["retentionUntil"]),
+
   counters: defineTable({
     name: v.string(),
     value: v.number(),

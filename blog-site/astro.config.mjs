@@ -85,7 +85,7 @@ export default defineConfig({
     sitemap({
       filter(page) {
         if (!IS_COMMODITYNODE) return true;
-        return !/\/(?:authors\/elie-habib|glossary|search)(?:\/|$)/.test(new URL(page).pathname);
+        return !/\/(?:authors\/elie-habib|brief|glossary|search)(?:\/|$)/.test(new URL(page).pathname);
       },
       serialize(item) {
         const lastmod = POST_DATES.get(item.url);

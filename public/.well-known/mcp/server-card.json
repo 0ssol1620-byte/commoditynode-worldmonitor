@@ -142,6 +142,22 @@
       "description": "Reddit geopolitical social velocity: top posts from worldnews, geopolitics, and related subreddits with engagement scores and trend signals."
     },
     {
+      "name": "commoditynode_list_events",
+      "description": "List release-reviewed CommodityNode Event Pulse records. Every result links to crawlable evidence and excludes drafts and fixtures."
+    },
+    {
+      "name": "commoditynode_list_benchmarks",
+      "description": "List CommodityNode commodity benchmarks and named analytical relationships. Instruments label futures benchmarks and ETF proxies explicitly."
+    },
+    {
+      "name": "commoditynode_list_routes",
+      "description": "List reviewed CommodityNode trade-route reference corridors. Status is registry metadata, not live vessel telemetry."
+    },
+    {
+      "name": "commoditynode_get_evidence",
+      "description": "Resolve one CommodityNode graph entity, relationship, or evidence record from the published reviewed graph snapshot."
+    },
+    {
       "name": "get_china_decision_signals",
       "description": "Return the bounded six-domain China decision-signal snapshot used by the public country summary. Every item retains canonical provenance, revision, supersession, translation, confidence, corroboration, and freshness claims; unavailable domains remain explicit rather than becoming zero or normal. Detailed bilateral trade rows and operator-only source health are intentionally excluded."
     },

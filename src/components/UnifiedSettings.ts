@@ -43,6 +43,17 @@ import {
   type ApiPlanLimitNotice,
 } from '@/services/api-plan-limit-notices';
 import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
+import {
+  deleteCommodityNodeAccountData,
+  exportCommodityNodeAccountData,
+  listCommodityNodeSavedEntities,
+  listCommodityNodeAlertDeliveries,
+  markCommodityNodeAlertDeliveriesRead,
+  setCommodityNodeEntitySaved,
+  type CommodityNodeSavedEntity,
+  type CommodityNodeAlertDelivery,
+} from '@/services/commoditynode-product';
+import { trackCommodityNodeEvent } from '@/services/commoditynode-analytics';
 
 
 function showToast(msg: string): void {
@@ -92,6 +103,10 @@ export class UnifiedSettings {
   private newlyCreatedKey: string | null = null;
   private planLimitNotices: ApiPlanLimitNotice[] = [];
   private planLimitNoticesLoading = false;
+  private commodityNodeSavedItems: CommodityNodeSavedEntity[] = [];
+  private commodityNodeSavedItemsLoading = false;
+  private commodityNodeAlertDeliveries: CommodityNodeAlertDelivery[] = [];
+  private commodityNodeAlertDeliveriesLoading = false;
   // ---- Business Pro seats (plan 2026-07-24-001 U7) ----
   private readonly businessSeatsSection: BusinessSeatsSection;
   // ---- Connected MCP clients tab (plan 2026-05-10-001 U9) ----
@@ -180,6 +195,30 @@ export class UnifiedSettings {
             );
           }
         });
+        return;
+      }
+
+      if (target.closest('.commoditynode-data-export')) {
+        void this.handleCommodityNodeDataExport();
+        return;
+      }
+
+      if (target.closest('.commoditynode-data-delete')) {
+        void this.handleCommodityNodeDataDeletion();
+        return;
+      }
+
+      const removeSaved = target.closest<HTMLElement>('.commoditynode-saved-remove');
+      if (removeSaved?.dataset.entityType && removeSaved.dataset.entityId) {
+        void this.handleCommodityNodeSavedRemoval(
+          removeSaved.dataset.entityType as CommodityNodeSavedEntity['entityType'],
+          removeSaved.dataset.entityId,
+        );
+        return;
+      }
+
+      if (target.closest('.commoditynode-alerts-read')) {
+        void this.handleCommodityNodeAlertsRead();
         return;
       }
 
@@ -579,6 +618,7 @@ export class UnifiedSettings {
         <div class="unified-settings-tab-panel${this.activeTab === 'settings' ? ' active' : ''}" data-panel-id="settings" id="us-tab-panel-settings" role="tabpanel" aria-labelledby="us-tab-settings">
           ${prefs.html}
           ${this.renderUpgradeSection()}
+          ${this.renderCommodityNodePrivacyControls(isSignedIn)}
         </div>
         <div class="unified-settings-tab-panel${this.activeTab === 'panels' ? ' active' : ''}" data-panel-id="panels" id="us-tab-panel-panels" role="tabpanel" aria-labelledby="us-tab-panels">
           <div class="unified-settings-region-wrapper">
@@ -659,6 +699,253 @@ export class UnifiedSettings {
     if (this.activeTab === 'mcp-clients' && getAuthState().user && hasFeature('mcpAccess')) {
       void this.loadMcpClients();
       this.startMcpQuotaPolling();
+    }
+    if (SITE_VARIANT === 'commoditynode' && isSignedIn) {
+      void this.loadCommodityNodeSavedItems();
+      void this.loadCommodityNodeAlertInbox();
+    }
+  }
+
+  private renderCommodityNodePrivacyControls(isSignedIn: boolean): string {
+    if (SITE_VARIANT !== 'commoditynode') return '';
+    return `
+      <section class="commoditynode-data-controls" aria-labelledby="commoditynode-data-title">
+        <h3 id="commoditynode-data-title">CommodityNode account data</h3>
+        <p>
+          Export saved items, alert rules, delivery records, newsletter status,
+          and brief requests linked to this signed-in email. Deletion removes
+          those records but does not delete the identity provider account.
+        </p>
+        ${isSignedIn ? `
+          <div>
+            <h4>Saved items</h4>
+            <div class="commoditynode-saved-items" aria-live="polite">
+              ${this.renderCommodityNodeSavedItems()}
+            </div>
+          </div>
+          <div>
+            <div class="commoditynode-alerts-heading">
+              <h4>Impact alert inbox</h4>
+              <button type="button" class="btn btn-ghost commoditynode-alerts-read">Mark all read</button>
+            </div>
+            <div class="commoditynode-alert-inbox" aria-live="polite">
+              ${this.renderCommodityNodeAlertInbox()}
+            </div>
+          </div>
+          <div class="commoditynode-data-actions">
+            <button type="button" class="btn btn-secondary commoditynode-data-export">Download JSON export</button>
+          </div>
+          <label class="commoditynode-delete-confirmation">
+            <span>To delete CommodityNode account data, type <strong>DELETE COMMODITYNODE DATA</strong></span>
+            <input
+              type="text"
+              class="commoditynode-delete-confirmation-input"
+              autocomplete="off"
+              spellcheck="false"
+              aria-describedby="commoditynode-data-status"
+            />
+          </label>
+          <button type="button" class="btn btn-danger commoditynode-data-delete">Delete CommodityNode data</button>
+        ` : `
+          <p class="commoditynode-data-signed-out">Sign in from the header to export or delete account-linked data.</p>
+        `}
+        <p id="commoditynode-data-status" class="commoditynode-data-status" role="status" aria-live="polite"></p>
+        <a href="https://commoditynode.com/privacy/?settings=privacy" target="_blank" rel="noopener">Read retention and privacy details</a>
+      </section>
+    `;
+  }
+
+  private renderCommodityNodeSavedItems(): string {
+    if (this.commodityNodeSavedItemsLoading) return '<p>Loading saved items…</p>';
+    if (this.commodityNodeSavedItems.length === 0) {
+      return '<p>No saved commodities, companies, or routes yet.</p>';
+    }
+    return `<ul>${this.commodityNodeSavedItems.map((item) => {
+      const label = item.entityId
+        .split(/[-_.]/)
+        .filter(Boolean)
+        .map((part) => `${part[0]?.toUpperCase() ?? ''}${part.slice(1)}`)
+        .join(' ');
+      return `<li>
+        <span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(item.entityType)}</small></span>
+        <button
+          type="button"
+          class="btn btn-ghost commoditynode-saved-remove"
+          data-entity-type="${escapeHtml(item.entityType)}"
+          data-entity-id="${escapeHtml(item.entityId)}"
+          aria-label="Remove ${escapeHtml(label)} from saved items"
+        >Remove</button>
+      </li>`;
+    }).join('')}</ul>`;
+  }
+
+  private refreshCommodityNodeSavedItems(): void {
+    const container = this.overlay.querySelector<HTMLElement>('.commoditynode-saved-items');
+    if (!container) return;
+    setTrustedHtml(
+      container,
+      trustedHtml(this.renderCommodityNodeSavedItems(), 'validated saved item fields'),
+    );
+  }
+
+  private renderCommodityNodeAlertInbox(): string {
+    if (this.commodityNodeAlertDeliveriesLoading) return '<p>Loading alerts…</p>';
+    if (this.commodityNodeAlertDeliveries.length === 0) {
+      return '<p>No delivered alerts. New alerts appear only after a verified Event Pulse or route update is published.</p>';
+    }
+    return `<ul>${this.commodityNodeAlertDeliveries.map((delivery) => {
+      if (!delivery.event) return '';
+      const published = new Date(delivery.event.publishedAt).toLocaleDateString();
+      return `<li${delivery.readAt ? '' : ' class="is-unread"'}>
+        <a href="${escapeHtml(delivery.event.evidenceHref)}" target="_blank" rel="noopener">
+          <strong>${escapeHtml(delivery.event.title)}</strong>
+          <span>${escapeHtml(delivery.event.summary)}</span>
+          <small>${escapeHtml(delivery.event.materiality)} · ${escapeHtml(published)}</small>
+        </a>
+      </li>`;
+    }).join('')}</ul>`;
+  }
+
+  private refreshCommodityNodeAlertInbox(): void {
+    const container = this.overlay.querySelector<HTMLElement>('.commoditynode-alert-inbox');
+    if (!container) return;
+    setTrustedHtml(
+      container,
+      trustedHtml(this.renderCommodityNodeAlertInbox(), 'canonical alert catalog fields'),
+    );
+  }
+
+  private async loadCommodityNodeAlertInbox(): Promise<void> {
+    if (this.commodityNodeAlertDeliveriesLoading) return;
+    this.commodityNodeAlertDeliveriesLoading = true;
+    this.refreshCommodityNodeAlertInbox();
+    try {
+      this.commodityNodeAlertDeliveries = await listCommodityNodeAlertDeliveries();
+    } catch {
+      this.commodityNodeAlertDeliveries = [];
+      this.setCommodityNodeDataStatus('Could not load the alert inbox.');
+    } finally {
+      this.commodityNodeAlertDeliveriesLoading = false;
+      this.refreshCommodityNodeAlertInbox();
+    }
+  }
+
+  private async handleCommodityNodeAlertsRead(): Promise<void> {
+    const unreadIds = this.commodityNodeAlertDeliveries
+      .filter((delivery) => !delivery.readAt)
+      .map((delivery) => delivery._id);
+    if (unreadIds.length === 0) {
+      this.setCommodityNodeDataStatus('There are no unread impact alerts.');
+      return;
+    }
+    try {
+      await markCommodityNodeAlertDeliveriesRead(unreadIds);
+      const readAt = Date.now();
+      this.commodityNodeAlertDeliveries = this.commodityNodeAlertDeliveries.map(
+        (delivery) => unreadIds.includes(delivery._id)
+          ? { ...delivery, readAt }
+          : delivery,
+      );
+      this.refreshCommodityNodeAlertInbox();
+      this.setCommodityNodeDataStatus('Impact alerts marked as read.');
+    } catch {
+      this.setCommodityNodeDataStatus('Could not update alert read state.');
+    }
+  }
+
+  private async loadCommodityNodeSavedItems(): Promise<void> {
+    if (this.commodityNodeSavedItemsLoading) return;
+    this.commodityNodeSavedItemsLoading = true;
+    this.refreshCommodityNodeSavedItems();
+    try {
+      this.commodityNodeSavedItems = await listCommodityNodeSavedEntities();
+    } catch {
+      this.commodityNodeSavedItems = [];
+      this.setCommodityNodeDataStatus('Could not load saved items.');
+    } finally {
+      this.commodityNodeSavedItemsLoading = false;
+      this.refreshCommodityNodeSavedItems();
+    }
+  }
+
+  private async handleCommodityNodeSavedRemoval(
+    entityType: CommodityNodeSavedEntity['entityType'],
+    entityId: string,
+  ): Promise<void> {
+    try {
+      await setCommodityNodeEntitySaved(entityType, entityId, false);
+      this.commodityNodeSavedItems = this.commodityNodeSavedItems.filter(
+        (item) => item.entityType !== entityType || item.entityId !== entityId,
+      );
+      this.refreshCommodityNodeSavedItems();
+      this.setCommodityNodeDataStatus('Saved item removed.');
+      trackCommodityNodeEvent('watchlist_item_removed', {
+        routeType: 'live_application',
+        placement: 'settings_saved_items',
+        entityType,
+      });
+    } catch {
+      this.setCommodityNodeDataStatus('Could not remove the saved item. Try again.');
+    }
+  }
+
+  private setCommodityNodeDataStatus(message: string): void {
+    const status = this.overlay.querySelector<HTMLElement>('.commoditynode-data-status');
+    if (status) status.textContent = message;
+  }
+
+  private async handleCommodityNodeDataExport(): Promise<void> {
+    const button = this.overlay.querySelector<HTMLButtonElement>('.commoditynode-data-export');
+    if (!button || button.disabled) return;
+    button.disabled = true;
+    this.setCommodityNodeDataStatus('Preparing account data…');
+    try {
+      const data = await exportCommodityNodeAccountData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json;charset=utf-8',
+      });
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = href;
+      anchor.download = `commoditynode-account-data-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.click();
+      URL.revokeObjectURL(href);
+      this.setCommodityNodeDataStatus('Export downloaded.');
+    } catch {
+      this.setCommodityNodeDataStatus('Could not export account data. Try again.');
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  private async handleCommodityNodeDataDeletion(): Promise<void> {
+    const button = this.overlay.querySelector<HTMLButtonElement>('.commoditynode-data-delete');
+    const input = this.overlay.querySelector<HTMLInputElement>(
+      '.commoditynode-delete-confirmation-input',
+    );
+    if (!button || !input || button.disabled) return;
+    if (input.value !== 'DELETE COMMODITYNODE DATA') {
+      this.setCommodityNodeDataStatus('Type the confirmation phrase exactly before deleting.');
+      input.focus();
+      return;
+    }
+    const confirmed = await confirmDialog({
+      message:
+        'Permanently delete CommodityNode saved items, alerts, delivery history, newsletter link, and matching brief requests?',
+    });
+    if (!confirmed) return;
+    button.disabled = true;
+    input.disabled = true;
+    this.setCommodityNodeDataStatus('Deleting CommodityNode account data…');
+    try {
+      await deleteCommodityNodeAccountData();
+      input.value = '';
+      this.setCommodityNodeDataStatus('CommodityNode account data was deleted.');
+    } catch {
+      this.setCommodityNodeDataStatus('Could not delete account data. No deletion was confirmed.');
+    } finally {
+      button.disabled = false;
+      input.disabled = false;
     }
   }
 

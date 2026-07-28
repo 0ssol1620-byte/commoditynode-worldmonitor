@@ -10,6 +10,9 @@ export type CommodityNodeRouteType =
   | 'author'
   | 'trust'
   | 'search'
+  | 'lead_workflow'
+  | 'developer'
+  | 'commercial'
   | 'source_offer'
   | 'live_application'
   | 'legacy_gone'
@@ -169,6 +172,33 @@ export function resolveCommodityNodeRoutePolicy(
       follow: true,
       adEligible: false,
       reason: 'Internal search-result combinations are not canonical landing pages.',
+    };
+  }
+  if (path === '/brief/') {
+    return {
+      routeType: 'lead_workflow',
+      indexable: false,
+      follow: true,
+      adEligible: false,
+      reason: 'Conversion workflow is linked from reviewed content but is not search inventory.',
+    };
+  }
+  if (path === '/developers/') {
+    return {
+      routeType: 'developer',
+      indexable: true,
+      follow: true,
+      adEligible: false,
+      reason: 'Substantive API and MCP contract documentation.',
+    };
+  }
+  if (path === '/plans/') {
+    return {
+      routeType: 'commercial',
+      indexable: true,
+      follow: true,
+      adEligible: false,
+      reason: 'Current access boundaries and fail-closed commercial policy.',
     };
   }
   if (path === '/source/') {

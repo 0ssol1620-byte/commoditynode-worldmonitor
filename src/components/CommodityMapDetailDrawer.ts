@@ -3,6 +3,16 @@ import {
   resolveCommodityNodeSelection,
   type CommodityNodeSelection,
 } from '@/config/commoditynode-selection';
+import { getAuthState } from '@/services/auth-state';
+import { openSignIn } from '@/services/clerk';
+import {
+  listCommodityNodeSavedEntities,
+  listCommodityNodeAlertRules,
+  setCommodityNodeAlertRule,
+  setCommodityNodeEntitySaved,
+  type CommodityNodeEntityType,
+} from '@/services/commoditynode-product';
+import { trackCommodityNodeEvent } from '@/services/commoditynode-analytics';
 
 const QUERY_KEY = 'mapEntity';
 
@@ -45,7 +55,17 @@ export class CommodityMapDetailDrawer {
   private readonly eventLink: HTMLAnchorElement;
   private readonly mapButton: HTMLButtonElement;
   private readonly universeButton: HTMLButtonElement;
+  private readonly saveButton: HTMLButtonElement;
+  private readonly saveStatus: HTMLElement;
+  private readonly alertButton: HTMLButtonElement;
+  private readonly alertStatus: HTMLElement;
   private currentSelection: CommodityNodeSelection | null = null;
+  private savedKeys = new Set<string>();
+  private savedAccountId: string | null = null;
+  private savePending = false;
+  private alertKeys = new Set<string>();
+  private alertAccountId: string | null = null;
+  private alertPending = false;
   private restoreFocusTo: HTMLElement | null = null;
   private readonly inertState = new Map<HTMLElement, boolean>();
   private destroyed = false;
@@ -152,20 +172,46 @@ export class CommodityMapDetailDrawer {
     this.universeButton = document.createElement('button');
     this.universeButton.type = 'button';
     this.universeButton.textContent = 'Open in Impact Universe';
+    this.saveButton = document.createElement('button');
+    this.saveButton.type = 'button';
+    this.saveButton.className = 'cn-map-detail-save';
+    this.saveButton.textContent = 'Save item';
+    this.alertButton = document.createElement('button');
+    this.alertButton.type = 'button';
+    this.alertButton.className = 'cn-map-detail-alert';
+    this.alertButton.textContent = 'Enable impact alert';
     actions.append(
       this.researchLink,
       this.eventLink,
       this.mapButton,
       this.universeButton,
+      this.saveButton,
+      this.alertButton,
     );
+    this.saveStatus = createTextElement('p', 'cn-map-detail-save-status', '');
+    this.saveStatus.setAttribute('role', 'status');
+    this.saveStatus.setAttribute('aria-live', 'polite');
+    this.alertStatus = createTextElement('p', 'cn-map-detail-alert-status', '');
+    this.alertStatus.setAttribute('role', 'status');
+    this.alertStatus.setAttribute('aria-live', 'polite');
 
-    this.root.append(header, facts, this.description, provenance, actions);
+    this.root.append(
+      header,
+      facts,
+      this.description,
+      provenance,
+      actions,
+      this.saveStatus,
+      this.alertStatus,
+    );
     container.append(this.backdrop, this.root);
 
     this.backdrop.addEventListener('click', () => this.close());
     this.closeButton.addEventListener('click', () => this.close());
     this.mapButton.addEventListener('click', () => this.centerSelection());
     this.universeButton.addEventListener('click', () => this.openUniverse());
+    this.saveButton.addEventListener('click', () => void this.toggleSavedSelection());
+    this.alertButton.addEventListener('click', () => void this.toggleAlertSelection());
     window.addEventListener('commoditynode:map-selection', this.handleSelection);
     window.addEventListener('popstate', this.handlePopState);
     document.addEventListener('keydown', this.handleKeyDown);
@@ -206,6 +252,16 @@ export class CommodityMapDetailDrawer {
       : '';
     this.mapButton.hidden = !hasCoordinates;
     this.universeButton.hidden = !selection.commodityId;
+    const saveTarget = this.savedTarget(selection);
+    this.saveButton.hidden = !saveTarget;
+    this.saveStatus.textContent = '';
+    this.updateSaveButton();
+    if (saveTarget) void this.hydrateSavedItems();
+    const alertTarget = this.alertTarget(selection);
+    this.alertButton.hidden = !alertTarget;
+    this.alertStatus.textContent = '';
+    this.updateAlertButton();
+    if (alertTarget) void this.hydrateAlertRules();
 
     this.researchLink.href = selection.researchHref;
     this.researchLink.textContent = selection.researchLabel;
@@ -288,6 +344,199 @@ export class CommodityMapDetailDrawer {
     document
       .querySelector('[data-panel="impact-universe"]')
       ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  private savedTarget(
+    selection = this.currentSelection,
+  ): { entityType: CommodityNodeEntityType; entityId: string } | null {
+    if (!selection) return null;
+    if (
+      selection.kind !== 'commodity'
+      && selection.kind !== 'company'
+      && selection.kind !== 'route'
+    ) return null;
+    const entityType = selection.kind;
+    const entityId = selection.entityId.includes(':')
+      ? selection.entityId.slice(selection.entityId.indexOf(':') + 1)
+      : selection.entityId;
+    return { entityType, entityId };
+  }
+
+  private savedKey(target: {
+    entityType: CommodityNodeEntityType;
+    entityId: string;
+  }): string {
+    return `${target.entityType}:${target.entityId}`;
+  }
+
+  private async hydrateSavedItems(): Promise<void> {
+    const accountId = getAuthState().user?.id ?? null;
+    if (!accountId) {
+      this.savedKeys.clear();
+      this.savedAccountId = null;
+      this.updateSaveButton();
+      return;
+    }
+    if (this.savedAccountId === accountId) {
+      this.updateSaveButton();
+      return;
+    }
+    try {
+      const saved = await listCommodityNodeSavedEntities();
+      if (getAuthState().user?.id !== accountId) return;
+      this.savedKeys = new Set(
+        saved.map((item) => `${item.entityType}:${item.entityId}`),
+      );
+      this.savedAccountId = accountId;
+      this.updateSaveButton();
+    } catch {
+      this.saveStatus.textContent = 'Saved items are unavailable right now.';
+    }
+  }
+
+  private async toggleSavedSelection(): Promise<void> {
+    const target = this.savedTarget();
+    if (!target || this.savePending) return;
+    if (!getAuthState().user) {
+      this.saveStatus.textContent = 'Sign in to save this item across devices.';
+      openSignIn();
+      return;
+    }
+    const key = this.savedKey(target);
+    const shouldSave = !this.savedKeys.has(key);
+    this.savePending = true;
+    this.updateSaveButton();
+    this.saveStatus.textContent = shouldSave ? 'Saving…' : 'Removing…';
+    try {
+      await setCommodityNodeEntitySaved(target.entityType, target.entityId, shouldSave);
+      if (shouldSave) this.savedKeys.add(key);
+      else this.savedKeys.delete(key);
+      this.savedAccountId = getAuthState().user?.id ?? null;
+      this.saveStatus.textContent = shouldSave
+        ? 'Saved across your signed-in devices.'
+        : 'Removed from saved items.';
+      trackCommodityNodeEvent(
+        shouldSave ? 'watchlist_item_saved' : 'watchlist_item_removed',
+        {
+          routeType: 'live_application',
+          placement: 'map_detail_drawer',
+          entityType: target.entityType,
+        },
+      );
+    } catch {
+      this.saveStatus.textContent = 'Could not update saved items. Try again.';
+    } finally {
+      this.savePending = false;
+      this.updateSaveButton();
+    }
+  }
+
+  private updateSaveButton(): void {
+    const target = this.savedTarget();
+    if (!target) return;
+    const saved = this.savedKeys.has(this.savedKey(target));
+    this.saveButton.disabled = this.savePending;
+    this.saveButton.setAttribute('aria-pressed', String(saved));
+    this.saveButton.textContent = saved ? 'Saved item' : 'Save item';
+  }
+
+  private alertTarget(
+    selection = this.currentSelection,
+  ): { scopeType: 'event_pulse' | 'route'; scopeId: string } | null {
+    if (!selection || (selection.kind !== 'event' && selection.kind !== 'route')) {
+      return null;
+    }
+    const scopeId = selection.entityId.includes(':')
+      ? selection.entityId.slice(selection.entityId.indexOf(':') + 1)
+      : selection.entityId;
+    return {
+      scopeType: selection.kind === 'event' ? 'event_pulse' : 'route',
+      scopeId,
+    };
+  }
+
+  private alertKey(target: {
+    scopeType: 'event_pulse' | 'route';
+    scopeId: string;
+  }): string {
+    return `${target.scopeType}:${target.scopeId}`;
+  }
+
+  private async hydrateAlertRules(): Promise<void> {
+    const accountId = getAuthState().user?.id ?? null;
+    if (!accountId) {
+      this.alertKeys.clear();
+      this.alertAccountId = null;
+      this.updateAlertButton();
+      return;
+    }
+    if (this.alertAccountId === accountId) {
+      this.updateAlertButton();
+      return;
+    }
+    try {
+      const rules = await listCommodityNodeAlertRules();
+      if (getAuthState().user?.id !== accountId) return;
+      this.alertKeys = new Set(
+        rules
+          .filter((rule) => rule.enabled)
+          .map((rule) => `${rule.scopeType}:${rule.scopeId}`),
+      );
+      this.alertAccountId = accountId;
+      this.updateAlertButton();
+    } catch {
+      this.alertStatus.textContent = 'Alert rules are unavailable right now.';
+    }
+  }
+
+  private async toggleAlertSelection(): Promise<void> {
+    const target = this.alertTarget();
+    if (!target || this.alertPending) return;
+    if (!getAuthState().user) {
+      this.alertStatus.textContent = 'Sign in to create an in-app impact alert.';
+      openSignIn();
+      return;
+    }
+    const key = this.alertKey(target);
+    const enabled = !this.alertKeys.has(key);
+    this.alertPending = true;
+    this.updateAlertButton();
+    this.alertStatus.textContent = enabled ? 'Creating alert…' : 'Disabling alert…';
+    try {
+      await setCommodityNodeAlertRule({
+        ...target,
+        channel: 'in_app',
+        minimumMateriality: 'material',
+        enabled,
+      });
+      if (enabled) this.alertKeys.add(key);
+      else this.alertKeys.delete(key);
+      this.alertAccountId = getAuthState().user?.id ?? null;
+      this.alertStatus.textContent = enabled
+        ? 'Alert enabled for new verified material updates.'
+        : 'Alert disabled.';
+      if (enabled) {
+        trackCommodityNodeEvent('alert_created', {
+          routeType: 'live_application',
+          placement: 'map_detail_drawer',
+          entityType: target.scopeType === 'route' ? 'route' : 'event',
+        });
+      }
+    } catch {
+      this.alertStatus.textContent = 'Could not update the alert. Try again.';
+    } finally {
+      this.alertPending = false;
+      this.updateAlertButton();
+    }
+  }
+
+  private updateAlertButton(): void {
+    const target = this.alertTarget();
+    if (!target) return;
+    const enabled = this.alertKeys.has(this.alertKey(target));
+    this.alertButton.disabled = this.alertPending;
+    this.alertButton.setAttribute('aria-pressed', String(enabled));
+    this.alertButton.textContent = enabled ? 'Impact alert enabled' : 'Enable impact alert';
   }
 
   private setModalEnvironment(active: boolean): void {

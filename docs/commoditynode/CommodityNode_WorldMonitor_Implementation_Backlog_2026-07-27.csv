@@ -83,16 +83,16 @@ CNWM-081,6,Map sync,Synchronize selected map entity/event with graph focus.,P1,"
 CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,complete
 CNWM-083,6,Table parity,Provide accessible path list/table equivalent to graph.,P0,CNWM-076,complete
 CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,complete
-CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,planned
+CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,in_progress
 CNWM-086,7,Analytics,Define privacy-aware event taxonomy across research and live surfaces.,P1,CNWM-020,complete
-CNWM-087,7,Watchlists,"Enable account-based saved commodities, companies and routes.",P2,CNWM-057,planned
-CNWM-088,7,Alerts,Enable deduplicated Event Pulse and route alerts.,P2,CNWM-086,planned
-CNWM-089,7,Pro contracts,"Define validated paid entitlements: historical replay, exports, advanced paths and API.",P2,CNWM-086,planned
-CNWM-090,7,Billing,Activate checkout only after product facts and legal/privacy gates pass.,P2,CNWM-088,planned
-CNWM-091,7,B2B lead,Add custom commodity exposure brief request workflow.,P1,CNWM-029,planned
-CNWM-092,7,API plans,"Define API keys, quotas, public/free and paid scopes.",P2,"CNWM-075,CNWM-088",planned
-CNWM-093,7,MCP tools,"Expose commodity event, benchmark, route and evidence tools.",P3,CNWM-091,planned
-CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API conversions separately from ads.",P2,CNWM-085..091,planned
+CNWM-087,7,Watchlists,"Enable account-based saved commodities, companies and routes.",P2,CNWM-057,in_progress
+CNWM-088,7,Alerts,Enable deduplicated Event Pulse and route alerts.,P2,CNWM-086,in_progress
+CNWM-089,7,Pro contracts,"Define validated paid entitlements: historical replay, exports, advanced paths and API.",P2,CNWM-086,complete
+CNWM-090,7,Billing,Activate checkout only after product facts and legal/privacy gates pass.,P2,CNWM-088,complete
+CNWM-091,7,B2B lead,Add custom commodity exposure brief request workflow.,P1,CNWM-029,in_progress
+CNWM-092,7,API plans,"Define API keys, quotas, public/free and paid scopes.",P2,"CNWM-075,CNWM-088",complete
+CNWM-093,7,MCP tools,"Expose commodity event, benchmark, route and evidence tools.",P3,CNWM-091,complete
+CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API conversions separately from ads.",P2,CNWM-085..091,complete
 CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,complete
 CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,complete
 CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,complete
@@ -106,7 +106,7 @@ CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after
 CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned
 CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,complete
 CNWM-107,9,Security,"Review CORS, CSP, API keys, rate limits and secret boundaries for all domains.",P0,CNWM-019,complete
-CNWM-108,9,Privacy,"Implement account export/deletion, retention and audit logging.",P1,CNWM-086,planned
+CNWM-108,9,Privacy,"Implement account export/deletion, retention and audit logging.",P1,CNWM-086,complete
 CNWM-109,9,Performance,Enforce separate research/live bundle and Core Web Vitals budgets.,P0,"CNWM-023,CNWM-055",complete
 CNWM-110,9,Accessibility,"Complete keyboard, screen-reader, contrast, motion and chart/table parity review.",P0,CNWM-081,complete
 CNWM-111,9,Reliability,"Run provider, Redis, DB, image and AI outage simulations.",P0,"CNWM-044,CNWM-056",complete

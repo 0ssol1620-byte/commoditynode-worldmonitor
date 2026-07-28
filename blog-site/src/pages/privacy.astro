@@ -46,6 +46,37 @@ const canonicalUrl = absoluteUrl('/privacy/');
       page list are documented and tested.
     </p>
 
+    <h2>Newsletter and brief requests</h2>
+    <p>
+      The Weekly Commodity Impact Brief uses double opt-in. A confirmation that
+      is not completed is deleted after 30 days. An active address is retained
+      until it is unsubscribed; unsubscribing immediately removes the address
+      from the subscription record, and the remaining withdrawal marker is
+      deleted after 30 days.
+    </p>
+    <p>
+      A custom exposure brief request stores the submitted contact details,
+      organization, selected commodities, decision context, consent record, and
+      workflow status for up to two years. The request form is not a secure
+      channel and should not contain confidential, regulated, or market-sensitive
+      information.
+    </p>
+
+    <h2>Signed-in product data</h2>
+    <p>
+      A signed-in account may store saved commodities, companies and routes,
+      alert rules, and alert-delivery records. These records are scoped to the
+      identity-provider account and are not used for advertising. CommodityNode
+      does not receive the account password.
+    </p>
+    <p>
+      In Live settings, a signed-in user can download a JSON copy or permanently
+      delete CommodityNode product data. Deletion also removes brief requests
+      matching the account email and anonymizes any newsletter record. A
+      pseudonymous export or deletion audit containing record counts, not the
+      deleted content, is retained for seven years and then pruned.
+    </p>
+
     <h2>Your controls</h2>
     <p>
       You can reject optional storage on the first prompt or reopen
@@ -55,10 +86,16 @@ const canonicalUrl = absoluteUrl('/privacy/');
       at any time. A new consent-policy version invalidates the previous choice and
       asks again.
     </p>
+    <p>
+      Newsletter messages include an unsubscribe link. Account export and
+      deletion are available in CommodityNode Live under Settings.
+    </p>
 
     <h2>Contact and corrections</h2>
     <p>
-      Privacy or source-attribution issues can be reported through the public repository. Do not include confidential information in a public issue.
+      Privacy or source-attribution issues can be reported through the
+      <a href="/contact/">contact channels</a>. Do not include personal,
+      confidential, or regulated information in a public issue.
     </p>
     <p>Policy version 1 · Effective July 28, 2026</p>
   </article>
