@@ -18,8 +18,10 @@ test.describe('CommodityNode browser and responsive matrix', () => {
     const missionClose = page.getByRole('button', { name: 'Close mission presets' });
     if (await missionClose.isVisible()) await missionClose.click();
 
+    await expect(page.locator('html')).toHaveClass(/wm-layout-hydrated/);
     await expect(page.locator('html')).toHaveAttribute('data-variant', 'commoditynode');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page).toHaveTitle('CommodityNode Live - Commodity Impact Intelligence');
     await expect(page.locator('.app-heading')).toContainText('CommodityNode Live');
     await expect(page.locator('.logo')).toContainText('COMMODITYNODE');
     await expect(page.locator('.site-footer')).toContainText('Derived from World Monitor');

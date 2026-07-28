@@ -23,24 +23,40 @@ function loadStoredVariant(): SiteVariant | null {
   }
 }
 
+export function resolveRuntimeSiteVariant(
+  hostname: string,
+  compiledVariant: SiteVariant,
+  storedVariant: SiteVariant | null,
+  isDesktopRuntime: boolean,
+): SiteVariant {
+  if (isDesktopRuntime) {
+    return storedVariant ?? compiledVariant;
+  }
+
+  const hostVariant = resolveSiteVariantFromHostname(hostname);
+  if (hostVariant) return hostVariant;
+
+  if (isLocalVariantHost(hostname)) {
+    return storedVariant ?? compiledVariant;
+  }
+
+  // Most public World Monitor deployments are one `full` build whose hostname
+  // selects the product at runtime. CommodityNode Live is intentionally a
+  // dedicated build, so its verified compile-time variant must also survive
+  // Vercel's fallback and preview hostnames before custom DNS is available.
+  if (compiledVariant !== 'full') return compiledVariant;
+
+  return 'full';
+}
+
 export const SITE_VARIANT: SiteVariant = (() => {
   if (typeof window === 'undefined') return buildVariant;
 
   const isTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
-  if (isTauri) {
-    const stored = loadStoredVariant();
-    if (stored) return stored;
-    return buildVariant;
-  }
-
-  const hostVariant = resolveSiteVariantFromHostname(location.hostname);
-  if (hostVariant) return hostVariant;
-
-  if (isLocalVariantHost(location.hostname)) {
-    const stored = loadStoredVariant();
-    if (stored) return stored;
-    return buildVariant;
-  }
-
-  return 'full';
+  return resolveRuntimeSiteVariant(
+    location.hostname,
+    buildVariant,
+    loadStoredVariant(),
+    isTauri,
+  );
 })();
