@@ -15,6 +15,10 @@ function findRewrite(source, host) {
   );
 }
 
+function findRedirect(source) {
+  return config.redirects.find((redirect) => redirect.source === source);
+}
+
 describe('CommodityNode Vercel routing', () => {
   it('serves research at the apex and live intelligence on its subdomain', () => {
     const research = findRewrite('/', '^(?:www\\.)?commoditynode\\.com$');
@@ -25,6 +29,21 @@ describe('CommodityNode Vercel routing', () => {
     assert.equal(fallback?.destination, '/dashboard.html');
     assert.ok(config.rewrites.indexOf(research) < config.rewrites.indexOf(live));
     assert.ok(config.rewrites.indexOf(live) < config.rewrites.indexOf(fallback));
+  });
+
+  it('does not redirect exact research utility pages into upstream documentation', () => {
+    for (const source of ['/about', '/contact', '/privacy']) {
+      const redirect = findRedirect(source);
+      assert.ok(redirect, `${source} shared redirect is missing`);
+      assert.ok(
+        redirect.missing?.some(
+          (rule) =>
+            rule.type === 'host'
+            && rule.value === '^(?:www\\.)?commoditynode\\.com$',
+        ),
+        `${source} must exclude CommodityNode research hosts`,
+      );
+    }
   });
 
   it('routes canonical research assets before the shared SPA catch-all', () => {
