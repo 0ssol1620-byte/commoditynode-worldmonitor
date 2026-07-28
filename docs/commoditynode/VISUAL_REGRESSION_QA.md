@@ -37,3 +37,16 @@ The test also rejects the regressions found during the July 2026 launch audit:
 
 Visual approval is not a substitute for semantic accessibility. The same
 release must also pass `npm run test:e2e:commoditynode:a11y`.
+
+The responsive/browser release matrix is a separate gate:
+
+```bash
+npm run test:e2e:commoditynode:matrix
+```
+
+It runs the live product contract in Chromium, Firefox, and WebKit across
+desktop, touch-phone, and phone-landscape layouts. The browser locale is
+deliberately set to `ko-KR` to prove that CommodityNode remains English-first
+unless a visitor explicitly selects another language. It also checks reduced
+motion, 200% text sizing, graph/table responsive parity, 44 px navigation
+targets, and horizontal overflow.

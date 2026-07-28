@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { enqueueSentryCall } from '@/bootstrap/sentry-defer';
+import { SITE_VARIANT } from '@/config/variant';
 import { readQueryLanguage, stripQueryLanguage } from '@/utils/i18n-url';
 
 // Keep only first-paint English strings in the entry chunk. The full English
@@ -162,10 +163,10 @@ export async function initI18n(): Promise<void> {
   //   /dashboard?lang=fa. These remain base-canonical and are not advertised
   //   as separately indexable hreflang documents.
   // - wmExplicit reads ONLY the explicit-choice key. Returns undefined when
-  //   unset so detection falls through to navigator. This replaces the default
-  //   `localStorage` step (which would read i18next's auto-cache key) so a user
-  //   whose browser is French always lands on French unless they've explicitly
-  //   chosen otherwise via Settings → Language.
+  //   unset so general World Monitor variants fall through to navigator.
+  //   CommodityNode instead falls through to its reviewed English product
+  //   default. This replaces the default `localStorage` step (which would read
+  //   i18next's auto-cache key); explicit Settings choices remain authoritative.
   const detector = new LanguageDetector();
   detector.addDetector({
     name: 'wmQuery',
@@ -180,6 +181,19 @@ export async function initI18n(): Promise<void> {
     },
     cacheUserLanguage: () => { /* writes go through explicit changeLanguage() */ },
   });
+  detector.addDetector({
+    name: 'commoditynodeEnglishDefault',
+    lookup: () => (SITE_VARIANT === 'commoditynode' ? 'en' : undefined),
+    cacheUserLanguage: () => { /* product default is not an explicit user choice */ },
+  });
+
+  // CommodityNode is an English-first international research product. A
+  // visitor's browser locale must not silently translate the analytical UI:
+  // the translated terms may not share the reviewed English copy's exact
+  // market meaning. Explicit language URLs and Settings choices still work.
+  const detectionOrder = SITE_VARIANT === 'commoditynode'
+    ? ['wmQuery', 'wmExplicit', 'commoditynodeEnglishDefault']
+    : ['wmQuery', 'wmExplicit', 'navigator'];
 
   await i18next
     .use(detector)
@@ -195,7 +209,7 @@ export async function initI18n(): Promise<void> {
         escapeValue: false, // not needed for these simple strings
       },
       detection: {
-        order: ['wmQuery', 'wmExplicit', 'navigator'],
+        order: detectionOrder,
         caches: [], // never auto-write — only changeLanguage() persists
       },
     });

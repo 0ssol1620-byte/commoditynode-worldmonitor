@@ -214,6 +214,25 @@
   }
 }
 
+/* The shared shell hides the desktop variant switcher below 980px but normally
+   waits until 768px to reveal the menu. CommodityNode has only Live/Research,
+   so keep navigation reachable throughout that intermediate landscape/tablet
+   range instead of leaving an 769-980px navigation dead zone. */
+@media (min-width: 769px) and (max-width: 980px) {
+  [data-variant='commoditynode'] .hamburger-btn {
+    display: flex;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  [data-variant='commoditynode'] .mobile-menu-overlay,
+  [data-variant='commoditynode'] .mobile-menu,
+  [data-variant='commoditynode'] .region-sheet-backdrop,
+  [data-variant='commoditynode'] .region-bottom-sheet {
+    display: block;
+  }
+}
+
 [data-variant='commoditynode'] .deckgl-layer-toggles {
   width: min(280px, calc(100% - 20px));
   max-width: 280px;

@@ -117,6 +117,7 @@
     "test:e2e:happy": "cross-env VITE_VARIANT=happy playwright test",
     "test:e2e:commoditynode": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-smoke.spec.ts",
     "test:e2e:commoditynode:a11y": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-accessibility.spec.ts",
+    "test:e2e:commoditynode:matrix": "cross-env VITE_VARIANT=commoditynode playwright test --config playwright.commoditynode-matrix.config.ts",
     "test:e2e:commoditynode:visual": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-visual.spec.ts",
     "test:e2e:commoditynode:visual:update": "cross-env VITE_VARIANT=commoditynode playwright test e2e/commoditynode-visual.spec.ts --update-snapshots",
     "test:e2e:runtime": "cross-env VITE_VARIANT=full playwright test e2e/runtime-fetch.spec.ts",
