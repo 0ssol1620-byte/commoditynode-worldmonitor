@@ -1,7 +1,10 @@
 node_modules/
+public/.well-known/commoditynode-build.json
+public/SOURCE-OFFER.md
 .idea/
 dist/
 public/blog/
+public/commoditynode-site/
 public/countries/
 public/chokepoints/
 public/reference/
@@ -44,6 +47,7 @@ src-tauri/sidecar/node/*
 
 # AI planning session state
 .planning/
+.commoditynode-private/
 
 # Compiled sebuf gateway bundle (built by scripts/build-sidecar-sebuf.mjs)
 api/[[][[].*.js

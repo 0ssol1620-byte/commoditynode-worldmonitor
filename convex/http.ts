@@ -1559,6 +1559,94 @@ http.route({
   }),
 });
 
+// CommodityNode lead gateway. Public Vercel endpoints own request validation,
+// rate limiting, consent UX, and email delivery; this authenticated relay is
+// the only bridge into the internal lead mutations. The browser never receives
+// the shared secret and direct Convex mutation calls cannot bypass edge limits.
+http.route({
+  path: "/commoditynode/product",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.COMMODITYNODE_PRODUCT_GATEWAY_SECRET ?? "";
+    const provided = (request.headers.get("Authorization") ?? "").replace(
+      /^Bearer\s+/,
+      "",
+    );
+    if (
+      secret.length < 32
+      || !(await timingSafeEqualStrings(provided, secret))
+    ) {
+      return new Response(JSON.stringify({ error: "UNAUTHORIZED" }), {
+        status: 401,
+        headers: {
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    const body = await parseJsonObjectBody<{
+      operation?: string;
+      payload?: Record<string, unknown>;
+    }>(request);
+    if (
+      !body
+      || !body.payload
+      || typeof body.payload !== "object"
+      || Array.isArray(body.payload)
+    ) {
+      return new Response(JSON.stringify({ error: "INVALID_REQUEST" }), {
+        status: 400,
+        headers: {
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    const product = (internal as any).commodityNodeProduct;
+    const operations: Record<string, unknown> = {
+      cancel_newsletter_confirmation: product.cancelNewsletterConfirmation,
+      confirm_newsletter_subscription: product.confirmNewsletterSubscription,
+      request_newsletter_subscription: product.requestNewsletterSubscription,
+      submit_brief_request: product.submitBriefRequest,
+      unsubscribe_newsletter: product.unsubscribeNewsletter,
+    };
+    const mutationRef = body.operation ? operations[body.operation] : undefined;
+    if (!mutationRef) {
+      return new Response(JSON.stringify({ error: "UNSUPPORTED_OPERATION" }), {
+        status: 400,
+        headers: {
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    try {
+      const result = await ctx.runMutation(
+        mutationRef as never,
+        body.payload as never,
+      );
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json",
+        },
+      });
+    } catch {
+      return new Response(JSON.stringify({ error: "OPERATION_FAILED" }), {
+        status: 422,
+        headers: {
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  }),
+});
+
 // Resend webhook: captures bounce/complaint events and suppresses emails.
 // Signature verification + internal mutation, same pattern as Dodo webhook.
 http.route({

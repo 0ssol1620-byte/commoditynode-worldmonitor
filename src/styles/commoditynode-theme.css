@@ -1,0 +1,1052 @@
+@import './commoditynode-tokens.generated.css';
+@import './commoditynode-universe.css';
+@import '@fontsource-variable/source-sans-3';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
+/*
+ * CommodityNode theme
+ * Unlayered by design so it wins over the upstream base cascade without
+ * increasing selector specificity across the shared dashboard.
+ */
+:root[data-variant='commoditynode'] {
+  --bg: var(--cn-color-canvas);
+  --bg-secondary: var(--cn-color-canvas-alt);
+  --surface: var(--cn-color-surface);
+  --surface-hover: var(--cn-color-surface-raised);
+  --surface-active: var(--cn-color-surface-selected);
+  --border: var(--cn-color-border);
+  --border-strong: var(--cn-color-border-strong);
+  --border-subtle: var(--cn-color-border-subtle);
+  --text: var(--cn-color-text);
+  --text-secondary: var(--cn-color-text-secondary);
+  --text-dim: var(--cn-color-text-muted);
+  --text-muted: var(--cn-color-text-faint);
+  --text-faint: var(--cn-color-text-faint);
+  --accent: var(--cn-color-signal-strong);
+  --green: var(--cn-color-signal);
+  --green-dim: var(--cn-color-signal-muted);
+  --yellow: var(--cn-color-attention);
+  --red: var(--cn-color-danger);
+  --panel-bg: var(--cn-color-surface);
+  --panel-border: var(--cn-color-border);
+  --map-bg: var(--cn-color-map-canvas);
+  --map-grid: var(--cn-color-border-subtle);
+  --map-country: var(--cn-color-map-land);
+  --map-stroke: var(--cn-color-map-stroke);
+  --font-body-base: var(--cn-font-ui);
+  --font-body: var(--cn-font-ui);
+  --font-mono: var(--cn-font-data);
+  --dashboard-grid-gap: var(--cn-space-2);
+}
+
+[data-variant='commoditynode'] body {
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-variant='commoditynode'] .header {
+  min-height: 48px;
+  height: auto;
+  padding-inline: 14px;
+  background: var(--cn-color-canvas-alt);
+  border-bottom-color: var(--cn-color-border);
+}
+
+[data-variant='commoditynode'] .logo {
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 760;
+  letter-spacing: -.01em;
+}
+
+[data-variant='commoditynode'] .version {
+  color: var(--text-muted);
+}
+
+[data-variant='commoditynode'] .cn-research-home {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--cn-color-text-secondary);
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-research-home:hover {
+    color: var(--cn-color-signal-strong);
+    border-color: var(--cn-color-border-strong);
+  }
+}
+
+[data-variant='commoditynode'] .variant-switcher {
+  min-height: 30px;
+  padding: 0 3px;
+  border-color: var(--cn-color-border);
+  background: transparent;
+  border-radius: var(--cn-radius-control);
+}
+
+[data-variant='commoditynode'] .variant-option {
+  min-height: 24px;
+  padding-inline: 8px;
+  border-radius: var(--cn-radius-control);
+  transition:
+    color var(--cn-motion-fast) var(--cn-motion-ease-out),
+    background-color var(--cn-motion-fast) var(--cn-motion-ease-out);
+}
+
+[data-variant='commoditynode'] .variant-option .variant-label,
+[data-variant='commoditynode'] .variant-switcher:hover .variant-option .variant-label {
+  max-width: none;
+  opacity: 1;
+}
+
+[data-variant='commoditynode'] .variant-option.active {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+}
+
+[data-variant='commoditynode'] .status-dot {
+  background: var(--cn-color-signal);
+  box-shadow: none;
+}
+
+[data-variant='commoditynode'] .map-section,
+[data-variant='commoditynode'] .panel {
+  border-color: var(--panel-border);
+  background: var(--panel-bg);
+  box-shadow: none;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(0, 1.4fr);
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--cn-color-border);
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide > div {
+  display: grid;
+  gap: 4px;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide__label {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide > div strong {
+  color: var(--cn-color-text);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: var(--cn-color-border-subtle);
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 2px 7px;
+  padding: 7px 9px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li > span {
+  grid-row: 1 / 3;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: var(--cn-color-signal-strong);
+  border: 1px solid var(--cn-color-border-strong);
+  font: 650 9px/1 var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li strong {
+  color: var(--cn-color-text-secondary);
+  font-size: 10px;
+}
+
+[data-variant='commoditynode'] .cn-workspace-guide li small {
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+}
+
+[data-variant='commoditynode'] .panel {
+  border-radius: var(--cn-radius-surface);
+}
+
+[data-variant='commoditynode'] .panel-header {
+  min-height: 36px;
+  padding-inline: 12px;
+  background: var(--cn-color-canvas-alt);
+  border-bottom-color: var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .panel-title {
+  color: var(--cn-color-text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: .035em;
+}
+
+[data-variant='commoditynode'] .panel-count,
+[data-variant='commoditynode'] .panel-data-badge,
+[data-variant='commoditynode'] .commodity-price,
+[data-variant='commoditynode'] .commodity-change {
+  font-family: var(--font-mono);
+}
+
+[data-variant='commoditynode'] .commodity-reference-state,
+[data-variant='commoditynode'] .cn-reference-panel,
+[data-variant='commoditynode'] .cn-implication-reference {
+  display: grid;
+  gap: 10px;
+  color: var(--cn-color-text-secondary);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .commodity-reference-notice,
+[data-variant='commoditynode'] .cn-reference-panel__intro,
+[data-variant='commoditynode'] .cn-implication-reference__status {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--cn-color-border-subtle);
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .commodity-reference-notice strong,
+[data-variant='commoditynode'] .cn-reference-panel__intro strong,
+[data-variant='commoditynode'] .cn-implication-reference__status strong {
+  color: var(--cn-color-text);
+  font-size: 12px;
+}
+
+[data-variant='commoditynode'] .commodity-reference-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .commodity-reference-row strong,
+[data-variant='commoditynode'] .cn-reference-panel__grid span,
+[data-variant='commoditynode'] .cn-implication-reference__path span {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1.2 var(--cn-font-data);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid > div,
+[data-variant='commoditynode'] .cn-implication-reference__path > div {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid strong,
+[data-variant='commoditynode'] .cn-implication-reference__path strong {
+  color: var(--cn-color-text);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .cn-reference-panel__grid small,
+[data-variant='commoditynode'] .cn-reference-panel__foot,
+[data-variant='commoditynode'] .cn-implication-reference__limit {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-implication-reference__path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-implication-reference__path > div:not(:last-child) {
+  border-right: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .monitor-starter-title {
+  margin-top: 12px;
+  color: var(--cn-color-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+[data-variant='commoditynode'] .monitor-starter-copy {
+  margin: 5px 0 8px;
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .monitor-starter-ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+[data-variant='commoditynode'] .monitor-starter-button {
+  min-height: 32px;
+  padding: 0 9px;
+  color: var(--cn-color-text-secondary);
+  border: 1px solid var(--cn-color-border);
+  background: var(--cn-color-canvas-alt);
+  border-radius: var(--cn-radius-control);
+  font-size: 10px;
+}
+
+[data-variant='commoditynode'] .cn-event-reference {
+  display: grid;
+  gap: 1px;
+  background: var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro,
+[data-variant='commoditynode'] .cn-event-reference a {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  color: var(--cn-color-text-secondary);
+  background: var(--cn-color-surface);
+  text-decoration: none;
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro {
+  background: var(--cn-color-canvas-alt);
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro strong,
+[data-variant='commoditynode'] .cn-event-reference a strong {
+  color: var(--cn-color-text);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .cn-event-reference__intro span,
+[data-variant='commoditynode'] .cn-event-reference a small {
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-event-reference a > span {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] button:focus-visible,
+[data-variant='commoditynode'] a:focus-visible,
+[data-variant='commoditynode'] select:focus-visible,
+[data-variant='commoditynode'] input:focus-visible {
+  outline: 2px solid var(--cn-color-signal-strong);
+  outline-offset: 2px;
+}
+
+[data-variant='commoditynode'] .site-footer {
+  gap: 20px;
+  background: var(--cn-color-canvas-alt);
+  border-top-color: var(--cn-color-border);
+}
+
+[data-variant='commoditynode'] .site-footer-icon {
+  border-radius: var(--cn-radius-overlay);
+}
+
+[data-variant='commoditynode'] .site-footer-sub {
+  max-width: 460px;
+  text-transform: none;
+  letter-spacing: .02em;
+}
+
+[data-variant='commoditynode'] .site-footer a {
+  color: var(--cn-color-text-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .site-footer a:hover {
+    color: var(--cn-color-signal-strong);
+  }
+}
+
+[data-variant='commoditynode'] button:active,
+[data-variant='commoditynode'] a:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-variant='commoditynode'] *,
+  [data-variant='commoditynode'] *::before,
+  [data-variant='commoditynode'] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-variant='commoditynode'] .header {
+    min-height: 56px;
+  }
+
+  [data-variant='commoditynode'] .logo-mobile {
+    color: var(--text);
+    font-weight: 760;
+    letter-spacing: -.02em;
+  }
+
+  [data-variant='commoditynode'] .cn-research-home {
+    min-height: 44px;
+    padding-inline: 8px;
+  }
+
+  [data-variant='commoditynode'] .cn-reference-panel__grid,
+  [data-variant='commoditynode'] .cn-implication-reference__path {
+    grid-template-columns: 1fr;
+  }
+
+  [data-variant='commoditynode'] .cn-workspace-guide {
+    grid-template-columns: 1fr;
+    margin: 8px 8px 0;
+  }
+
+  [data-variant='commoditynode'] .cn-workspace-guide ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  [data-variant='commoditynode'] .panels-grid {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  [data-variant='commoditynode'] .panel-header button,
+  [data-variant='commoditynode'] .map-header-actions button,
+  [data-variant='commoditynode'] .hamburger-btn,
+  [data-variant='commoditynode'] .mobile-settings-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  [data-variant='commoditynode'] .site-footer {
+    align-items: flex-start;
+  }
+
+  [data-variant='commoditynode'] .site-footer nav {
+    row-gap: 12px;
+  }
+}
+
+/* The shared shell hides the desktop variant switcher below 980px but normally
+   waits until 768px to reveal the menu. CommodityNode has only Live/Research,
+   so keep navigation reachable throughout that intermediate landscape/tablet
+   range instead of leaving an 769-980px navigation dead zone. */
+@media (min-width: 769px) and (max-width: 980px) {
+  [data-variant='commoditynode'] .hamburger-btn {
+    display: flex;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  [data-variant='commoditynode'] .mobile-menu-overlay,
+  [data-variant='commoditynode'] .mobile-menu,
+  [data-variant='commoditynode'] .region-sheet-backdrop,
+  [data-variant='commoditynode'] .region-bottom-sheet {
+    display: block;
+  }
+}
+
+@media (min-width: 1600px) {
+  [data-variant='commoditynode'] .cn-workspace-guide {
+    display: none;
+  }
+}
+
+[data-variant='commoditynode'] .deckgl-layer-toggles {
+  width: min(280px, calc(100% - 20px));
+  max-width: 280px;
+  background: var(--cn-color-surface);
+  border-color: var(--cn-color-border-strong);
+  border-radius: var(--cn-radius-panel);
+}
+
+[data-variant='commoditynode'] .layer-toggles:not(.deckgl-layer-toggles) {
+  top: 54px;
+  bottom: auto;
+  left: 12px;
+  display: block;
+  width: min(220px, calc(100% - 24px));
+  max-height: calc(100% - 66px);
+  padding: 8px;
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--cn-color-surface) 96%, transparent);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: var(--cn-radius-control);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+[data-variant='commoditynode'] .svg-mode .commodity-hub-marker {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--cn-color-signal);
+  background: color-mix(in srgb, var(--cn-color-surface) 92%, transparent);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(7, 22, 29, .75);
+  font: 700 7px/1 var(--cn-font-data);
+  letter-spacing: -.02em;
+}
+
+[data-variant='commoditynode'] .layer-toggles:not(.deckgl-layer-toggles) .cn-map-presets {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: -8px -8px 8px;
+}
+
+[data-variant='commoditynode'] .globe-mode .globe-beta-badge {
+  display: none;
+}
+
+[data-variant='commoditynode'] .globe-mode .deckgl-layer-toggles .toggle-icon {
+  width: 24px;
+  min-width: 24px;
+  height: 18px;
+  color: var(--cn-color-signal);
+  font: 700 8px/18px var(--cn-font-data);
+  letter-spacing: .04em;
+  background: var(--cn-color-surface-selected);
+  border: 1px solid var(--cn-color-border-subtle);
+  border-radius: 2px;
+}
+
+[data-variant='commoditynode'] .cn-map-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+  padding: var(--cn-space-2);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-map-presets button {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 6px;
+  overflow: hidden;
+  color: var(--cn-color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cn-radius-control);
+  font: 650 9px var(--cn-font-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-variant='commoditynode'] .cn-map-presets button[aria-pressed='true'] {
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-border-strong);
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group {
+  display: grid;
+  gap: 2px;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group + .cn-map-layer-group {
+  margin-top: var(--cn-space-2);
+  padding-top: var(--cn-space-2);
+  border-top: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group h3 {
+  margin: 0;
+  padding: 4px 8px 2px;
+  color: var(--cn-color-text-faint);
+  font: 600 9px var(--cn-font-data);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group .layer-toggle-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'toggle explain'
+    'health health';
+  gap: 1px 4px;
+  align-items: center;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group .layer-toggle {
+  grid-area: toggle;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-group .layer-explain-btn {
+  grid-area: explain;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-health {
+  grid-area: health;
+  min-width: 0;
+  padding: 0 8px 4px 28px;
+  overflow: hidden;
+  color: var(--cn-color-text-faint);
+  font: 500 8px/1.35 var(--cn-font-data);
+  letter-spacing: .025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-health::before {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 5px 1px 0;
+  background: currentColor;
+  border-radius: 50%;
+  content: '';
+}
+
+[data-variant='commoditynode'] .cn-map-layer-health--current {
+  color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-map-layer-health--historical,
+[data-variant='commoditynode'] .cn-map-layer-health--stale,
+[data-variant='commoditynode'] .cn-map-layer-health--partial {
+  color: var(--cn-color-attention);
+}
+
+[data-variant='commoditynode'] .cn-map-layer-health--unavailable {
+  color: var(--cn-color-text-faint);
+}
+
+[data-variant='commoditynode'] .cn-map-layer-static-state {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  padding: 5px 8px 3px;
+  opacity: .82;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-static-state__name {
+  overflow: hidden;
+  color: var(--cn-color-text-muted);
+  font: 600 10px/1.35 var(--cn-font-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-static-state .cn-map-layer-health {
+  padding: 0;
+}
+
+[data-variant='commoditynode'] .cn-map-layer-unavailable {
+  margin: 0;
+  padding: 4px 8px 8px;
+  color: var(--cn-color-text-faint);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-map-event-marker {
+  position: absolute;
+  z-index: 75 !important;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+[data-variant='commoditynode'] .cn-map-event-marker__ring,
+[data-variant='commoditynode'] .cn-map-event-marker__core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: block;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+[data-variant='commoditynode'] .cn-map-event-marker__ring {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgb(244 190 73 / 72%);
+  animation: cn-map-event-ripple 1.2s ease-out 2;
+}
+
+[data-variant='commoditynode'] .cn-map-event-marker__core {
+  width: 9px;
+  height: 9px;
+  background: #f4be49;
+  border: 1.5px solid #fff6d4;
+  box-shadow: 0 0 0 2px rgb(3 16 21 / 72%);
+}
+
+[data-variant='commoditynode'] .cn-map-event-marker:focus-visible {
+  outline: 2px solid var(--cn-color-signal-strong);
+  outline-offset: 2px;
+}
+
+@keyframes cn-map-event-ripple {
+  from {
+    opacity: .72;
+    transform: translate(-50%, -50%) scale(.82);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-variant='commoditynode'] .cn-map-event-marker__ring {
+    opacity: .36;
+    animation: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-map-presets button:hover {
+    color: var(--cn-color-text);
+    border-color: var(--cn-color-border);
+  }
+}
+
+@media (max-width: 720px) {
+  [data-variant='commoditynode'] .cn-map-presets button {
+    min-height: 44px;
+  }
+}
+
+[data-variant='commoditynode'] .cn-map-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1199;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: rgb(1 7 10 / 68%);
+  border: 0;
+  border-radius: 0;
+  cursor: default;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer {
+  position: fixed;
+  top: 64px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 32px));
+  overflow: auto;
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface);
+  border: 1px solid var(--cn-color-border-strong);
+  border-radius: var(--cn-radius-panel);
+  box-shadow: 0 18px 44px rgb(0 0 0 / 34%);
+  animation: cn-map-detail-enter var(--cn-motion-medium) var(--cn-motion-ease-out);
+  overscroll-behavior: contain;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer[hidden],
+[data-variant='commoditynode'] .cn-map-detail-backdrop[hidden] {
+  display: none;
+}
+
+@keyframes cn-map-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+[data-variant='commoditynode'] .cn-map-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cn-space-4);
+  padding: 20px;
+  background: var(--cn-color-canvas-alt);
+  border-bottom: 1px solid var(--cn-color-border);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-header > div {
+  min-width: 0;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-type {
+  margin: 0 0 6px;
+  color: var(--cn-color-signal-strong);
+  font: 650 10px var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-title {
+  margin: 0;
+  color: var(--cn-color-text);
+  font: 720 22px/1.18 var(--cn-font-ui);
+  letter-spacing: -.025em;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-subtitle {
+  margin: 7px 0 0;
+  color: var(--cn-color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-close {
+  flex: 0 0 auto;
+  min-width: 56px;
+  min-height: 40px;
+  padding: 0 10px;
+  color: var(--cn-color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 650 10px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts {
+  display: grid;
+  margin: 0;
+  padding: 8px 20px;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts > div {
+  display: grid;
+  grid-template-columns: minmax(108px, .8fr) minmax(0, 1.2fr);
+  gap: 12px;
+  padding-block: 11px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dt,
+[data-variant='commoditynode'] .cn-map-detail-facts dd {
+  margin: 0;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dt {
+  color: var(--cn-color-text-faint);
+  font: 600 10px var(--cn-font-data);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-facts dd {
+  color: var(--cn-color-text-secondary);
+  font: 600 11px/1.45 var(--cn-font-data);
+  text-align: right;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-description {
+  margin: 0;
+  padding: 14px 20px 18px;
+  color: var(--cn-color-text-secondary);
+  font-size: 13px;
+  line-height: 1.62;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance {
+  margin: 0 20px 18px;
+  padding: 14px;
+  background: var(--cn-color-canvas-alt);
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-surface);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance h3 {
+  margin: 0 0 6px;
+  color: var(--cn-color-text);
+  font: 680 11px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-provenance p {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-drawer[data-source-status='verified_historical_event']
+  .cn-map-detail-provenance {
+  border-color: var(--cn-color-signal-muted);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding: 0 20px 20px;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions a,
+[data-variant='commoditynode'] .cn-map-detail-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  color: var(--cn-color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 680 11px var(--cn-font-ui);
+  text-decoration: none;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions [hidden] {
+  display: none;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-primary {
+  color: var(--cn-color-canvas);
+  background: var(--cn-color-signal-strong);
+  border-color: var(--cn-color-signal-strong);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-save[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-actions .cn-map-detail-alert[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-map-detail-save-status,
+[data-variant='commoditynode'] .cn-map-detail-alert-status {
+  min-height: 1.4em;
+  margin: -12px 20px 18px;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-map-detail-alert-status {
+  margin-top: -16px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-map-detail-close:hover,
+  [data-variant='commoditynode'] .cn-map-detail-actions button:hover,
+  [data-variant='commoditynode'] .cn-map-detail-actions a:hover {
+    color: var(--cn-color-text);
+    border-color: var(--cn-color-border-strong);
+  }
+}
+
+@media (max-width: 720px) {
+  html.cn-map-detail-sheet-open {
+    overflow: hidden;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-drawer {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: min(78dvh, 680px);
+    border-width: 1px 0 0;
+    border-radius: 18px 18px 0 0;
+    animation-name: cn-map-detail-sheet-enter;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-drawer::before {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: block;
+    width: 38px;
+    height: 4px;
+    margin: 8px auto -12px;
+    background: var(--cn-color-border-strong);
+    border-radius: 2px;
+    content: '';
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-header {
+    padding-top: 24px;
+  }
+
+  [data-variant='commoditynode'] .cn-map-detail-close,
+  [data-variant='commoditynode'] .cn-map-detail-actions a,
+  [data-variant='commoditynode'] .cn-map-detail-actions button {
+    min-height: 44px;
+  }
+}
+
+@keyframes cn-map-detail-sheet-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Copper",
+  "shortName": "Copper",
+  "description": "Copper is a globally traded industrial metal shaped by mine output, smelter capacity, inventories, freight constraints, construction, and electrical-equipment demand.",
+  "group": "industrial-metals",
+  "coverage": "live",
+  "benchmark": {
+    "name": "COMEX Copper futures",
+    "symbol": "HG=F",
+    "instrumentType": "futures_benchmark",
+    "exchange": "COMEX",
+    "unit": "USD/lb",
+    "currency": "USD",
+    "provider": "Yahoo Finance via provider adapter",
+    "delayPolicy": "Provider-defined; use the displayed as-of timestamp.",
+    "caveat": "This futures quote is a market proxy, not a physical spot assessment."
+  },
+  "productionRegions": ["Chile", "Peru", "Democratic Republic of the Congo", "China"],
+  "supplyStages": ["Mine", "Concentrator", "Smelter", "Refinery", "Port", "Fabricator"],
+  "demandSectors": ["Electrical equipment", "Construction", "Transport", "Industrial machinery"],
+  "marketContext": "Read the futures benchmark beside mine disruptions, treatment charges, exchange inventories, freight conditions, and demand from construction and electrical equipment. Those indicators move on different schedules. A quote can react before a physical shortage is documented, or move for macro reasons while the supply chain remains unchanged.",
+  "evidence": [
+    {
+      "label": "USGS Copper Statistics and Information",
+      "url": "https://www.usgs.gov/centers/national-minerals-information-center/copper-statistics-and-information",
+      "publisher": "U.S. Geological Survey",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-27"
+}

@@ -4,7 +4,7 @@ import type { MarketData, CryptoData, TokenData } from '@/types';
 import { formatPrice, formatChange, getChangeClass, getHeatmapClass } from '@/utils';
 import { escapeHtml, unsafeRawHtml } from '@/utils/sanitize';
 import { miniSparkline } from '@/utils/sparkline';
-import { SITE_VARIANT } from '@/config';
+import { isCommoditySiteVariant, SITE_VARIANT } from '@/config';
 import { createWatchlistButton } from './watchlist-modal';
 import {
   renderChinaCorporateDisclosureSignals,
@@ -112,6 +112,7 @@ export class HeatmapPanel extends Panel {
         this._render();
       }
     });
+    if (SITE_VARIANT === 'commoditynode') this._render();
   }
 
   public renderHeatmap(
@@ -434,7 +435,7 @@ export class CommoditiesPanel extends Panel {
       if (
         tab === 'commodities' ||
         tab === 'fx' ||
-        (tab === 'xau' && SITE_VARIANT === 'commodity')
+        (tab === 'xau' && isCommoditySiteVariant(SITE_VARIANT))
       ) {
         this._tab = tab as CommoditiesTab;
         this._render();
@@ -495,7 +496,7 @@ export class CommoditiesPanel extends Panel {
 
   private _render(): void {
     const hasFx = this._fxRates.length > 0;
-    const hasXau = SITE_VARIANT === 'commodity' && this._commodityData.some(d => d.symbol === 'GC=F' && d.price !== null);
+    const hasXau = isCommoditySiteVariant(SITE_VARIANT) && this._commodityData.some(d => d.symbol === 'GC=F' && d.price !== null);
     if (this._tab === 'xau' && !hasXau) this._tab = 'commodities';
     const tabBar = this._buildTabBar(hasFx, hasXau);
 
@@ -528,6 +529,31 @@ export class CommoditiesPanel extends Panel {
       (d) => typeof d.price === 'number' && Number.isFinite(d.price) && !d.symbol?.endsWith('=X'),
     );
     if (validData.length === 0) {
+      if (SITE_VARIANT === 'commoditynode') {
+        const groups: Array<readonly [string, string]> = [
+          ['Energy', 'Crude oil · Natural gas · Gasoline · Heating oil'],
+          ['Metals', 'Copper · Aluminum · Lithium · Uranium'],
+          ['Precious', 'Gold · Silver · Platinum · Palladium'],
+          ['Agriculture', 'Wheat · Corn · Soybeans · Rice · Sugar · Coffee · Cocoa · Cotton'],
+        ];
+        const coverage = groups.map(([group, names]) => `
+          <div class="commodity-reference-row">
+            <strong>${escapeHtml(group)}</strong>
+            <span>${escapeHtml(names)}</span>
+          </div>
+        `).join('');
+        this.setDataBadge('unavailable');
+        this.setSafeContent(unsafeRawHtml(`
+          <div class="commodity-reference-state">
+            <div class="commodity-reference-notice">
+              <strong>Live quotes are temporarily unavailable.</strong>
+              <span>The instrument directory remains available; no stale price is shown as current.</span>
+            </div>
+            ${coverage}
+          </div>
+        `, 'static CommodityNode coverage fallback'));
+        return;
+      }
       if (!hasFx) {
         this.showRetrying(t('common.failedCommodities'));
         return;

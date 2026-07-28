@@ -11,7 +11,7 @@ const postFiles = readdirSync(blogDir).filter((name) => name.endsWith('.md')).so
 
 function parsePost(file) {
   const source = readFileSync(join(blogDir, file), 'utf8');
-  const frontmatter = source.match(/^---\n([\s\S]*?)\n---\n/);
+  const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   assert.ok(frontmatter, `${file}: missing frontmatter`);
   const field = (name) => {
     const match = frontmatter[1].match(new RegExp(`^${name}:\\s*(?:"([^"]*)"|'([^']*)')$`, 'm'));
@@ -47,11 +47,10 @@ describe('blog SEO and GEO corpus contract', () => {
 
       assert.doesNotMatch(post.body, /^#\s/m, `${post.file}: layout owns the sole H1`);
       assert.match(post.body, /^## Frequently Asked Questions$/m, `${post.file}: missing FAQ section`);
-      assert.match(
-        post.body,
-        /\[[^\]]+\]\((?:https:\/\/www\.worldmonitor\.app)?\/blog\/posts\//,
-        `${post.file}: missing contextual internal link`,
-      );
+      const internalPostPath = post.field('site') === 'commoditynode'
+        ? /\[[^\]]+\]\(\/posts\//
+        : /\[[^\]]+\]\((?:https:\/\/www\.worldmonitor\.app)?\/blog\/posts\//;
+      assert.match(post.body, internalPostPath, `${post.file}: missing contextual internal link`);
 
       const offsiteLinks = [...post.body.matchAll(/\[[^\]]+\]\((https?:\/\/[^\s)]+)/g)]
         .map((match) => new URL(match[1]))

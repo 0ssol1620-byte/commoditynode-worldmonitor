@@ -64,7 +64,7 @@ function resolveCategoryLabel(cmd: Command): string {
   return key ? t(key, { defaultValue: cmd.category }) : cmd.category;
 }
 
-export type SearchResultType = 'country' | 'news' | 'hotspot' | 'market' | 'prediction' | 'conflict' | 'base' | 'pipeline' | 'cable' | 'datacenter' | 'earthquake' | 'outage' | 'nuclear' | 'irradiator' | 'techcompany' | 'ailab' | 'startup' | 'techevent' | 'techhq' | 'accelerator' | 'exchange' | 'financialcenter' | 'centralbank' | 'commodityhub' | 'flight';
+export type SearchResultType = 'country' | 'news' | 'hotspot' | 'market' | 'prediction' | 'conflict' | 'base' | 'pipeline' | 'cable' | 'datacenter' | 'earthquake' | 'outage' | 'nuclear' | 'irradiator' | 'techcompany' | 'ailab' | 'startup' | 'techevent' | 'techhq' | 'accelerator' | 'exchange' | 'financialcenter' | 'centralbank' | 'commodityhub' | 'commodity' | 'commodityfacility' | 'commoditycompany' | 'commodityevent' | 'commodityroute' | 'flight';
 
 export interface SearchResult {
   type: SearchResultType;
@@ -473,6 +473,7 @@ export class SearchModal {
 
     const priority: SearchResultType[] = [
       'flight',
+      'commodityevent', 'commodityfacility', 'commodity', 'commoditycompany', 'commodityroute',
       'news', 'prediction', 'market', 'earthquake', 'outage',
       'conflict', 'hotspot', 'country',
       'base', 'pipeline', 'cable', 'datacenter', 'nuclear', 'irradiator',
@@ -740,6 +741,11 @@ export class SearchModal {
       financialcenter: '\u{1F4B0}',
       centralbank: '\u{1F3E6}',
       commodityhub: '\u{1F4E6}',
+      commodity: '\u25C7',
+      commodityfacility: '\u25A3',
+      commoditycompany: '\u25A1',
+      commodityevent: '\u25CE',
+      commodityroute: '\u2197',
       flight: '✈',
     };
 
@@ -776,7 +782,15 @@ export class SearchModal {
             <div class="search-result-title">${this.highlightMatch(result.title)}</div>
             ${result.subtitle ? `<div class="search-result-subtitle">${escapeHtml(result.subtitle)}</div>` : ''}
           </div>
-          <span class="search-result-type">${escapeHtml(t(`modals.search.types.${result.type}`) || result.type)}</span>
+          <span class="search-result-type">${escapeHtml(t(`modals.search.types.${result.type}`, {
+            defaultValue: ({
+              commodity: 'Commodity',
+              commodityfacility: 'Facility',
+              commoditycompany: 'Company',
+              commodityevent: 'Verified event',
+              commodityroute: 'Route',
+            } as Partial<Record<SearchResultType, string>>)[result.type] ?? result.type,
+          }))}</span>
         </div>`;
       globalIndex++;
     }

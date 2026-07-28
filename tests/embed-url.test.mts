@@ -82,6 +82,26 @@ describe('embed URL contract', () => {
     assert.equal(fallback.variant, 'full');
   });
 
+  it('supports the public CommodityNode asset-map preset', () => {
+    const parsed = parseEmbedParams(
+      '?layers=mining-sites,processing-plants,commodity-ports,commodityHubs,tradeRoutes'
+      + '&variant=commoditynode',
+    );
+    assert.equal(parsed.variant, 'commoditynode');
+    assert.deepEqual(parsed.layerIds, [
+      'miningSites',
+      'processingPlants',
+      'commodityPorts',
+      'commodityHubs',
+      'tradeRoutes',
+    ]);
+    assert.equal(parsed.layers.miningSites, true);
+    assert.equal(parsed.layers.processingPlants, true);
+    assert.equal(parsed.layers.commodityPorts, true);
+    assert.equal(parsed.layers.commodityHubs, true);
+    assert.equal(parsed.layers.tradeRoutes, true);
+  });
+
   it('builds a narrow embed URL with no main-app state params', () => {
     const layers = createBlankMapLayers();
     layers.conflicts = true;

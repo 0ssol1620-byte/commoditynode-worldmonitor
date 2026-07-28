@@ -17,6 +17,10 @@ if (SITE_VARIANT === 'happy') {
   void import('./styles/happy-theme.css');
 }
 
+if (SITE_VARIANT === 'commoditynode') {
+  void import('./styles/commoditynode-theme.css');
+}
+
 // Activate the deferred dashboard app stylesheet. The build
 // (deferDashboardStylesheetLinks in vite.config.ts) emits the large dashboard
 // CSS as <link media="print" data-wm-deferred-style="dashboard"> + a <noscript>
@@ -383,8 +387,14 @@ const chunkReloadStorageKey = installChunkReloadGuard(__APP_VERSION__);
 
 // Product analytics are secondary startup work; RUM starts once the trusted
 // dashboard entry executes so it can observe page-load vitals.
-void initAnalytics();
-initVercelAnalytics();
+if (SITE_VARIANT !== 'commoditynode') {
+  void initAnalytics();
+  initVercelAnalytics();
+} else {
+  void import('@/services/commoditynode-analytics')
+    .then(({ initCommodityNodeAnalytics }) => initCommodityNodeAnalytics())
+    .catch(() => {});
+}
 initDebugBearRum();
 
 // Initialize dynamic meta tags for sharing

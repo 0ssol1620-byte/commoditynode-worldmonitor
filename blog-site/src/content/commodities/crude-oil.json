@@ -1,0 +1,32 @@
+{
+  "name": "Crude Oil",
+  "shortName": "Crude oil",
+  "description": "Crude oil links production, storage, pipelines, ports, tanker routes, refineries, inventories, and end demand. This page distinguishes WTI from Brent and physical grades.",
+  "group": "energy",
+  "coverage": "live",
+  "benchmark": {
+    "name": "NYMEX WTI Crude Oil futures",
+    "symbol": "CL=F",
+    "instrumentType": "futures_benchmark",
+    "exchange": "NYMEX",
+    "unit": "USD/barrel",
+    "currency": "USD",
+    "provider": "Yahoo Finance via provider adapter",
+    "delayPolicy": "Provider-defined; use the displayed as-of timestamp.",
+    "caveat": "WTI futures are not interchangeable with Brent or every physical crude grade."
+  },
+  "productionRegions": ["United States", "Saudi Arabia", "Russia", "Canada", "Iraq"],
+  "supplyStages": ["Field", "Gathering system", "Pipeline", "Storage", "Port", "Refinery"],
+  "demandSectors": ["Road transport", "Aviation", "Petrochemicals", "Industry"],
+  "marketContext": "Read WTI beside Brent, regional physical grades, inventories, refinery runs, pipeline constraints, tanker routes, and producer policy. A disruption may matter differently by location and delivery month. The benchmark can also move with currencies, interest rates, or broad risk positioning even when physical flows have not changed.",
+  "evidence": [
+    {
+      "label": "World Oil Transit Chokepoints",
+      "url": "https://www.eia.gov/international/content/analysis/special_topics/World_Oil_Transit_Chokepoints/",
+      "publisher": "U.S. Energy Information Administration",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-27"
+}

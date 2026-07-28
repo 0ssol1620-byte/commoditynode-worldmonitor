@@ -18,6 +18,16 @@ import {
 
 type SortMode = 'relevance' | 'newest';
 
+function cleanHeadline(value: string): string {
+  return value
+    // Google News can return non-breaking spaces after one or more rounds of
+    // entity escaping (for example "&amp;nbsp;"). Normalize every form before
+    // escaping the headline for HTML output so entity text never reaches users.
+    .replace(/&(?:amp;)*(?:nbsp|#(?:160|xA0));|\u00A0/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Threshold for enabling virtual scrolling */
 const VIRTUAL_SCROLL_THRESHOLD = 15;
 
@@ -72,6 +82,29 @@ export class NewsPanel extends Panel {
 
   public setRiskScoreGetter(fn: (cluster: ClusteredEvent) => number | null): void {
     this.riskScoreGetter = fn;
+  }
+
+  public showCommodityNodeReferenceState(): void {
+    this.setCount(0);
+    this.setDataBadge('cached', 'reference');
+    this.setSafeContent(unsafeRawHtml(`
+      <div class="cn-event-reference">
+        <div class="cn-event-reference__intro">
+          <strong>Current event feeds are unavailable.</strong>
+          <span>Use reviewed research records while live sources recover.</span>
+        </div>
+        <a href="https://commoditynode.com/events/cobre-panama-production-halt/">
+          <span>Historical event</span>
+          <strong>Cobre Panama production halt</strong>
+          <small>Verified source record and impact path</small>
+        </a>
+        <a href="https://commoditynode.com/posts/from-chokepoint-event-to-market-impact/">
+          <span>Method</span>
+          <strong>From chokepoint event to market impact</strong>
+          <small>How to test routes, timing, and benchmark exposure</small>
+        </a>
+      </div>
+    `, 'static CommodityNode event reference state'));
   }
 
   constructor(id: string, title: string, infoTooltip?: string) {
@@ -408,7 +441,7 @@ export class NewsPanel extends Panel {
   }
 
   public renderNews(items: NewsItem[]): void {
-    if (items.length === 0) {
+        if (items.length === 0) {
       this.renderRequestId += 1; // Cancel in-flight clustering from previous renders.
       this.setDataBadge('unavailable');
       this.showError(t('common.noNewsAvailable'));
@@ -474,7 +507,7 @@ export class NewsPanel extends Panel {
     const topItems = sorted
       .slice(0, 5)
       .filter((item) => typeof item.title === 'string' && item.title.trim().length > 0);
-    this.currentHeadlines = topItems.map((item) => item.title);
+    this.currentHeadlines = topItems.map((item) => cleanHeadline(item.title));
     // Paired RSS descriptions for LLM grounding; empty string falls back to
     // headline-only on the server (R6).
     this.currentBodies = topItems.map((item) => typeof item.snippet === 'string' ? item.snippet : '');
@@ -493,7 +526,7 @@ export class NewsPanel extends Panel {
           ${item.storyMeta?.phase === 'sustained' ? '<span class="phase-badge sustained">ONGOING</span>' : ''}
           ${item.isAlert ? '<span class="alert-tag">ALERT</span>' : ''}
         </div>
-        <a class="item-title" href="${sanitizeUrl(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a>
+        <a class="item-title" href="${sanitizeUrl(item.link)}" target="_blank" rel="noopener">${escapeHtml(cleanHeadline(item.title))}</a>
         ${item.snippet ? `<div class="item-snippet">${escapeHtml(item.snippet.length > 200 ? item.snippet.slice(0, 200).replace(/\s+\S*$/, '') + '…' : item.snippet)}</div>` : ''}
         <div class="item-time">
           ${formatTime(item.pubDate)}

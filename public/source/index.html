@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#061015">
+    <title>Source Code · CommodityNode</title>
+    <meta name="description" content="Corresponding source, build provenance, license, and upstream attribution for CommodityNode Live.">
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+        background: #061015;
+        color: #e8eef1;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: #061015; }
+      a { color: #66ded3; text-underline-offset: .18em; }
+      a:hover { color: #a1f2ea; }
+      header, main, footer { width: min(880px, calc(100% - 40px)); margin-inline: auto; }
+      header { display: flex; align-items: center; gap: 12px; padding: 28px 0 22px; border-bottom: 1px solid #21404a; }
+      header img { width: 36px; height: 36px; }
+      header strong { letter-spacing: .035em; }
+      header span { margin-left: auto; color: #91a5ad; font-size: 13px; }
+      main { padding: 52px 0 64px; }
+      .eyebrow { color: #66ded3; font: 700 12px/1.4 "IBM Plex Mono", Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { max-width: 720px; margin: 12px 0 16px; font-size: clamp(36px, 7vw, 64px); line-height: 1.02; letter-spacing: -.045em; }
+      .lede { max-width: 700px; color: #b7c7cd; font-size: 18px; line-height: 1.65; }
+      .primary { display: inline-flex; align-items: center; min-height: 44px; margin: 24px 0 38px; padding: 0 18px; border: 1px solid #39d0c3; background: #0e292c; color: #e8fffc; font-weight: 700; text-decoration: none; }
+      .primary:hover { background: #123638; }
+      dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); margin: 0; border-top: 1px solid #21404a; }
+      dt, dd { margin: 0; padding: 15px 0; border-bottom: 1px solid #17313a; }
+      dt { color: #91a5ad; }
+      dd { overflow-wrap: anywhere; font: 13px/1.55 "IBM Plex Mono", Consolas, monospace; }
+      .notice { margin-top: 34px; padding: 18px 20px; border-left: 3px solid #f3b54a; background: #0b171d; color: #b7c7cd; line-height: 1.6; }
+      footer { padding: 22px 0 36px; border-top: 1px solid #21404a; color: #91a5ad; font-size: 13px; }
+      footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
+      @media (max-width: 620px) {
+        header, main, footer { width: min(100% - 28px, 880px); }
+        header span { display: none; }
+        main { padding-top: 38px; }
+        dl { grid-template-columns: 1fr; }
+        dt { padding-bottom: 4px; border-bottom: 0; }
+        dd { padding-top: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="/commoditynode-mark.svg" alt="">
+      <strong>CommodityNode</strong>
+      <span>Build provenance and corresponding source</span>
+    </header>
+    <main>
+      <div class="eyebrow">AGPL source access</div>
+      <h1>Source Code</h1>
+      <p class="lede">
+        This page identifies the exact public source corresponding to the
+        CommodityNode Live build you are using. The mapping is generated from
+        the deployment commit and checked before release.
+      </p>
+      <a class="primary" id="source-link" href="https://github.com/0ssol1620-byte/commoditynode-worldmonitor">
+        Browse deployed source
+      </a>
+      <dl aria-label="Build provenance">
+        <dt>Build commit</dt><dd id="commit">Loading…</dd>
+        <dt>Built at</dt><dd id="built-at">Loading…</dd>
+        <dt>Variant</dt><dd id="variant">commoditynode</dd>
+        <dt>Fork repository</dt><dd><a id="repository" href="https://github.com/0ssol1620-byte/commoditynode-worldmonitor">0ssol1620-byte/commoditynode-worldmonitor</a></dd>
+        <dt>Upstream base</dt><dd id="upstream">Loading…</dd>
+        <dt>License</dt><dd><a href="https://github.com/0ssol1620-byte/commoditynode-worldmonitor/blob/main/LICENSE">GNU Affero General Public License</a></dd>
+      </dl>
+      <p class="notice">
+        CommodityNode is an independent modified fork of World Monitor. It is
+        not affiliated with or endorsed by the upstream project. World Monitor
+        attribution and copyright notices are preserved in the source.
+      </p>
+    </main>
+    <footer>
+      <nav aria-label="Source and product links">
+        <a href="/">Return to Live</a>
+        <a href="https://commoditynode.com">Research</a>
+        <a href="/SOURCE-OFFER.md">Source offer</a>
+        <a href="https://github.com/koala73/worldmonitor">Upstream</a>
+      </nav>
+    </footer>
+    <script>
+      fetch('/.well-known/commoditynode-build.json', { cache: 'no-store' })
+        .then((response) => {
+          if (!response.ok) throw new Error('Build provenance unavailable');
+          return response.json();
+        })
+        .then((build) => {
+          const sourceLink = document.getElementById('source-link');
+          const repository = document.getElementById('repository');
+          sourceLink.href = build.sourceUrl;
+          repository.href = build.repository;
+          document.getElementById('commit').textContent = build.commitSha;
+          document.getElementById('built-at').textContent = build.buildDate;
+          document.getElementById('variant').textContent = build.variant;
+          document.getElementById('upstream').textContent = build.upstream.baseSha;
+        })
+        .catch(() => {
+          document.getElementById('commit').textContent = 'Unavailable — use the canonical repository link';
+          document.getElementById('built-at').textContent = 'Unavailable';
+          document.getElementById('upstream').textContent = 'See UPSTREAM.md in the repository';
+        });
+    </script>
+  </body>
+</html>

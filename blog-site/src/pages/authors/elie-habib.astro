@@ -1,6 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { isCommodityNode } from '../../lib/site-variant';
+
+if (isCommodityNode) return Astro.redirect('/');
 
 const DEFAULT_AUTHOR = 'Elie Habib';
 const posts = (await getCollection('blog'))

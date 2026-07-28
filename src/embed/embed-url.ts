@@ -14,12 +14,22 @@ export const EMBEDDABLE_LAYERS = [
   { id: 'financialCenters', mapLayer: 'financialCenters', label: 'Financial Centers' },
   { id: 'centralBanks', mapLayer: 'centralBanks', label: 'Central Banks' },
   { id: 'commodityHubs', mapLayer: 'commodityHubs', label: 'Commodity Hubs' },
+  { id: 'miningSites', mapLayer: 'miningSites', label: 'Mining Sites' },
+  { id: 'processingPlants', mapLayer: 'processingPlants', label: 'Processing Plants' },
+  { id: 'commodityPorts', mapLayer: 'commodityPorts', label: 'Commodity Ports' },
   { id: 'gulfInvestments', mapLayer: 'gulfInvestments', label: 'GCC Investments' },
 ] as const;
 
 export type EmbedLayerId = typeof EMBEDDABLE_LAYERS[number]['id'];
 export type EmbedTheme = 'dark' | 'light';
-export type EmbedVariant = 'full' | 'tech' | 'finance' | 'commodity' | 'happy' | 'energy';
+export type EmbedVariant =
+  | 'full'
+  | 'tech'
+  | 'finance'
+  | 'commodity'
+  | 'commoditynode'
+  | 'happy'
+  | 'energy';
 
 export interface EmbedCenter {
   lat: number;
@@ -72,6 +82,12 @@ const EMBED_LAYER_ALIASES = new Map<string, EmbedLayerId>(([
   ['commodity-hubs', 'commodityHubs'],
   ['commodityHub', 'commodityHubs'],
   ['commodity-hub', 'commodityHubs'],
+  ['mining-sites', 'miningSites'],
+  ['mining-site', 'miningSites'],
+  ['processing-plants', 'processingPlants'],
+  ['processing-plant', 'processingPlants'],
+  ['commodity-ports', 'commodityPorts'],
+  ['commodity-port', 'commodityPorts'],
   ['gcc-investments', 'gulfInvestments'],
   ['gulf-investments', 'gulfInvestments'],
   ['gulfInvestment', 'gulfInvestments'],
@@ -79,7 +95,15 @@ const EMBED_LAYER_ALIASES = new Map<string, EmbedLayerId>(([
 ] as const).map(([alias, id]) => [alias.toLowerCase(), id]));
 
 const VALID_THEMES = new Set<EmbedTheme>(['dark', 'light']);
-const VALID_VARIANTS = new Set<EmbedVariant>(['full', 'tech', 'finance', 'commodity', 'happy', 'energy']);
+const VALID_VARIANTS = new Set<EmbedVariant>([
+  'full',
+  'tech',
+  'finance',
+  'commodity',
+  'commoditynode',
+  'happy',
+  'energy',
+]);
 
 export function createBlankMapLayers(): MapLayers {
   return {

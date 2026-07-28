@@ -1,5 +1,6 @@
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https:\/\/(.*\.)?worldmonitor\.app$/,
+  /^https:\/\/(?:www\.|live\.|api\.|editorial\.)?commoditynode\.com$/,
   // Vercel preview deployments under the "eliewm" team scope, e.g.
   //   worldmonitor-git-<branch>-eliewm.vercel.app  (git-branch alias)
   //   worldmonitor-<hash>-eliewm.vercel.app        (deployment URL)

@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import {
+  isPublishedCommodityEvent,
+  sortCommodityEventsByOccurrence,
+} from '../../lib/published-events';
+
+const events = (await getCollection('events'))
+  .filter(isPublishedCommodityEvent)
+  .sort(sortCommodityEventsByOccurrence);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': 'https://commoditynode.com/events/#collection',
+  name: 'Commodity Event Pulse',
+  description: 'Reviewed physical, legal, operational, and route events with claim-level evidence and bounded impact paths.',
+  url: 'https://commoditynode.com/events/',
+  isPartOf: {
+    '@type': 'WebSite',
+    '@id': 'https://commoditynode.com/#website',
+    name: 'CommodityNode',
+    url: 'https://commoditynode.com',
+  },
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: events.length,
+    itemListElement: events.map((event, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://commoditynode.com/events/${event.id}/`,
+      name: event.data.title,
+    })),
+  },
+};
+---
+
+<Base
+  title="Commodity Event Pulse"
+  metaTitle="Commodity Event Pulse | Evidence-Backed Supply Shocks"
+  description="Reviewed commodity events with exact sources, publication controls, materiality reasoning, unknowns, and inspectable impact paths."
+  jsonLd={jsonLd}
+>
+  <header class="directory-header event-index-header">
+    <p class="section-label">Event Pulse</p>
+    <h1>What happened, what it touches, and what remains unproven.</h1>
+    <p>
+      Each record separates verified facts, reported claims, analyst inference, and unknowns.
+      A material event needs an authoritative primary source or independent corroboration before
+      it can appear here.
+    </p>
+  </header>
+
+  <div class="event-index">
+    <section class="event-publication-contract" aria-labelledby="event-contract-title">
+      <div>
+        <p class="section-label">Publication contract</p>
+        <h2 id="event-contract-title">Public by review, never by ingestion.</h2>
+      </div>
+      <ol>
+        <li><span>01</span>Resolve date, place, commodity, and affected entities.</li>
+        <li><span>02</span>Attach exact source locators to every published claim.</li>
+        <li><span>03</span>Record contradictions, unknowns, reviewer, and update time.</li>
+      </ol>
+    </section>
+
+    <section class="event-stream" aria-labelledby="published-event-title">
+      <header>
+        <div>
+          <p class="section-label">Reviewed record</p>
+          <h2 id="published-event-title">Published Event Pulses</h2>
+        </div>
+        <p>{events.length} record{events.length === 1 ? '' : 's'} passed the current gate.</p>
+      </header>
+
+      {events.length > 0 ? (
+        <div class="event-card-list">
+          {events.map((event) => (
+            <article class="event-card">
+              <div class="event-card-rail" aria-hidden="true"></div>
+              <div class="event-card-meta">
+                <span class:list={['event-materiality', `is-${event.data.materiality}`]}>
+                  {event.data.materiality}
+                </span>
+                <span>{event.data.location.countryCode}</span>
+                <time datetime={event.data.occurredAt.toISOString()}>
+                  {event.data.occurredAt.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </time>
+              </div>
+              <div class="event-card-body">
+                <p>{event.data.commodityIds.join(' · ')}</p>
+                <h3><a href={`/events/${event.id}/`}>{event.data.title}</a></h3>
+                <p>{event.data.summary}</p>
+                <dl>
+                  <div>
+                    <dt>Direction</dt>
+                    <dd>{event.data.direction.replaceAll('_', ' ')}</dd>
+                  </div>
+                  <div>
+                    <dt>Evidence</dt>
+                    <dd>{event.data.evidence.length} exact source records</dd>
+                  </div>
+                  <div>
+                    <dt>Unknowns</dt>
+                    <dd>{event.data.unknowns.length} stated limitation{event.data.unknowns.length === 1 ? '' : 's'}</dd>
+                  </div>
+                </dl>
+              </div>
+              <a class="event-card-action" href={`/events/${event.id}/`}>
+                Inspect evidence <span aria-hidden="true">→</span>
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="event-empty-state">
+          <h3>No event has passed the publication gate.</h3>
+          <p>Candidate and fixture records remain private until their evidence and review state are complete.</p>
+        </div>
+      )}
+    </section>
+  </div>
+</Base>

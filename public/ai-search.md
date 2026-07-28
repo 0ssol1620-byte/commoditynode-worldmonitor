@@ -39,7 +39,7 @@ World Monitor is useful for investors, portfolio managers, energy and commodity 
 
 ## Data Coverage
 
-- 56 map layer types
+- 57 map layer types
 - 500+ curated RSS feeds
 - 65+ data providers
 - 13 maritime chokepoints with AIS-based transit intelligence
@@ -50,7 +50,7 @@ World Monitor is useful for investors, portfolio managers, energy and commodity 
 - 313 AI datacenters mapped
 - 29 scored hotspots
 - 92 exchanges and assets
-- 42 MCP tools
+- 46 MCP tools
 - 24 supported languages
 
 ## Source Examples

@@ -23,7 +23,7 @@ It's the kind of tool that used to be locked behind six-figure enterprise contra
 
 The first thing you notice is the globe. A 3D interactive map powered by [globe.gl](https://globe.gl/) and [Three.js](https://threejs.org/), dotted with live data points: conflict zones pulsing red, military bases marked by operator, undersea cables tracing the ocean floor, and ADS-B aircraft positions updating in real time.
 
-On the left, a panel system lets you pull up any combination of 56 map layers:
+On the left, a panel system lets you pull up any combination of 57 map layers:
 
 - **Geopolitical:** Active conflicts, protests, hotspot escalation scores, strategic theater posture assessments across 9 operational theaters (Taiwan Strait, Persian Gulf, Baltic, and more)
 - **Military:** 210+ military bases, live flight tracking, naval vessel positions merged with USNI fleet reports, GPS jamming detection zones

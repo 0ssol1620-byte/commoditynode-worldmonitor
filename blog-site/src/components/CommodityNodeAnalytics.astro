@@ -1,0 +1,70 @@
+---
+import { isCommodityNode } from '../lib/site-variant';
+import { resolveCommodityNodeRoutePolicy } from '../../../shared/commoditynode-route-policy';
+
+const policy = isCommodityNode ? resolveCommodityNodeRoutePolicy(Astro.url.pathname) : null;
+---
+
+{isCommodityNode && policy && (
+  <script
+    define:vars={{
+      routeType: policy.routeType,
+    }}
+  >
+    const CONSENT_KEY = 'commoditynode:consent:v1';
+    const CONSENT_EVENT = 'commoditynode:consent-changed';
+    const endpoint = '/api/commoditynode-analytics';
+
+    function analyticsAllowed() {
+      try {
+        const stored = localStorage.getItem(CONSENT_KEY);
+        const cookie = document.cookie
+          .split('; ')
+          .find((part) => part.startsWith(`${CONSENT_KEY}=`))
+          ?.slice(CONSENT_KEY.length + 1);
+        const value = JSON.parse(stored || (cookie ? decodeURIComponent(cookie) : 'null'));
+        return value?.version === 1 && value?.analytics === true;
+      } catch {
+        return false;
+      }
+    }
+
+    function track(event, properties = {}) {
+      if (!analyticsAllowed()) return;
+      const payload = {
+        version: 1,
+        event,
+        surface: 'research',
+        routeType,
+        ...properties,
+      };
+      fetch(endpoint, {
+        method: 'POST',
+        credentials: 'omit',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    }
+
+    function pageView() {
+      track('page_view');
+    }
+
+    if (analyticsAllowed()) pageView();
+    window.addEventListener(CONSENT_EVENT, (event) => {
+      if (event.detail?.analytics === true) pageView();
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element
+        ? event.target.closest('[data-commoditynode-event]')
+        : null;
+      if (!target) return;
+      track(target.getAttribute('data-commoditynode-event'), {
+        placement: target.getAttribute('data-commoditynode-placement') || undefined,
+        conversion: target.getAttribute('data-commoditynode-conversion') || undefined,
+      });
+    });
+  </script>
+)}

@@ -141,10 +141,10 @@ export const PUBLIC_PRODUCT_FACTS = {
     }
   ],
   "capabilities": {
-    "mcpTools": 42,
+    "mcpTools": 46,
     "locales": 25,
-    "variants": 6,
-    "mapLayers": 56,
+    "variants": 7,
+    "mapLayers": 57,
     "feedDefinitions": 568,
     "freshnessTrackedSourceGroups": 35
   }

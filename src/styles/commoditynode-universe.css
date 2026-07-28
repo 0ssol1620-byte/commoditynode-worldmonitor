@@ -1,0 +1,1041 @@
+[data-variant='commoditynode'] .cn-universe-panel {
+  grid-column: 1 / -1;
+}
+
+[data-variant='commoditynode'] .cn-universe-content {
+  padding: 0;
+}
+
+[data-variant='commoditynode'] .cn-universe-shell {
+  min-height: 620px;
+}
+
+[data-variant='commoditynode'] .cn-universe-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--cn-space-5);
+  padding: var(--cn-space-5);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-intro > div:first-child {
+  display: grid;
+  max-width: 720px;
+  gap: var(--cn-space-1);
+}
+
+[data-variant='commoditynode'] .cn-universe-eyebrow {
+  display: block;
+  color: var(--cn-color-text-muted);
+  font-family: var(--cn-font-data);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+}
+
+[data-variant='commoditynode'] .cn-universe-title {
+  display: block;
+  color: var(--cn-color-text);
+  font-size: 20px;
+  font-weight: 720;
+  letter-spacing: -.02em;
+}
+
+[data-variant='commoditynode'] .cn-universe-description {
+  display: block;
+  color: var(--cn-color-text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+[data-variant='commoditynode'] .cn-universe-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--cn-space-2) var(--cn-space-4);
+  max-width: 420px;
+}
+
+[data-variant='commoditynode'] .cn-universe-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+}
+
+[data-variant='commoditynode'] .cn-universe-legend-mark {
+  width: 8px;
+  height: 8px;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+}
+
+[data-variant='commoditynode'] .group-energy {
+  --cn-universe-group: #e5a84b;
+}
+
+[data-variant='commoditynode'] .group-industrial-metals {
+  --cn-universe-group: #38b6ad;
+}
+
+[data-variant='commoditynode'] .group-precious-metals {
+  --cn-universe-group: #c8b46b;
+}
+
+[data-variant='commoditynode'] .group-agriculture {
+  --cn-universe-group: #83ad70;
+}
+
+[data-variant='commoditynode'] .cn-universe-legend-item {
+  color: var(--cn-universe-group);
+}
+
+[data-variant='commoditynode'] .cn-universe-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cn-space-3);
+  padding: var(--cn-space-2) var(--cn-space-5);
+  background: var(--cn-color-canvas-alt);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path {
+  display: grid;
+  grid-template-columns: minmax(240px, .72fr) minmax(0, 1.8fr);
+  gap: var(--cn-space-5);
+  padding: var(--cn-space-4) var(--cn-space-5);
+  background: var(--cn-color-canvas-alt);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading {
+  display: grid;
+  align-content: center;
+  gap: var(--cn-space-1);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading h3 {
+  margin: 0;
+  color: var(--cn-color-text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-heading p {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: var(--cn-color-border-subtle);
+  border: 1px solid var(--cn-color-border-subtle);
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list li {
+  position: relative;
+  display: grid;
+  min-height: 92px;
+  align-content: center;
+  gap: 5px;
+  padding: 12px;
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list li:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--cn-color-signal-strong);
+  border-right: 1px solid var(--cn-color-signal-strong);
+  background: var(--cn-color-surface);
+  content: '';
+  transform: translateY(-50%) rotate(45deg);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-kind {
+  color: var(--cn-color-signal-strong);
+  font: 650 9px/1 var(--cn-font-data);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-universe-primary-path-list [data-kind='exposure'] .cn-universe-path-kind {
+  color: var(--cn-color-attention);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-name {
+  color: var(--cn-color-text);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-status {
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+[data-variant='commoditynode'] .cn-universe-clusters,
+[data-variant='commoditynode'] .cn-universe-views {
+  display: flex;
+  gap: 2px;
+}
+
+[data-variant='commoditynode'] .cn-universe-clusters {
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+[data-variant='commoditynode'] .cn-universe-cluster-button,
+[data-variant='commoditynode'] .cn-universe-view-button {
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--cn-color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cn-radius-control);
+  font: 600 11px/1 var(--cn-font-ui);
+  transition:
+    color var(--cn-motion-fast) var(--cn-motion-ease-out),
+    border-color var(--cn-motion-fast) var(--cn-motion-ease-out),
+    background-color var(--cn-motion-fast) var(--cn-motion-ease-out);
+}
+
+[data-variant='commoditynode'] .cn-universe-cluster-button {
+  flex: 0 0 auto;
+}
+
+[data-variant='commoditynode'] .cn-universe-cluster-button[aria-pressed='true'],
+[data-variant='commoditynode'] .cn-universe-view-button[aria-pressed='true'] {
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-border-strong);
+}
+
+[data-variant='commoditynode'] .cn-universe-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  min-height: 500px;
+}
+
+[data-variant='commoditynode'] .cn-universe-graph-stage {
+  position: relative;
+  height: 480px;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--cn-color-map-canvas);
+  border-right: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-webgl-canvas,
+[data-variant='commoditynode'] .cn-universe-graph {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-variant='commoditynode'] .cn-universe-webgl-canvas {
+  pointer-events: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-graph {
+  background: transparent;
+}
+
+[data-variant='commoditynode'] .cn-universe-graph-stage.is-webgl .cn-universe-backdrop,
+[data-variant='commoditynode'] .cn-universe-graph-stage.is-webgl .cn-universe-edges {
+  opacity: 0;
+}
+
+[data-variant='commoditynode'] .cn-universe-graph-stage.is-webgl .cn-universe-node-planet {
+  fill: transparent;
+  stroke: transparent;
+}
+
+[data-variant='commoditynode'] .cn-universe-backdrop ellipse {
+  fill: none;
+  stroke: var(--cn-color-border-subtle);
+  stroke-width: 1;
+  stroke-dasharray: 2 10;
+}
+
+[data-variant='commoditynode'] .cn-universe-backdrop circle {
+  fill: var(--cn-color-text-faint);
+}
+
+[data-variant='commoditynode'] .cn-universe-edges line {
+  stroke: var(--cn-color-border-strong);
+  stroke-width: 1;
+  opacity: .35;
+  transition:
+    opacity var(--cn-motion-standard) var(--cn-motion-ease-out),
+    stroke-width var(--cn-motion-standard) var(--cn-motion-ease-out);
+}
+
+[data-variant='commoditynode'] .cn-universe-edges line[data-edge-kind='refining-chain'] {
+  stroke-dasharray: 6 4;
+}
+
+[data-variant='commoditynode'] .cn-universe-edges line.is-related {
+  stroke: var(--cn-color-signal-strong);
+  stroke-width: 2;
+  opacity: .9;
+}
+
+[data-variant='commoditynode'] .cn-universe-edges line.is-dimmed {
+  opacity: .06;
+}
+
+[data-variant='commoditynode'] .cn-universe-node {
+  --cn-universe-group: var(--cn-color-text-muted);
+  cursor: pointer;
+  outline: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-node.is-dimmed {
+  opacity: .2;
+}
+
+[data-variant='commoditynode'] .cn-universe-node-orbit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+[data-variant='commoditynode'] .cn-universe-node-planet {
+  fill: var(--cn-color-surface-raised);
+  stroke: var(--cn-universe-group);
+  stroke-width: 2;
+  transition:
+    fill var(--cn-motion-standard) var(--cn-motion-ease-out),
+    stroke-width var(--cn-motion-standard) var(--cn-motion-ease-out);
+}
+
+[data-variant='commoditynode'] .cn-universe-node-state {
+  fill: var(--cn-color-text-faint);
+  stroke: var(--cn-color-map-canvas);
+  stroke-width: 2;
+}
+
+[data-variant='commoditynode'] .cn-universe-node.state-up .cn-universe-node-state {
+  fill: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-universe-node.state-down .cn-universe-node-state {
+  fill: var(--cn-color-danger);
+}
+
+[data-variant='commoditynode'] .cn-universe-node.state-flat .cn-universe-node-state {
+  fill: var(--cn-color-attention);
+}
+
+[data-variant='commoditynode'] .cn-universe-node-label {
+  fill: var(--cn-color-text-secondary);
+  font: 600 12px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-universe-node-change {
+  fill: var(--cn-color-text-muted);
+  font: 500 10px var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-node.is-related .cn-universe-node-planet {
+  fill: var(--cn-color-surface-selected);
+}
+
+[data-variant='commoditynode'] .cn-universe-node.is-selected .cn-universe-node-orbit,
+[data-variant='commoditynode'] .cn-universe-node:focus-visible .cn-universe-node-orbit {
+  stroke: var(--cn-color-signal-strong);
+}
+
+[data-variant='commoditynode'] .cn-universe-node.is-selected .cn-universe-node-planet {
+  stroke-width: 4;
+}
+
+[data-variant='commoditynode'] .cn-universe-node.is-selected .cn-universe-node-label {
+  fill: var(--cn-color-text);
+  font-weight: 720;
+}
+
+[data-variant='commoditynode'] .cn-universe-inspector {
+  max-height: 480px;
+  overflow-y: auto;
+  padding: var(--cn-space-5);
+  background: var(--cn-color-surface);
+}
+
+[data-variant='commoditynode'] .cn-universe-inspector-heading {
+  display: grid;
+  gap: 2px;
+  padding-bottom: var(--cn-space-4);
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-inspector h3 {
+  margin: var(--cn-space-1) 0 0;
+  color: var(--cn-color-text);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+[data-variant='commoditynode'] .cn-universe-symbol {
+  color: var(--cn-color-text-muted);
+  font: 500 11px var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(0, 1.4fr);
+  margin: var(--cn-space-4) 0;
+  font-size: 12px;
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics dt,
+[data-variant='commoditynode'] .cn-universe-metrics dd {
+  margin: 0;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics dt {
+  color: var(--cn-color-text-muted);
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics dd {
+  color: var(--cn-color-text);
+  font-family: var(--cn-font-data);
+  text-align: right;
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics dd[data-state='up'] {
+  color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-universe-metrics dd[data-state='down'] {
+  color: var(--cn-color-danger);
+}
+
+[data-variant='commoditynode'] .cn-universe-coverage-note {
+  margin: 0 0 var(--cn-space-5);
+  color: var(--cn-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions {
+  display: grid;
+  gap: var(--cn-space-2);
+  margin: 0 0 var(--cn-space-5);
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button {
+  min-height: 38px;
+  padding: 8px 12px;
+  color: var(--cn-color-text);
+  background: var(--cn-color-canvas-alt);
+  border: 1px solid var(--cn-color-border);
+  border-radius: 3px;
+  font: 650 12px var(--cn-font-ui);
+  text-align: left;
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button[aria-pressed='true'] {
+  color: var(--cn-color-signal-strong);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-signal);
+}
+
+[data-variant='commoditynode'] .cn-universe-product-actions button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+[data-variant='commoditynode'] .cn-universe-action-status {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-universe-inspector h4 {
+  margin: 0 0 var(--cn-space-2);
+  color: var(--cn-color-text);
+  font-size: 12px;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-list {
+  display: grid;
+  gap: 1px;
+  margin: 0 0 var(--cn-space-5);
+  padding: 0;
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--cn-space-2);
+  min-height: 34px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-list button {
+  padding: 6px 0;
+  overflow: hidden;
+  color: var(--cn-color-text);
+  background: transparent;
+  border: 0;
+  font: 600 12px var(--cn-font-ui);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-variant='commoditynode'] .cn-universe-edge-label {
+  color: var(--cn-color-text-muted);
+  font-size: 10px;
+  text-align: right;
+}
+
+[data-variant='commoditynode'] .cn-universe-methodology {
+  color: var(--cn-color-signal-strong);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+[data-variant='commoditynode'] .cn-universe-case {
+  margin: 0 0 var(--cn-space-5);
+  padding: var(--cn-space-4) 0;
+  border-block: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-case-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: var(--cn-space-2);
+}
+
+[data-variant='commoditynode'] .cn-universe-case-heading h4 {
+  margin: 0;
+  font-size: 13px;
+}
+
+[data-variant='commoditynode'] .cn-universe-case-status {
+  color: var(--cn-color-signal);
+  font: 600 9px/1.4 var(--cn-font-data);
+  letter-spacing: .06em;
+}
+
+[data-variant='commoditynode'] .cn-universe-case-summary,
+[data-variant='commoditynode'] .cn-universe-case-condition {
+  margin: 0 0 var(--cn-space-3);
+  color: var(--cn-color-text-secondary);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+[data-variant='commoditynode'] .cn-universe-case h5 {
+  margin: var(--cn-space-3) 0 var(--cn-space-1);
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-universe-case-branch {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-case-branch li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-case-branch button {
+  min-height: 30px;
+  padding: 0 8px;
+  color: var(--cn-color-signal-strong);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 650 10px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-universe-case-branch button[aria-expanded='true'] {
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-border-strong);
+}
+
+[data-variant='commoditynode'] .cn-universe-case-condition {
+  padding-top: var(--cn-space-2);
+  color: var(--cn-color-text-muted);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-path {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-path li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--cn-space-2);
+  min-height: 46px;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-path li:not(:last-child)::after {
+  position: absolute;
+  top: 34px;
+  bottom: -12px;
+  left: 10px;
+  width: 1px;
+  background: var(--cn-color-border-strong);
+  content: '';
+}
+
+[data-variant='commoditynode'] .cn-universe-path-step {
+  display: grid;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: var(--cn-color-map-canvas);
+  background: var(--cn-color-signal-strong);
+  border-radius: 50%;
+  font: 700 10px var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-path-name,
+[data-variant='commoditynode'] .cn-universe-path-type {
+  display: block;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-name {
+  color: var(--cn-color-text);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+[data-variant='commoditynode'] .cn-universe-path-type {
+  margin-top: 2px;
+  color: var(--cn-color-text-muted);
+  font: 500 9px var(--cn-font-data);
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-path button {
+  min-height: 30px;
+  padding: 0 8px;
+  color: var(--cn-color-signal-strong);
+  background: transparent;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+  font: 650 10px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-path button[aria-expanded='true'] {
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface-selected);
+  border-color: var(--cn-color-border-strong);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer {
+  display: grid;
+  gap: var(--cn-space-3);
+  margin: var(--cn-space-2) 0 var(--cn-space-3);
+  padding: var(--cn-space-3);
+  background: var(--cn-color-canvas-alt);
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-title {
+  display: block;
+  margin-top: 3px;
+  color: var(--cn-color-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer dt,
+[data-variant='commoditynode'] .cn-universe-evidence-drawer dd {
+  margin: 0;
+  font-size: 9px;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer dt {
+  color: var(--cn-color-text-muted);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer dd {
+  grid-row: 2;
+  color: var(--cn-color-text);
+  font-family: var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-drawer > p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--cn-color-text-secondary);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-label {
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-sources {
+  display: grid;
+  gap: var(--cn-space-2);
+  margin: 0;
+  padding: var(--cn-space-2) 0 0;
+  border-top: 1px solid var(--cn-color-border-subtle);
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-sources a,
+[data-variant='commoditynode'] .cn-universe-event-link {
+  color: var(--cn-color-signal-strong);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+[data-variant='commoditynode'] .cn-universe-evidence-sources p {
+  margin: 3px 0 0;
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline {
+  display: grid;
+  gap: var(--cn-space-2);
+  margin: var(--cn-space-3) 0;
+  color: var(--cn-color-text-secondary);
+  font-size: 10px;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-title {
+  color: var(--cn-color-text);
+  font-weight: 650;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-position {
+  color: var(--cn-color-text-muted);
+  font: 500 9px var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  border: 1px solid var(--cn-color-border);
+  border-radius: var(--cn-radius-control);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-controls button {
+  min-width: 62px;
+  min-height: 36px;
+  padding: 0 8px;
+  color: var(--cn-color-signal-strong);
+  background: transparent;
+  border: 0;
+  font: 650 9px var(--cn-font-ui);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-controls button:disabled {
+  color: var(--cn-color-text-faint);
+  cursor: not-allowed;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-state {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 7px 9px;
+  border-inline: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-state time {
+  color: var(--cn-color-text);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-state-label {
+  overflow: hidden;
+  color: var(--cn-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline-disclosure {
+  margin: 0;
+  color: var(--cn-color-text-muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline li {
+  padding: 7px 8px;
+  border-left: 2px solid var(--cn-color-border-subtle);
+  color: var(--cn-color-text-muted);
+  line-height: 1.4;
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline li.is-active {
+  color: var(--cn-color-text);
+  background: var(--cn-color-surface-selected);
+  border-left-color: var(--cn-color-signal-strong);
+}
+
+[data-variant='commoditynode'] .cn-universe-timeline time {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--cn-color-text-muted);
+  font: 500 9px var(--cn-font-data);
+}
+
+[data-variant='commoditynode'] .cn-universe-table-wrap {
+  max-height: 620px;
+  overflow: auto;
+  border-right: 1px solid var(--cn-color-border-subtle);
+}
+
+[data-variant='commoditynode'] .cn-universe-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--cn-color-text-secondary);
+  font-size: 12px;
+}
+
+[data-variant='commoditynode'] .cn-universe-table caption {
+  padding: var(--cn-space-3);
+  color: var(--cn-color-text-muted);
+  text-align: left;
+}
+
+[data-variant='commoditynode'] .cn-universe-table th,
+[data-variant='commoditynode'] .cn-universe-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--cn-color-border-subtle);
+  text-align: left;
+}
+
+[data-variant='commoditynode'] .cn-universe-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: var(--cn-color-text-muted);
+  background: var(--cn-color-canvas-alt);
+  font-size: 10px;
+  letter-spacing: .04em;
+}
+
+[data-variant='commoditynode'] .cn-universe-table tbody tr.is-selected {
+  background: var(--cn-color-surface-selected);
+}
+
+[data-variant='commoditynode'] .cn-universe-table button {
+  padding: 4px 0;
+  color: var(--cn-color-text);
+  background: transparent;
+  border: 0;
+  font: 650 12px var(--cn-font-ui);
+  text-align: left;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-variant='commoditynode'] .cn-universe-node:hover .cn-universe-node-planet {
+    fill: var(--cn-color-surface-selected);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-cluster-button:hover,
+  [data-variant='commoditynode'] .cn-universe-view-button:hover {
+    color: var(--cn-color-text);
+    border-color: var(--cn-color-border);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-path-list button:hover,
+  [data-variant='commoditynode'] .cn-universe-table button:hover,
+  [data-variant='commoditynode'] .cn-universe-product-actions button:hover:not(:disabled) {
+    color: var(--cn-color-signal-strong);
+  }
+}
+
+@media (max-width: 900px) {
+  [data-variant='commoditynode'] .cn-universe-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-graph-stage,
+  [data-variant='commoditynode'] .cn-universe-table-wrap {
+    border-right: 0;
+    border-bottom: 1px solid var(--cn-color-border-subtle);
+  }
+}
+
+@media (max-width: 720px) {
+  [data-variant='commoditynode'] .cn-universe-panel {
+    grid-column: span 1;
+    scroll-margin-top: 150px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-shell {
+    min-height: 0;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-legend {
+    justify-content: flex-start;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-title {
+    font-size: 18px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: stretch;
+    padding-inline: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path {
+    grid-template-columns: 1fr;
+    padding: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list {
+    grid-template-columns: 1fr;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list li {
+    min-height: 0;
+    padding: 12px 14px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-primary-path-list li:not(:last-child)::after {
+    top: auto;
+    right: 50%;
+    bottom: -6px;
+    transform: translateX(50%) rotate(135deg);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-cluster-button,
+  [data-variant='commoditynode'] .cn-universe-view-button {
+    min-height: 44px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-view-button {
+    flex: 1;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-graph-stage {
+    height: 420px;
+    min-height: 420px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-table-wrap {
+    max-height: 280px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-table th,
+  [data-variant='commoditynode'] .cn-universe-table td {
+    padding: 10px;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-table th:nth-child(3),
+  [data-variant='commoditynode'] .cn-universe-table td:nth-child(3),
+  [data-variant='commoditynode'] .cn-universe-table th:nth-child(6),
+  [data-variant='commoditynode'] .cn-universe-table td:nth-child(6) {
+    display: none;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-inspector {
+    max-height: 300px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--cn-space-4);
+  }
+
+  [data-variant='commoditynode'] .cn-universe-inspector .cn-universe-metrics,
+  [data-variant='commoditynode'] .cn-universe-inspector .cn-universe-coverage-note {
+    display: none;
+  }
+
+  [data-variant='commoditynode'] .cn-universe-evidence-path button,
+  [data-variant='commoditynode'] .cn-universe-case-branch button,
+  [data-variant='commoditynode'] .cn-universe-timeline-controls button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-variant='commoditynode'] .cn-universe-edges line,
+  [data-variant='commoditynode'] .cn-universe-node-planet {
+    transition: none;
+  }
+}

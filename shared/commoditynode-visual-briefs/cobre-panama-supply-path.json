@@ -1,0 +1,38 @@
+{
+  "id": "visual-cobre-panama-supply-path-v1",
+  "eventId": "cobre-panama-production-halt",
+  "visualType": "editorial_illustration",
+  "subject": "copper mine-to-port supply interruption",
+  "centerNode": "copper",
+  "originRegion": "Donoso, Colón Province, Panama",
+  "primaryPulse": "supply_negative",
+  "secondaryConcepts": [
+    "open-pit mine",
+    "processing plant",
+    "concentrate corridor",
+    "port",
+    "cargo vessel"
+  ],
+  "visualLanguage": "orbital_industrial_cartography",
+  "palette": {
+    "background": "deep_navy",
+    "physicalAccent": "muted_copper",
+    "signalAccent": "teal",
+    "textOverlay": "off_white"
+  },
+  "composition": "Wide mine-left to port-right physical chain with edge-safe crop area.",
+  "prohibited": [
+    "generated_numbers",
+    "generated_dates",
+    "readable_logos",
+    "fake_map_labels",
+    "fake_headlines",
+    "photorealistic_claim_of_actual_scene",
+    "people",
+    "flags",
+    "explosions",
+    "financial_price_arrows"
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: 16:9 editorial hero for a professional commodity-risk research page\nPrimary request: Create a text-free editorial illustration of a copper supply interruption linking an open-pit mine in a tropical mountainous landscape to a coastal concentrate port. Show the physical chain as restrained orbital cartography: mine terracing, processing plant, conveyor or road, port stockpile, loading pier, and a cargo vessel, connected by a few precise luminous path lines and subtle circular field marks.\nScene/backdrop: dark deep-navy analytical map space merging into an oblique geographic terrain view; no literal globe and no outer-space planets.\nStyle/medium: premium institutional editorial illustration, architectural and geospatial, crisp matte surfaces, realistic industrial proportions, restrained detail, not photorealistic news footage.\nComposition/framing: wide landscape with mine on the left, port on the right, clear center corridor, generous edge-safe crop area for responsive web use.\nLighting/mood: controlled low-key dawn light, serious and evidence-oriented, no disaster spectacle.\nColor palette: deep navy, graphite, muted copper-orange, small teal signal accents, off-white highlights.\nConstraints: no people, no flags, no explosions, no flames, no smoke plume, no fake damage, no claim that this depicts an actual scene. Do not render numbers, dates, labels, company names, logos, maps with place names, headlines, interface elements, borders, watermarks, or any readable text. No gradients used as decorative UI; visual depth should come from light, terrain, and materials.\nAvoid: sci-fi spaceship aesthetics, neon cyberpunk, generic glowing planet, glassmorphism, purple-indigo palette, financial candlesticks, stock arrows, sensational crisis imagery.",
+  "disclosure": "Illustrative visualization generated for CommodityNode. It is not a photograph of Cobre Panama, Punta Rincón port, or the 2023 event."
+}

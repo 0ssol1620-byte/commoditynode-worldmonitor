@@ -33,6 +33,11 @@ import type { PositionSample } from '@/services/aviation';
 import { fetchAircraftPositions } from '@/services/aviation';
 import { isProUser } from '@/services/widget-store';
 import { getAuthState } from '@/services/auth-state';
+import {
+  getCommodityNodeSearchCatalog,
+  isCommodityNodeSelection,
+  type CommodityNodeSearchCategory,
+} from '@/config/commoditynode-selection';
 
 export interface SearchManagerCallbacks {
   openCountryBriefByCode: (code: string, country: string) => void;
@@ -61,6 +66,11 @@ export class SearchManager implements AppModule {
       ? { placeholder: t('modals.search.placeholderTech') }
       : SITE_VARIANT === 'happy'
         ? { placeholder: 'Search or type a command...' }
+        : SITE_VARIANT === 'commoditynode'
+          ? {
+              placeholder:
+                'Search commodities, facilities, companies, events, or routes...',
+            }
         : SITE_VARIANT === 'finance'
           ? { placeholder: t('modals.search.placeholderFinance') }
           : { placeholder: t('modals.search.placeholder') };
@@ -198,6 +208,13 @@ export class SearchManager implements AppModule {
         subtitle: `${h.type} • ${h.city}, ${h.country}${h.commodities ? ` • ${h.commodities.slice(0, 3).join(', ')}` : ''}`,
         data: h,
       })));
+    }
+
+    if (SITE_VARIANT === 'commoditynode') {
+      const catalog = getCommodityNodeSearchCatalog();
+      for (const type of Object.keys(catalog) as CommodityNodeSearchCategory[]) {
+        this.ctx.searchModal.registerSource(type, catalog[type]);
+      }
     }
 
     this.ctx.searchModal.registerSource('country', this.buildCountrySearchItems());
@@ -436,6 +453,40 @@ export class SearchManager implements AppModule {
         this.ctx.map?.enableLayer('commodityHubs');
         this.ctx.mapLayers.commodityHubs = true;
         setTimeout(() => { this.ctx.map?.setCenter(hub.lat, hub.lon, 4); }, 300);
+        break;
+      }
+      case 'commodity':
+      case 'commodityfacility':
+      case 'commoditycompany':
+      case 'commodityevent':
+      case 'commodityroute': {
+        if (!isCommodityNodeSelection(result.data)) break;
+        const selection = result.data;
+        this.ctx.map?.setView('global');
+        if (selection.layerId) {
+          this.ctx.map?.enableLayer(selection.layerId);
+          this.ctx.mapLayers[selection.layerId] = true;
+        }
+        if (selection.latitude !== null && selection.longitude !== null) {
+          setTimeout(() => {
+            this.ctx.map?.setCenter(
+              selection.latitude!,
+              selection.longitude!,
+              selection.kind === 'route' ? 3 : 6,
+            );
+          }, 120);
+        }
+        window.dispatchEvent(
+          new CustomEvent('commoditynode:map-selection', {
+            detail: {
+              entityId: selection.entityId,
+              layerId: selection.layerId,
+              commodityId: selection.commodityId,
+              selection,
+              source: 'search',
+            },
+          }),
+        );
         break;
       }
       case 'country': {

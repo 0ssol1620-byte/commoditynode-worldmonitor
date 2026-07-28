@@ -17,7 +17,7 @@ const displayPrice = (price) => (Number.isInteger(price) ? String(price) : price
 
 function machineReadablePricing() {
   const match = read('public/pricing.md').match(
-    /## Machine-Readable Summary[\s\S]*?```json\n([\s\S]*?)\n```/,
+    /## Machine-Readable Summary[\s\S]*?```json\r?\n([\s\S]*?)\r?\n```/,
   );
   assert.ok(match, 'public/pricing.md must publish a machine-readable pricing summary');
   return JSON.parse(match[1]);

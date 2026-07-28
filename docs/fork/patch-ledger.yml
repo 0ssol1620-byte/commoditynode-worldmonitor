@@ -1,0 +1,275 @@
+schemaVersion: 1
+upstream:
+  repository: https://github.com/koala73/worldmonitor
+  baseSha: eb51542990b244fdde1314d6682f813c9e29ff70
+  lastRehearsedSha: 456995b35271cdf29e6580a78f791dfcf70f51c2
+  lastRehearsedAt: 2026-07-28
+fork:
+  repository: https://github.com/0ssol1620-byte/commoditynode-worldmonitor
+  variant: commoditynode
+patches:
+  - id: CNWM-014
+    upstreamFile: src/config/variant.ts
+    reason: Centralize valid variants and resolve live.commoditynode.com.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Upstream supports an external variant registry.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-017
+    upstreamFile: src/config/panels.ts
+    reason: Register the additive CommodityNode panel and layer defaults.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Upstream supports variant plugins outside the core panel table.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-017-runtime
+    upstreamFile: src/app/panel-layout.ts
+    reason: Mount Event Pulse and route-risk adapters and render fork-safe branding.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Panel factories and shell branding are externally registered.
+    tests:
+      - tests/commoditynode-variant.test.mts
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-017-prime
+    upstreamFile: src/App.ts
+    reason: Prime and refresh the route-risk panel and admit commodity-focused data paths.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Panels own declarative refresh contracts.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-018
+    upstreamFile: src/config/map-layer-definitions.ts
+    reason: Add the CommodityNode layer allowlist and ordering.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Map layer order is supplied by external variant configuration.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-015
+    upstreamFile: src/config/variant-meta.ts
+    reason: Add accurate CommodityNode public metadata without upstream aggregate claims.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Variant metadata is supplied by external configuration.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-016
+    upstreamFile: package.json
+    reason: Add CommodityNode development, build, source, and test commands.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Variant scripts are generated from the registry.
+    tests:
+      - npm run commoditynode:contracts
+  - id: CNWM-016-smoke
+    upstreamFile: e2e/variant-live-smoke.spec.ts
+    reason: Admit the additive variant to the shared public reliability smoke.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Variant smoke expectations are generated from the registry.
+    tests:
+      - npm run test:e2e:variant-smoke:commoditynode
+  - id: CNWM-016-playwright
+    upstreamFile: playwright.config.ts
+    reason: Make the shared E2E web-server environment declaration portable across Windows and Linux.
+    owner: Platform
+    conflictRisk: low
+    removalCondition: Upstream adopts a platform-independent Playwright launcher.
+    tests:
+      - npm run test:e2e:commoditynode
+  - id: CNWM-019
+    upstreamFile: src/main.ts
+    reason: Lazy-load the independent CommodityNode theme only for its variant.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Variant styles are registered by configuration.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-021-edge
+    upstreamFile: api/_cors.js
+    reason: Admit only the CommodityNode apex, live, API, and editorial HTTPS origins.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Fork API CORS policy is injected outside the upstream edge module.
+    tests:
+      - api/commoditynode-cors.test.mjs
+  - id: CNWM-021-gateway
+    upstreamFile: server/cors.ts
+    reason: Keep the typed gateway allowlist in parity with the edge allowlist.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Fork API CORS policy is injected outside the upstream gateway.
+    tests:
+      - api/commoditynode-cors.test.mjs
+  - id: CNWM-021-runtime
+    upstreamFile: src/services/runtime.ts
+    reason: Recognize owned CommodityNode web and API origins without wildcard trust.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Runtime hosts are supplied by the variant registry.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-015-html
+    upstreamFile: vite.config.ts
+    reason: Replace upstream product structured data, authorship, social identity, and icons in CommodityNode builds.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Variant HTML is rendered from a schema-aware external template.
+    tests:
+      - tests/commoditynode-built-html.test.mjs
+  - id: CNWM-009-settings
+    upstreamFile: src/components/UnifiedSettings.ts
+    reason: Keep upstream account monetization out of the independent CommodityNode shell and constrain panel settings to the variant contract.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Variant capability and settings visibility are externally configurable.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-009-windows
+    upstreamFile: src/settings-window.ts
+    reason: Use CommodityNode product identity and expose only its allowed panel set in the standalone settings window.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Standalone window branding and panel visibility derive from variant capabilities.
+    tests:
+      - npm run typecheck
+  - id: CNWM-009-shells
+    upstreamFile: src/settings-main.ts
+    reason: Use CommodityNode product identity in the desktop settings shell.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Standalone shell titles derive from variant metadata.
+    tests:
+      - npm run typecheck
+  - id: CNWM-009-channels
+    upstreamFile: src/live-channels-window.ts
+    reason: Prevent upstream product branding from leaking into auxiliary window titles.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Auxiliary shell titles derive from variant metadata.
+    tests:
+      - npm run typecheck
+  - id: CNWM-009-embed
+    upstreamFile: src/app/event-handlers.ts
+    reason: Use the active variant identity in map embed accessibility text.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Embed metadata is injected by the variant registry.
+    tests:
+      - npm run typecheck
+  - id: CNWM-017-data
+    upstreamFile: src/app/data-loader.ts
+    reason: Admit the CommodityNode variant to commodity-focused data hydration.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Data requirements are declared by panel capabilities.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-017-agent-bus
+    upstreamFile: src/app/agent-bus-applier.ts
+    reason: Validate agent-bus variant instructions through the centralized registry.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: The registry is the sole variant validation entry point.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-017-chokepoint
+    upstreamFile: src/components/ChokepointStripPanel.ts
+    reason: Reuse the route-risk visualization with variant-specific identifiers and titles.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: The panel accepts declarative metadata through a generic adapter.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-018-map
+    upstreamFile: src/components/DeckGLMap.ts
+    reason: Activate commodity geography and route layers for the CommodityNode variant.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: Variant map behavior is fully data-driven.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-018-svg-map
+    upstreamFile: src/components/Map.ts
+    reason: Keep the constrained/mobile SVG layer picker within the CommodityNode commodity-only control budget.
+    owner: CommodityNode
+    conflictRisk: high
+    removalCondition: The SVG map consumes the shared variant layer registry directly.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-017-implications
+    upstreamFile: src/components/MarketImplicationsPanel.ts
+    reason: Allow the independent CommodityNode shell to render a fail-soft reviewed-evidence state without upstream account monetization.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Panel entitlement and unavailable states are supplied declaratively.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-017-market
+    upstreamFile: src/components/MarketPanel.ts
+    reason: Admit the CommodityNode variant to the commodity benchmark tape while retaining instrument labels.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Market panel composition is provided by variant configuration.
+    tests:
+      - e2e/commoditynode-smoke.spec.ts
+  - id: CNWM-017-insights
+    upstreamFile: src/components/InsightsPanel.ts
+    reason: Allow CommodityNode to reuse the commodity-safe insight path.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Insight capabilities are variant-declarative.
+    tests:
+      - npm run typecheck
+  - id: CNWM-017-feeds
+    upstreamFile: src/config/feeds.ts
+    reason: Resolve the CommodityNode feed set through the existing commodity-focused feed contract.
+    owner: CommodityNode
+    conflictRisk: medium
+    removalCondition: Feed presets live entirely in additive variant configuration.
+    tests:
+      - tests/commoditynode-variant.test.mts
+  - id: CNWM-014-exports
+    upstreamFile: src/config/index.ts
+    reason: Export the centralized variant registry through the configuration boundary.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Consumers import registry APIs directly from a stable module.
+    tests:
+      - npm run typecheck
+  - id: CNWM-015-dashboard
+    upstreamFile: src/config/variant-dashboard-html.ts
+    reason: Register the CommodityNode dashboard output without replacing upstream variants.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Dashboard outputs are generated from the variant registry.
+    tests:
+      - tests/commoditynode-built-html.test.mjs
+  - id: CNWM-024-agent-index
+    upstreamFile: scripts/build-agent-skills-index.mjs
+    reason: Canonicalize LF bytes before hashing so discovery digests are reproducible on Windows and Linux.
+    owner: Platform
+    conflictRisk: low
+    removalCondition: Upstream adopts platform-independent digest generation.
+    tests:
+      - npm run build:agent-skills
+  - id: CNWM-007
+    upstreamFile: .github/workflows/commoditynode-foundation.yml
+    reason: Block builds whose source URL, build SHA, license, identity, tests, or typecheck fail.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: The checks move into a shared fork release workflow.
+    tests:
+      - npm run commoditynode:contracts
+  - id: CNWM-023
+    upstreamFile: .github/workflows/commoditynode-upstream-sync.yml
+    reason: Mirror the exact upstream main and open a review-only sync PR with red-zone intersections.
+    owner: CommodityNode
+    conflictRisk: low
+    removalCondition: Upstream synchronization moves to a dedicated reviewed service.
+    tests:
+      - workflow_dispatch dry run

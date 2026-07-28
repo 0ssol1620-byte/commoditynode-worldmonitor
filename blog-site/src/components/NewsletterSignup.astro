@@ -1,0 +1,147 @@
+---
+interface Props {
+  placement: 'home' | 'article';
+}
+
+const { placement } = Astro.props;
+---
+
+<aside class:list={['newsletter-signup', `is-${placement}`]} aria-labelledby={`newsletter-title-${placement}`}>
+  <div>
+    <p class="section-label">Weekly brief</p>
+    <h2 id={`newsletter-title-${placement}`}>One commodity impact chain, checked end to end.</h2>
+    <p>
+      A concise weekly note on the event, physical constraint, market transmission,
+      exposed companies, evidence, and what remains unknown.
+    </p>
+  </div>
+  <form
+    data-newsletter-form
+    data-placement={placement}
+    data-capability-ready="false"
+    aria-busy="true"
+    novalidate
+  >
+    <label>
+      <span>Email address</span>
+      <input name="email" type="email" autocomplete="email" maxlength="254" required disabled />
+    </label>
+    <label class="newsletter-consent">
+      <input name="consent" type="checkbox" required disabled />
+      <span>
+        Send me the Weekly Commodity Impact Brief. I understand that confirmation is
+        required and I can unsubscribe from any issue. <a href="/privacy/">Privacy</a>
+      </span>
+    </label>
+    <label class="form-honeypot" aria-hidden="true">
+      Website
+      <input name="website" type="text" tabindex="-1" autocomplete="off" disabled />
+    </label>
+    <button type="submit" disabled>
+      Request confirmation
+    </button>
+    <p class="form-status" data-newsletter-status role="status" aria-live="polite">
+      Checking signup availability…
+    </p>
+  </form>
+</aside>
+
+<script>
+  const newsletterForms = document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]');
+
+  const setNewsletterAvailability = (available: boolean) => {
+    newsletterForms.forEach((form) => {
+      form.dataset.capabilityReady = String(available);
+      form.setAttribute('aria-busy', 'false');
+      form.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input, button')
+        .forEach((control) => {
+          control.disabled = !available;
+        });
+      const status = form.querySelector<HTMLElement>('[data-newsletter-status]');
+      if (status) {
+        status.textContent = available
+          ? ''
+          : 'Weekly brief signup is currently unavailable.';
+      }
+    });
+  };
+
+  const hydrateNewsletterCapability = async () => {
+    try {
+      const response = await fetch('/api/commoditynode-capabilities', {
+        credentials: 'omit',
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error('capability_unavailable');
+      const result = await response.json() as {
+        newsletter?: { available?: boolean };
+      };
+      setNewsletterAvailability(result.newsletter?.available === true);
+    } catch {
+      setNewsletterAvailability(false);
+    }
+  };
+
+  void hydrateNewsletterCapability();
+
+  newsletterForms.forEach((form) => {
+    let started = false;
+    form.addEventListener('focusin', () => {
+      if (started) return;
+      started = true;
+      window.dispatchEvent(new CustomEvent('commoditynode:analytics', {
+        detail: {
+          event: 'newsletter_signup_started',
+          properties: {
+            routeType: 'newsletter_form',
+            placement: `${form.dataset.placement}_newsletter`,
+            conversion: 'newsletter',
+          },
+        },
+      }));
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (form.dataset.capabilityReady !== 'true') return;
+      const status = form.querySelector<HTMLElement>('[data-newsletter-status]');
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const data = new FormData(form);
+      if (!form.reportValidity() || !status || !button) return;
+      button.disabled = true;
+      status.textContent = 'Requesting confirmation…';
+      try {
+        const response = await fetch('/api/commoditynode-newsletter', {
+          method: 'POST',
+          credentials: 'omit',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: data.get('email'),
+            consent: data.get('consent') === 'on',
+            consentVersion: 1,
+            website: data.get('website'),
+            source: `${form.dataset.placement}_newsletter`,
+          }),
+        });
+        if (!response.ok) throw new Error('request_failed');
+        await response.json();
+        form.reset();
+        status.textContent =
+          'If this address is eligible, check your inbox. The confirmation link expires in 48 hours.';
+        window.dispatchEvent(new CustomEvent('commoditynode:analytics', {
+          detail: {
+            event: 'newsletter_signup_submitted',
+            properties: {
+              routeType: 'newsletter_form',
+              placement: `${form.dataset.placement}_newsletter`,
+              conversion: 'newsletter',
+            },
+          },
+        }));
+      } catch {
+        status.textContent = 'The signup service is unavailable right now. Please try again later.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>

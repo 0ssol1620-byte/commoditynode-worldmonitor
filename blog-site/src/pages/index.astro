@@ -1,13 +1,37 @@
 ---
 import Base from '../layouts/Base.astro';
+import LiveMapTeaser from '../components/LiveMapTeaser.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import { getCollection } from 'astro:content';
 import { coverWebpSources } from '../lib/cover-webp';
+import {
+  absoluteUrl,
+  belongsToActiveSite,
+  isCommodityNode,
+  postPath,
+  site,
+} from '../lib/site-variant';
+import {
+  isPublishedCommodityEvent,
+  sortCommodityEventsByOccurrence,
+} from '../lib/published-events';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) =>
-    Number(b.data.pinned ?? false) - Number(a.data.pinned ?? false) ||
-    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const posts = (await getCollection('blog'))
+  .filter(belongsToActiveSite)
+  .sort(
+    (a, b) =>
+      Number(b.data.pinned ?? false) - Number(a.data.pinned ?? false) ||
+      b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
+const commodityHubs = isCommodityNode
+  ? (await getCollection('commodities')).sort((a, b) => a.data.name.localeCompare(b.data.name))
+  : [];
+const publishedEvents = isCommodityNode
+  ? (await getCollection('events'))
+      .filter(isPublishedCommodityEvent)
+      .sort(sortCommodityEventsByOccurrence)
+      .slice(0, 3)
+  : [];
 
 // Committed covers have generated .webp / -640.webp siblings (guarded by
 // tests/blog-cover-webp.test.mjs); coverWebpSources() returns null when the
@@ -15,26 +39,28 @@ const posts = (await getCollection('blog')).sort(
 // render at ~340-540px, so the 640w thumb covers 1x displays and the full
 // WebP covers high-DPI ones.
 
-const DEFAULT_AUTHOR = 'Elie Habib';
-const DEFAULT_AUTHOR_URL = 'https://www.worldmonitor.app/blog/authors/elie-habib/';
-const DEFAULT_AUTHOR_ID = `${DEFAULT_AUTHOR_URL}#person`;
+const DEFAULT_AUTHOR = site.defaultAuthor;
+const DEFAULT_AUTHOR_URL = isCommodityNode
+  ? undefined
+  : 'https://www.worldmonitor.app/blog/authors/elie-habib/';
+const DEFAULT_AUTHOR_ID = DEFAULT_AUTHOR_URL ? `${DEFAULT_AUTHOR_URL}#person` : undefined;
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "@id": "https://www.worldmonitor.app/blog/#blog",
-  "name": "World Monitor Blog",
-  "description": "Analysis, guides, and deep dives on real-time intelligence, OSINT, geopolitics, markets, and the open-source tools behind World Monitor.",
-  "url": "https://www.worldmonitor.app/blog/",
+  "@id": `${absoluteUrl(site.indexPath)}#publication`,
+  "name": site.publication,
+  "description": site.description,
+  "url": absoluteUrl(site.indexPath),
   "inLanguage": "en-US",
   "publisher": {
     "@type": "Organization",
-    "@id": "https://www.worldmonitor.app/#organization",
-    "name": "World Monitor",
-    "url": "https://www.worldmonitor.app",
+    "@id": `${site.origin}/#organization`,
+    "name": site.name,
+    "url": site.origin,
     "logo": {
       "@type": "ImageObject",
-      "url": "https://www.worldmonitor.app/favico/apple-touch-icon.png"
+      "url": absoluteUrl(site.markUrl)
     }
   },
   "blogPost": posts.map(post => {
@@ -43,46 +69,163 @@ const jsonLd = {
 
     return {
       "@type": "BlogPosting",
-      "@id": `https://www.worldmonitor.app/blog/posts/${post.id}/#article`,
+      "@id": `${absoluteUrl(postPath(post.id))}#article`,
       "headline": post.data.title,
       "description": post.data.description,
       "datePublished": post.data.pubDate.toISOString(),
       ...(post.data.modifiedDate ? { "dateModified": post.data.modifiedDate.toISOString() } : {}),
       "author": {
-        "@type": "Person",
+        "@type": post.data.authorType || "Person",
         "name": authorName,
         ...(authorUrl ? { "url": authorUrl } : {}),
         ...(authorName === DEFAULT_AUTHOR ? { "@id": DEFAULT_AUTHOR_ID } : {})
       },
-      "url": `https://www.worldmonitor.app/blog/posts/${post.id}/`,
-      "image": post.data.heroImage ? `https://www.worldmonitor.app${post.data.heroImage}` : "https://www.worldmonitor.app/favico/og-image.png"
+      "url": absoluteUrl(postPath(post.id)),
+      "image": post.data.heroImage
+        ? absoluteUrl(post.data.heroImage)
+        : absoluteUrl(site.markUrl)
     };
   })
 };
 ---
 
 <Base
-  title="World Monitor Blog"
-  description="Insights on real-time global intelligence, OSINT, geopolitics, markets, and the open-source tools that power situational awareness."
-  metaTitle="World Monitor Blog | Global Intelligence & OSINT"
+  title={site.publication}
+  description={site.description}
+  metaTitle={isCommodityNode
+    ? 'CommodityNode Research | Commodity Impact Intelligence'
+    : 'World Monitor Blog | Global Intelligence & OSINT'}
   jsonLd={jsonLd}
 >
   <div class="blog-hero">
-    <div class="badge">
-      <span class="dot"></span>
-      Intelligence Feed
-    </div>
-    <h1>Noise<span class="green">.</span>Signal<span class="green">.</span>Blog</h1>
-    <p class="subtitle">
-      Analysis, guides, and deep dives on real-time intelligence, OSINT, geopolitics, markets, and the open-source tools behind World Monitor.
-    </p>
+    {isCommodityNode ? (
+      <>
+        <p class="section-label">Commodity impact research</p>
+        <h1>Trace commodity shocks from source event to market exposure.</h1>
+        <p class="subtitle">
+          CommodityNode connects benchmarks, assets, routes, companies, and source evidence so each claim can be checked before it is used.
+        </p>
+        <div class="hero-actions">
+          <a
+            class="primary-action"
+            href={site.liveUrl}
+            data-commoditynode-event="live_opened"
+            data-commoditynode-placement="home_hero"
+          >
+            Open live intelligence
+          </a>
+          <a
+            class="secondary-action"
+            href="/events/"
+            data-commoditynode-event="research_opened"
+            data-commoditynode-placement="home_hero"
+          >
+            Read Event Pulse
+          </a>
+        </div>
+      </>
+    ) : (
+      <>
+        <p class="section-label">Intelligence feed</p>
+        <h1>Noise. Signal. Blog.</h1>
+        <p class="subtitle">{site.description}</p>
+      </>
+    )}
   </div>
+  {isCommodityNode && (
+    <>
+      <LiveMapTeaser liveUrl={site.liveUrl} />
+
+      <section class="home-events" aria-labelledby="home-events-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Event Pulse</p>
+            <h2 id="home-events-title">A reviewed event record, with the uncertainty left in.</h2>
+          </div>
+          <a href="/events/">Open Event Pulse</a>
+        </div>
+        <div class="home-event-list">
+          {publishedEvents.map((event) => (
+            <article>
+              <div>
+                <span class:list={['event-materiality', `is-${event.data.materiality}`]}>
+                  {event.data.materiality}
+                </span>
+                <time datetime={event.data.occurredAt.toISOString()}>
+                  {event.data.occurredAt.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </time>
+              </div>
+              <p>{event.data.commodityIds.join(' · ')}</p>
+              <h3><a href={`/events/${event.id}/`}>{event.data.title}</a></h3>
+              <p>{event.data.summary}</p>
+              <footer>
+                <span>{event.data.evidence.length} source records</span>
+                <span>{event.data.unknowns.length} stated unknowns</span>
+              </footer>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="home-coverage" aria-labelledby="home-coverage-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Flagship coverage</p>
+            <h2 id="home-coverage-title">Start with a defined instrument, not an ambiguous ticker.</h2>
+          </div>
+          <a href="/commodities/">View coverage directory</a>
+        </div>
+        <div class="home-commodity-list">
+          {commodityHubs.map((commodity) => (
+            <a href={`/commodities/${commodity.id}/`}>
+              <span>{commodity.data.name}</span>
+              <small>{commodity.data.benchmark.name}</small>
+              <code>{commodity.data.benchmark.symbol}</code>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <NewsletterSignup placement="home" />
+
+      <section class="home-transmission" aria-labelledby="home-transmission-title">
+        <div class="home-section-heading">
+          <div>
+            <p class="section-label">Physical world → market impact</p>
+            <h2 id="home-transmission-title">Follow the chain before interpreting the move.</h2>
+          </div>
+          <p>
+            Event paths are published only when entities, direction, lag, claims, and reviewer status
+            satisfy the graph contract.
+          </p>
+        </div>
+        <ol>
+          <li><span>01</span><strong>Source event</strong><p>Official notice, company disclosure, or corroborated observation.</p></li>
+          <li><span>02</span><strong>Physical constraint</strong><p>Mine, plant, storage, port, route, or processing capacity.</p></li>
+          <li><span>03</span><strong>Market transmission</strong><p>Benchmark, inventory, freight, substitution, and time lag.</p></li>
+          <li><span>04</span><strong>Exposure</strong><p>Company segment, industry input, or final-product cost channel.</p></li>
+        </ol>
+      </section>
+    </>
+  )}
   <div class="blog-list">
+    {isCommodityNode && (
+      <div class="home-section-heading research-heading">
+        <div>
+          <p class="section-label">Reviewed research</p>
+          <h2>Methods and analyses you can inspect.</h2>
+        </div>
+      </div>
+    )}
     <div class="post-grid">
       {posts.map((post) => {
         const cover = coverWebpSources(post.data.heroImage);
         return (
-        <a href={`/blog/posts/${post.id}/`} class:list={['post-card', { pinned: post.data.pinned }]}>
+        <a href={postPath(post.id)} class:list={['post-card', { pinned: post.data.pinned }]}>
           {post.data.heroImage && (
             <picture>
               {cover && (
@@ -103,7 +246,7 @@ const jsonLd = {
             </picture>
           )}
           <div class="tag">
-            {post.data.pinned && <span class="pin">Pinned</span>}
+            {post.data.pinned && <span class="pin">Selected</span>}
             {post.data.audience}
           </div>
           <h2>{post.data.title}</h2>

@@ -1,3 +1,22 @@
+# CommodityNode Live fork
+
+This public repository is the AGPL-3.0 fork used for the CommodityNode live
+intelligence surface. The product-specific build is additive: it introduces
+the `commoditynode` variant while retaining the upstream World Monitor source
+and history.
+
+- Live product target: [live.commoditynode.com](https://live.commoditynode.com)
+- Research surface: [commoditynode.com](https://commoditynode.com)
+- Exact deployed source: `/source/` and `/.well-known/commoditynode-build.json`
+- Fork changes: [CHANGES-COMMODITYNODE.md](CHANGES-COMMODITYNODE.md)
+- Upstream and base commit: [UPSTREAM.md](UPSTREAM.md)
+- License and source offer: [LICENSE](LICENSE), [SOURCE-OFFER.md](SOURCE-OFFER.md)
+
+“CommodityNode” is independent product branding. “World Monitor” below refers
+to the upstream project and is retained for attribution and documentation.
+
+---
+
 # World Monitor
 
 [简体中文](README.zh-CN.md) | [日本語](README.ja-JP.md)
@@ -51,7 +70,7 @@
 ## What It Does
 
 - **500+ curated news feeds** across 15 categories, AI-synthesized into briefs
-- **Dual map engine** — 3D globe (globe.gl) and WebGL flat map (deck.gl) with 56 map layer types
+- **Dual map engine** — 3D globe (globe.gl) and WebGL flat map (deck.gl) with 57 map layer types
 - **Cross-stream correlation** — military, economic, disaster, and escalation signal convergence
 - **Country Instability Index (CII)** — server-authoritative CII v8 stress scoring for 31 Tier-1 countries
 - **Finance radar** — 29 stock exchanges, commodities, crypto, and 7-signal market composite

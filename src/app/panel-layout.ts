@@ -176,6 +176,7 @@ export const DEFERRED_PANEL_NATURAL_FOOTPRINTS: Readonly<Record<string, Deferred
   'fuel-shortages': { rowSpan: 2 },
   'gdelt-intel': { rowSpan: 2 },
   'internet-disruptions': { rowSpan: 2 },
+  'impact-universe': { rowSpan: 4, className: 'panel-wide' },
   'live-news': { className: 'panel-wide' },
   'live-webcams': { className: 'panel-wide' },
   'oil-inventories': { rowSpan: 2 },
@@ -369,6 +370,10 @@ export class PanelLayoutManager implements AppModule {
   private scheduledLoadAllIdle: number | null = null;
   private responsiveZoneListener: ResponsiveZoneListener | null = null;
   private readonly proActivationController: ProActivationController;
+  private commodityMapDetailDrawer:
+    | import('@/components/CommodityMapDetailDrawer').CommodityMapDetailDrawer
+    | null = null;
+  private boundCommodityMapCenterHandler: ((event: Event) => void) | null = null;
 
   constructor(ctx: AppContext, callbacks: PanelLayoutManagerCallbacks) {
     this.ctx = ctx;
@@ -702,6 +707,16 @@ export class PanelLayoutManager implements AppModule {
 
     this.proActivationController.destroy();
 
+    if (this.boundCommodityMapCenterHandler) {
+      window.removeEventListener(
+        'commoditynode:map-center-request',
+        this.boundCommodityMapCenterHandler,
+      );
+      this.boundCommodityMapCenterHandler = null;
+    }
+    this.commodityMapDetailDrawer?.destroy();
+    this.commodityMapDetailDrawer = null;
+
     // Reset checkout overlay so next layout init can register its callback
     destroyCheckoutOverlay();
 
@@ -717,7 +732,9 @@ export class PanelLayoutManager implements AppModule {
     // the same verdict at a period-end boundary.
     const billingAwareFreeTier = resolveBillingAwareGateReason(PanelGateReason.FREE_TIER);
     for (const [key, panel] of Object.entries(this.ctx.panels)) {
-      const isPremium = WEB_PREMIUM_PANELS.has(key);
+      const isPremium =
+        WEB_PREMIUM_PANELS.has(key) &&
+        Boolean(getEffectivePanelConfig(key, SITE_VARIANT).premium);
       let reason = getPanelGateReason(state, isPremium);
 
       // Clerk-pro-only panels: even when hasPremiumAccess() returns
@@ -796,6 +813,13 @@ export class PanelLayoutManager implements AppModule {
       const href = this.ctx.isDesktopApp ? `https://www.worldmonitor.app${path}` : path;
       return `<a href="${href}" target="_blank" rel="noopener">${label}</a>`;
     }).join('');
+    const isCommodityNode = SITE_VARIANT === 'commoditynode';
+    const sourceRepositoryUrl = 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor';
+    const productName = isCommodityNode ? 'CommodityNode' : 'World Monitor';
+    const productWordmark = isCommodityNode ? 'COMMODITYNODE' : 'MONITOR';
+    const productIcon = isCommodityNode
+      ? '/commoditynode-mark.svg'
+      : '/favico/android-chrome-96x96.png';
 
     markLcpDebug('wm:layout:render-start');
     document.documentElement.classList.add('wm-layout-hydrated');
@@ -809,6 +833,16 @@ export class PanelLayoutManager implements AppModule {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
           <div class="variant-switcher">${(() => {
+        if (isCommodityNode) {
+          return `
+            <a href="#" class="variant-option active" data-variant="commoditynode" title="CommodityNode Live">
+              <span class="variant-label">LIVE</span>
+            </a>
+            <span class="variant-divider"></span>
+            <a href="https://commoditynode.com" class="variant-option" target="_blank" rel="noopener" title="CommodityNode Research">
+              <span class="variant-label">RESEARCH</span>
+            </a>`;
+        }
         const local = this.ctx.isDesktopApp || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         const inIframe = window.self !== window.top;
         const vHref = (v: string, prod: string) => local || SITE_VARIANT === v ? '#' : prod;
@@ -868,12 +902,13 @@ export class PanelLayoutManager implements AppModule {
               <span class="variant-label">Good News</span>
             </a>`;
       })()}</div>
-          <span class="logo">MONITOR</span><span class="logo-mobile">World Monitor</span><span class="version">v${__APP_VERSION__}</span>${BETA_MODE ? '<span class="beta-badge">BETA</span>' : ''}
-          <a href="https://x.com/eliehabib" target="_blank" rel="noopener" class="credit-link">
+          <span class="logo">${productWordmark}</span><span class="logo-mobile">${productName}</span><span class="version">v${__APP_VERSION__}</span>${BETA_MODE ? '<span class="beta-badge">BETA</span>' : ''}
+          ${isCommodityNode ? '<a href="https://commoditynode.com/" class="cn-research-home" aria-label="Back to CommodityNode research home">← Research home</a>' : ''}
+          ${isCommodityNode ? '' : `<a href="https://x.com/eliehabib" target="_blank" rel="noopener" class="credit-link">
             <svg class="x-logo" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             <span class="credit-text">@eliehabib</span>
-          </a>
-          <a href="https://github.com/koala73/worldmonitor" target="_blank" rel="noopener" class="github-link" title="${t('header.viewOnGitHub')}">
+          </a>`}
+          <a href="${isCommodityNode ? sourceRepositoryUrl : 'https://github.com/koala73/worldmonitor'}" target="_blank" rel="noopener" class="github-link" title="${t('header.viewOnGitHub')}">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           </a>
           <button class="mobile-settings-btn" id="mobileSettingsBtn" title="${t('header.settings')}">
@@ -881,7 +916,7 @@ export class PanelLayoutManager implements AppModule {
           </button>
           <div class="status-indicator">
             <span class="status-dot"></span>
-            <span>${t('header.live')}</span>
+            <span>${isCommodityNode ? 'WORKSPACE' : t('header.live')}</span>
           </div>
           <div class="region-selector">
             <select id="regionSelect" class="region-select" aria-label="${t('header.selectRegion')}">
@@ -913,14 +948,14 @@ export class PanelLayoutManager implements AppModule {
       <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
       <nav class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
-          <span class="mobile-menu-title">WORLD MONITOR</span>
+          <span class="mobile-menu-title">${isCommodityNode ? 'COMMODITYNODE' : 'WORLD MONITOR'}</span>
           <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="mobile-menu-divider"></div>
         ${(() => {
-        const variants = [
+        const variants = isCommodityNode ? [] : [
           { key: 'full', icon: '🌍', label: t('header.world') },
           { key: 'tech', icon: '💻', label: t('header.tech') },
           { key: 'finance', icon: '📈', label: t('header.finance') },
@@ -956,17 +991,25 @@ export class PanelLayoutManager implements AppModule {
           <span class="mobile-menu-item-icon">${getCurrentTheme() === 'dark' ? '☀️' : '🌙'}</span>
           <span class="mobile-menu-item-label">${getCurrentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </button>
-        <a class="mobile-menu-item" href="https://x.com/eliehabib" target="_blank" rel="noopener">
+        ${isCommodityNode ? '' : `<a class="mobile-menu-item" href="https://x.com/eliehabib" target="_blank" rel="noopener">
           <span class="mobile-menu-item-icon"><svg class="x-logo" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
           <span class="mobile-menu-item-label">@eliehabib</span>
-        </a>
+        </a>`}
         <div class="mobile-menu-divider"></div>
         <div class="mobile-menu-footer-links">
-          ${referenceLinksHtml}
-          <a href="${this.ctx.isDesktopApp ? 'https://www.worldmonitor.app/pro#pricing' : '/pro#pricing'}" target="_blank" rel="noopener">Pricing</a>
-          <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/blog/' : 'https://www.worldmonitor.app/blog/'}" target="_blank" rel="noopener">Blog</a>
-          <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/docs' : 'https://www.worldmonitor.app/docs'}" target="_blank" rel="noopener">Docs</a>
-          <a href="https://status.worldmonitor.app/" target="_blank" rel="noopener">Status</a>
+          ${isCommodityNode ? `
+            <a href="https://commoditynode.com" target="_blank" rel="noopener">Research</a>
+            <a href="https://commoditynode.com/privacy/?settings=privacy" target="_blank" rel="noopener">Privacy</a>
+            <a href="/source/">Source Code</a>
+            <a href="/SOURCE-OFFER.md" target="_blank" rel="noopener">Source Offer</a>
+            <a href="${sourceRepositoryUrl}" target="_blank" rel="noopener">GitHub</a>
+          ` : `
+            ${referenceLinksHtml}
+            <a href="${this.ctx.isDesktopApp ? 'https://www.worldmonitor.app/pro#pricing' : '/pro#pricing'}" target="_blank" rel="noopener">Pricing</a>
+            <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/blog/' : 'https://www.worldmonitor.app/blog/'}" target="_blank" rel="noopener">Blog</a>
+            <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/docs' : 'https://www.worldmonitor.app/docs'}" target="_blank" rel="noopener">Docs</a>
+            <a href="https://status.worldmonitor.app/" target="_blank" rel="noopener">Status</a>
+          `}
         </div>
         <div class="mobile-menu-version">v${__APP_VERSION__}</div>
       </nav>
@@ -992,6 +1035,20 @@ export class PanelLayoutManager implements AppModule {
       </div>
       <div class="dashboard-tabs-mount" id="panelTabsMount"></div>
       <main id="main" tabindex="-1" class="main-content${this.ctx.isDesktopApp ? ' desktop-grid' : ''}">
+        ${isCommodityNode ? `
+          <section class="cn-workspace-guide" aria-labelledby="cn-workspace-guide-title">
+            <div>
+              <span class="cn-workspace-guide__label">How to read this workspace</span>
+              <strong id="cn-workspace-guide-title">Trace an event to physical flow, then test market exposure.</strong>
+            </div>
+            <ol>
+              <li><span>1</span><strong>Event</strong><small>Confirm source and time</small></li>
+              <li><span>2</span><strong>Map</strong><small>Locate asset and route</small></li>
+              <li><span>3</span><strong>Impact path</strong><small>Follow named links</small></li>
+              <li><span>4</span><strong>Evidence</strong><small>Stop where facts end</small></li>
+            </ol>
+          </section>
+        ` : ''}
         <div class="map-section${mapStartsCollapsed ? ' collapsed' : ''}" id="mapSection">
           <div class="panel-header">
             <div class="panel-header-left">
@@ -1020,18 +1077,26 @@ export class PanelLayoutManager implements AppModule {
         </div>
         <div class="map-width-resize-handle" id="mapWidthResizeHandle"></div>
         <div class="panels-grid" id="panelsGrid" role="tabpanel"></div>
-        <button class="search-mobile-fab" id="searchMobileFab" aria-label="Search">\u{1F50D}</button>
+        <button class="search-mobile-fab" id="searchMobileFab" aria-label="${t('header.search')}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
       </main>
       <footer class="site-footer">
         <div class="site-footer-brand">
-          <img src="/favico/android-chrome-96x96.png" alt="" width="28" height="28" loading="lazy" decoding="async" class="site-footer-icon" />
+          <img src="${productIcon}" alt="" width="28" height="28" loading="lazy" decoding="async" class="site-footer-icon" />
           <div class="site-footer-brand-text">
-            <span class="site-footer-name">WORLD MONITOR</span>
-            <span class="site-footer-sub">v${__APP_VERSION__} &middot; <a href="https://x.com/eliehabib" target="_blank" rel="noopener" class="site-footer-credit">@eliehabib</a></span>
+            <span class="site-footer-name">${isCommodityNode ? 'COMMODITYNODE' : 'WORLD MONITOR'}</span>
+            <span class="site-footer-sub">v${__APP_VERSION__}${isCommodityNode ? ' &middot; Derived from World Monitor under AGPL-3.0' : ' &middot; <a href="https://x.com/eliehabib" target="_blank" rel="noopener" class="site-footer-credit">@eliehabib</a>'}</span>
           </div>
         </div>
         <nav>
-          ${referenceLinksHtml}
+          ${isCommodityNode ? `
+            <a href="https://commoditynode.com" target="_blank" rel="noopener">Research</a>
+            <a href="/source/">Source Code</a>
+            <a href="/SOURCE-OFFER.md" target="_blank" rel="noopener">Source Offer</a>
+            <a href="${sourceRepositoryUrl}" target="_blank" rel="noopener">GitHub</a>
+          ` : referenceLinksHtml}
+          ${isCommodityNode ? '' : `
           <a href="${this.ctx.isDesktopApp ? 'https://www.worldmonitor.app/pro#pricing' : '/pro#pricing'}" target="_blank" rel="noopener">Pricing</a>
           <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/blog/' : 'https://www.worldmonitor.app/blog/'}" target="_blank" rel="noopener">Blog</a>
           <a href="${this.ctx.isDesktopApp ? 'https://worldmonitor.app/docs' : 'https://www.worldmonitor.app/docs'}" target="_blank" rel="noopener">Docs</a>
@@ -1040,8 +1105,9 @@ export class PanelLayoutManager implements AppModule {
           <a href="https://discord.gg/re63kWKxaz" target="_blank" rel="noopener">Discord</a>
           <a href="https://x.com/worldmonitorai" target="_blank" rel="noopener">X</a>
           ${this.ctx.isDesktopApp ? '' : `<span id="footerDownloadMount"></span>`}
+          `}
         </nav>
-        <span class="site-footer-copy">&copy; ${new Date().getFullYear()} World Monitor</span>
+        <span class="site-footer-copy">&copy; ${new Date().getFullYear()} ${productName}</span>
       </footer>
     `, "legacy direct innerHTML migration"));
     // Mark AFTER the innerHTML swap so the timestamp reflects when the new shell
@@ -1546,6 +1612,8 @@ export class PanelLayoutManager implements AppModule {
         } else {
           panel.renderNews(filteredItems);
         }
+      } else if (SITE_VARIANT === 'commoditynode' && panelKey === 'event-pulse') {
+        panel.showCommodityNodeReferenceState();
       }
       return panel;
     });
@@ -1877,10 +1945,24 @@ export class PanelLayoutManager implements AppModule {
     this.lazyDefaultPanel('latest-brief', () => import('@/components/LatestBriefPanel'), 'LatestBriefPanel');
 
     this.lazyDefaultPanel('commodities', () => import('@/components/MarketPanel'), 'CommoditiesPanel');
+    this.lazyDefaultPanel(
+      'impact-universe',
+      () => import('@/components/ImpactUniversePanel'),
+      'ImpactUniversePanel',
+    );
     this.lazyDefaultPanel('energy-complex', () => import('@/components/EnergyComplexPanel'), 'EnergyComplexPanel');
     this.lazyDefaultPanel('oil-inventories', () => import('@/components/OilInventoriesPanel'), 'OilInventoriesPanel');
     this.lazyDefaultPanel('energy-crisis', () => import('@/components/EnergyCrisisPanel'), 'EnergyCrisisPanel');
     this.lazyDefaultPanel('chokepoint-strip', () => import('@/components/ChokepointStripPanel'), 'ChokepointStripPanel');
+    this.lazyImportedPanel(
+      'route-risk',
+      () => import('@/components/ChokepointStripPanel'),
+      'ChokepointStripPanel',
+      (ChokepointStripPanel) => new ChokepointStripPanel({
+        id: 'route-risk',
+        title: 'Routes & Chokepoints',
+      }),
+    );
     this.lazyPanel('pipeline-status', () =>
       this.importPanel('pipeline-status', () => import('@/components/PipelineStatusPanel'), 'PipelineStatusPanel', (PipelineStatusPanel) => new PipelineStatusPanel()),
     );
@@ -1963,6 +2045,12 @@ export class PanelLayoutManager implements AppModule {
     this.createNewsPanel('latam', 'panels.latam');
     this.createNewsPanel('asia', 'panels.asia');
     this.createNewsPanel('energy', 'panels.energy');
+    this.createNewsPanelWithLabel(
+      'event-pulse',
+      'Material Commodity Events',
+      'Verified commodity-relevant events with source context and materiality signals.',
+      'commodity-news',
+    );
 
     // Iterate CANONICAL_FEEDS (union of all variants), not just the active
     // variant's FEEDS preset — so a news panel the user customized in from
@@ -2115,7 +2203,29 @@ export class PanelLayoutManager implements AppModule {
 
     this.lazyDefaultPanel('daily-market-brief', () => import('@/components/DailyMarketBriefPanel'), 'DailyMarketBriefPanel');
 
-    this.lazyDefaultPanel('market-implications', () => import('@/components/MarketImplicationsPanel'), 'MarketImplicationsPanel');
+    this.lazyImportedPanel(
+      'market-implications',
+      () => import('@/components/MarketImplicationsPanel'),
+      'MarketImplicationsPanel',
+      (MarketImplicationsPanel) =>
+        new MarketImplicationsPanel(
+          SITE_VARIANT === 'commoditynode'
+            ? {
+                premium: false,
+                frameworkAccess: true,
+                title: 'Evidence-backed Market Implications',
+                infoTooltip: 'Reviewed transmission paths from material events to benchmark, sector, and company exposures. Unreviewed or stale implications are withheld.',
+              }
+            : undefined,
+        ),
+      (panel) => {
+        if (SITE_VARIANT === 'commoditynode') {
+          panel.showUnavailable(
+            'Market implications are withheld until the evidence pipeline returns a reviewed, current record.',
+          );
+        }
+      },
+    );
     // Gating for daily-market-brief, market-implications, and chat-analyst is handled
     // reactively by updatePanelGating() via auth state subscription (all in WEB_PREMIUM_PANELS).
 
@@ -2588,6 +2698,33 @@ export class PanelLayoutManager implements AppModule {
       layers: this.ctx.mapLayers,
       timeRange: '7d',
     }, preferGlobe);
+
+    if (SITE_VARIANT === 'commoditynode') {
+      const { CommodityMapDetailDrawer } = await import(
+        '@/components/CommodityMapDetailDrawer'
+      );
+      if (this.ctx.isDestroyed) return;
+      this.commodityMapDetailDrawer = new CommodityMapDetailDrawer(document.body);
+      this.boundCommodityMapCenterHandler = ((event: CustomEvent<{
+        latitude?: number;
+        longitude?: number;
+        layerId?: keyof MapLayers | null;
+      }>) => {
+        const { latitude, longitude, layerId } = event.detail ?? {};
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+          return;
+        }
+        if (layerId) {
+          this.ctx.map?.enableLayer(layerId);
+          this.ctx.mapLayers[layerId] = true;
+        }
+        this.ctx.map?.setCenter(latitude, longitude, 6);
+      }) as EventListener;
+      window.addEventListener(
+        'commoditynode:map-center-request',
+        this.boundCommodityMapCenterHandler,
+      );
+    }
 
     const eagerSupplyChainPanel = this.ctx.panels['supply-chain'] as SupplyChainPanel | undefined;
     if (eagerSupplyChainPanel) {

@@ -109,6 +109,7 @@ const PANEL_CLUSTER: Record<string, PanelChunkName> = {
   EnergyCrisis: 'panels-energy', EnergyDisruptions: 'panels-energy',
   EnergyRiskOverview: 'panels-energy', FuelPrices: 'panels-energy',
   FuelShortage: 'panels-energy', Hormuz: 'panels-energy',
+  ImpactUniverse: 'panels-energy',
   OilInventories: 'panels-energy', PipelineStatus: 'panels-energy',
   StorageFacilityMap: 'panels-energy', RenewableEnergy: 'panels-energy',
   // Defense / military / aviation
@@ -191,6 +192,22 @@ function panelChunkForComponentId(id: string): PanelManualChunkName | null {
 }
 
 function brotliPrecompressPlugin(): Plugin {
+  const concurrency = 8;
+
+  async function compressFile(outDir: string, fileName: string): Promise<void> {
+    const extension = extname(fileName).toLowerCase();
+    if (!BROTLI_EXTENSIONS.has(extension)) return;
+
+    const sourcePath = resolve(outDir, fileName);
+    const compressedPath = `${sourcePath}.br`;
+    const sourceBuffer = await readFile(sourcePath);
+    if (sourceBuffer.length < 1024) return;
+
+    const compressedBuffer = await brotliCompressAsync(sourceBuffer);
+    await mkdir(dirname(compressedPath), { recursive: true });
+    await writeFile(compressedPath, compressedBuffer);
+  }
+
   return {
     name: 'brotli-precompress',
     apply: 'build',
@@ -198,19 +215,14 @@ function brotliPrecompressPlugin(): Plugin {
       const outDir = outputOptions.dir;
       if (!outDir) return;
 
-      await Promise.all(Object.keys(bundle).map(async (fileName) => {
-        const extension = extname(fileName).toLowerCase();
-        if (!BROTLI_EXTENSIONS.has(extension)) return;
-
-        const sourcePath = resolve(outDir, fileName);
-        const compressedPath = `${sourcePath}.br`;
-        const sourceBuffer = await readFile(sourcePath);
-        if (sourceBuffer.length < 1024) return;
-
-        const compressedBuffer = await brotliCompressAsync(sourceBuffer);
-        await mkdir(dirname(compressedPath), { recursive: true });
-        await writeFile(compressedPath, compressedBuffer);
-      }));
+      const fileNames = Object.keys(bundle);
+      for (let index = 0; index < fileNames.length; index += concurrency) {
+        await Promise.all(
+          fileNames
+            .slice(index, index + concurrency)
+            .map((fileName) => compressFile(outDir, fileName)),
+        );
+      }
     },
   };
 }
@@ -218,6 +230,16 @@ function brotliPrecompressPlugin(): Plugin {
 function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDesktopBuild: boolean): Plugin {
   return {
     name: 'html-variant',
+    configureServer(server) {
+      if (activeVariant !== 'commoditynode') return;
+      server.middlewares.use((request, _response, next) => {
+        const pathname = request.url?.split('?', 1)[0];
+        if (pathname === '/source' || pathname === '/source/') {
+          request.url = `/source/index.html${request.url?.includes('?') ? request.url.slice(request.url.indexOf('?')) : ''}`;
+        }
+        next();
+      });
+    },
     transformIndexHtml(html) {
       let result = html
         .replace(/<title>.*?<\/title>/, `<title>${activeMeta.title}</title>`)
@@ -253,7 +275,7 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
       // before CSS loads. Web builds always use 'full' — runtime hostname detection handles variants.
       if (activeVariant !== 'full') {
         result = result.replace(
-          /if\(v\)document\.documentElement\.dataset\.variant=v;/,
+          /if\(v\)document\.documentElement\.dataset\.variant=v;else document\.documentElement\.removeAttribute\('data-variant'\);/,
           `v='${activeVariant}';document.documentElement.dataset.variant=v;`
         );
       }
@@ -280,6 +302,76 @@ function htmlVariantPlugin(activeMeta: VariantMeta, activeVariant: string, isDes
           .replace(/\/favico\/apple-touch-icon/g, `/favico/${activeVariant}/apple-touch-icon`)
           .replace(/\/favico\/android-chrome/g, `/favico/${activeVariant}/android-chrome`)
           .replace(/\/favico\/og-image/g, `/favico/${activeVariant}/og-image`);
+      }
+
+      if (activeVariant === 'commoditynode') {
+        const commodityNodeNoScript = `<noscript>
+      <main id="dashboard-noscript" class="dashboard-noscript">
+        <h2>CommodityNode Live requires JavaScript</h2>
+        <p>The interactive commodity map and live evidence panels run in the browser. The research site and corresponding AGPL source remain available without the application.</p>
+        <nav aria-label="CommodityNode references">
+          <ul>
+            <li><a href="https://commoditynode.com/">CommodityNode Research</a></li>
+            <li><a href="/source/">Corresponding source and build provenance</a></li>
+          </ul>
+        </nav>
+      </main>
+    </noscript>`;
+        const commodityNodeJsonLd = {
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: activeMeta.siteName,
+          url: activeMeta.url,
+          description: activeMeta.description,
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web',
+          isAccessibleForFree: true,
+          license: 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor/blob/main/LICENSE',
+          codeRepository: 'https://github.com/0ssol1620-byte/commoditynode-worldmonitor',
+          featureList: activeMeta.features,
+          isBasedOn: {
+            '@type': 'SoftwareSourceCode',
+            name: 'World Monitor',
+            codeRepository: 'https://github.com/koala73/worldmonitor',
+          },
+        };
+        const structuredData = `<script type="application/ld+json">\n${JSON.stringify(commodityNodeJsonLd, null, 2)}\n</script>\n`;
+
+        result = result
+          .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g, '')
+          .replace('</head>', `    ${structuredData}  </head>`)
+          .replace(/<meta name="author" content="[^"]*" \/>/, '<meta name="author" content="CommodityNode contributors" />')
+          .replace(/\s*<meta name="twitter:(?:site|creator)" content="[^"]*" \/>/g, '')
+          .replace(/https:\/\/www\.worldmonitor\.app\/favico\/commoditynode\/og-image\.png/g, 'https://commoditynode.com/og/commoditynode-impact-universe.svg')
+          .replace(/https:\/\/www\.worldmonitor\.app\/dashboard(?:\?lang=[^"]+)?/g, activeMeta.url)
+          .replace(/<link rel="icon"[^>]*>/g, '<link rel="icon" type="image/svg+xml" href="/commoditynode-mark.svg" />')
+          .replace(/<link rel="apple-touch-icon"[^>]*>/g, '<link rel="apple-touch-icon" href="/commoditynode-mark.svg" />')
+          .replace(/(<h1 class="app-heading">)[^<]*(<\/h1>)/, `$1${activeMeta.title}$2`)
+          .replace(/<meta name="robots" content="[^"]*" \/>/, '<meta name="robots" content="noindex, follow, max-image-preview:large" />')
+          .replace(/<meta property="og:image:alt" content="[^"]*" \/>/, '<meta property="og:image:alt" content="CommodityNode live commodity impact map and market intelligence dashboard" />')
+          .replace(/<noscript>\s*<main id="dashboard-noscript"[\s\S]*?<\/main>\s*<\/noscript>/, commodityNodeNoScript)
+          .replace(/(<div class="skeleton-brand"><span class="skeleton-brand-mark" aria-hidden="true"><\/span><span>)World Monitor(<\/span><\/div>)/, '$1CommodityNode$2')
+          .replace(/aria-label="World Monitor dashboard loading"/, 'aria-label="CommodityNode commodity intelligence loading"')
+          .replace('Dashboard shell loading', 'Loading current data')
+          .replace('<span class="skeleton-chip">Global</span>', '<span class="skeleton-chip">Global commodities</span>')
+          .replace('<span class="skeleton-chip live">Live</span>', '<span class="skeleton-chip live">Current</span>')
+          .replace('<span class="skeleton-section-label">Dashboard</span>', '<span class="skeleton-section-label">Commodity impact map</span>')
+          .replace('Preparing map and panels', 'Loading sources and market context')
+          .replace('Preparing dashboard', 'Current market context')
+          .replace('Dashboard is loading', 'Commodity intelligence is loading')
+          .replace('Map layers, panels, alerts, and analysis will appear here as soon as the app finishes loading.', 'Benchmarks, physical assets, routes, material events, and evidence panels will appear when the current data contracts are ready.')
+          .replace('<span class="skeleton-chip">Map</span>', '<span class="skeleton-chip">Benchmarks</span>')
+          .replace('<span class="skeleton-chip">Panels</span>', '<span class="skeleton-chip">Physical assets</span>')
+          .replace('<span class="skeleton-chip">Alerts</span>', '<span class="skeleton-chip">Routes</span>')
+          .replace('<span class="skeleton-chip">Analysis</span>', '<span class="skeleton-chip">Events</span>')
+          .replace('<h3 class="skeleton-panel-title">Primary View</h3>', '<h3 class="skeleton-panel-title">Event Pulse</h3>')
+          .replace('<h3 class="skeleton-panel-title">Map Layers</h3>', '<h3 class="skeleton-panel-title">Benchmark Tape</h3>')
+          .replace('<h3 class="skeleton-panel-title">Signal Panels</h3>', '<h3 class="skeleton-panel-title">Supply Chain</h3>')
+          .replace('<h3 class="skeleton-panel-title">Context</h3>', '<h3 class="skeleton-panel-title">Route Risk</h3>')
+          .replace('<h3 class="skeleton-panel-title">Analysis</h3>', '<h3 class="skeleton-panel-title">Market Implications</h3>')
+          .replace('<h3 class="skeleton-panel-title">Updates</h3>', '<h3 class="skeleton-panel-title">Monitors</h3>')
+          .replace(/\.skeleton-brand-mark::after\{content:"W"\}/, '.skeleton-brand-mark::after{content:"C"}')
+          .replace(/if\(window\.self===window\.top&&!dismissed\)document\.documentElement\.classList\.add\('wm-pro-banner-reserved'\);/, '');
       }
 
       return result;
@@ -394,7 +486,7 @@ function polymarketPlugin(): Plugin {
         const order = ALLOWED_ORDER.includes(url.searchParams.get('order') ?? '') ? url.searchParams.get('order') : 'volume';
         const ascending = ['true', 'false'].includes(url.searchParams.get('ascending') ?? '') ? url.searchParams.get('ascending') : 'false';
         const rawLimit = parseInt(url.searchParams.get('limit') ?? '', 10);
-        const limit = isNaN(rawLimit) ? 50 : Math.max(1, Math.min(100, rawLimit));
+        const limit = Number.isNaN(rawLimit) ? 50 : Math.max(1, Math.min(100, rawLimit));
 
         const params = new URLSearchParams({ closed: closed!, order: order!, ascending: ascending!, limit: String(limit) });
         if (endpoint === 'events') {
@@ -952,6 +1044,47 @@ export default defineConfig(({ mode }) => {
             '**/onnx*.wasm',
             '**/locale-*.js',
             '**/clerk-*.js',
+            // The dashboard imports these revisioned chunks only when their
+            // feature mounts. Precaching them downloaded the whole WebGL,
+            // globe, panel, and RPC surface during service-worker install,
+            // defeating route-level lazy loading and adding ~8–10 MB to a
+            // first visit. They are cached on first use by `feature-chunks`
+            // below, so a used feature still becomes restart/offline capable.
+            '**/maplibre-*.js',
+            '**/deck-stack-*.js',
+            '**/protomaps-*.js',
+            '**/GlobeMap-*.js',
+            '**/d3-*.js',
+            '**/topojson-*.js',
+            '**/h3-js-*.js',
+            '**/panels-markets-*.js',
+            '**/panels-energy-*.js',
+            '**/panels-defense-*.js',
+            '**/panels-news-*.js',
+            '**/panels-economy-*.js',
+            '**/panels-intel-*.js',
+            '**/panels-risk-*.js',
+            '**/rpc-client-*.js',
+            '**/hls-*.js',
+            '**/sentry-*.js',
+            '**/conflict-zone-*.js',
+            '**/gdelt-intel-*.js',
+            '**/*-data-*.js',
+            '**/layer-explanation-card-*.js',
+            '**/UnifiedSettings-*.js',
+            '**/Map-*.js',
+            '**/MapContainer-*.js',
+            '**/search-manager-*.js',
+            '**/apt-groups-*.js',
+            '**/*.worker-*.js',
+            '**/RouteExplorer-*.js',
+            '**/oref-locations-*.js',
+            '**/military-surge-*.js',
+            '**/map-interaction-guard-*.js',
+            '**/maplibre-*.css',
+            '**/embed-*.css',
+            '**/embed-url-*.css',
+            'mapbox-gl-rtl-text.min.js',
             // Fonts are fetched only when their stylesheet applies. Precache
             // would pull every local weight into the first mobile visit.
             '**/*.woff2',
@@ -961,6 +1094,11 @@ export default defineConfig(({ mode }) => {
             'pro/**',
             'favico/**',
             'textures/**',
+            // The apex research build is copied into the same deployment
+            // artifact, but it is a separate static site. Its editorial
+            // covers and Astro assets must not be installed by the Live
+            // dashboard service worker.
+            'commoditynode-site/**',
             // #4891: blog OG covers + post images are generated into the prod
             // build (absent locally), and the png glob was precaching all ~40
             // of them (~700KB) on every first dashboard visit — and again on
@@ -980,6 +1118,19 @@ export default defineConfig(({ mode }) => {
           importScripts: ['/push-handler.js'],
 
           runtimeCaching: [
+            {
+              urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) =>
+                sameOrigin
+                && /^(?:\/mapbox-gl-rtl-text\.min\.js|\/assets\/(?:maplibre|deck-stack|protomaps|GlobeMap|d3|topojson|h3-js|panels-(?:markets|energy|defense|news|economy|intel|risk)-|rpc-client-|hls-|sentry-|conflict-zone-|gdelt-intel-|layer-explanation-card-|UnifiedSettings-|Map-|MapContainer-|search-manager-|apt-groups-|RouteExplorer-|oref-locations-|military-surge-|map-interaction-guard-|[^/]+-data-)[^/]*\.(?:js|css))$/i.test(
+                  url.pathname,
+                ),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'feature-chunks',
+                expiration: { maxEntries: 80, maxAgeSeconds: 30 * 24 * 60 * 60 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
             {
               urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
               handler: 'NetworkFirst',

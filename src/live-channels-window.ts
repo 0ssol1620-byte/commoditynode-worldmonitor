@@ -16,6 +16,7 @@ import { escapeHtml } from '@/utils/sanitize';
 import { toApiUrl } from '@/services/runtime';
 import { resolveUserCountryCode } from '@/utils/user-location';
 import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
+import { SITE_VARIANT } from '@/config/variant';
 
 
 /** Builds a stable custom channel id from a YouTube handle (e.g. @Foo -> custom-foo). */
@@ -100,7 +101,7 @@ export async function initLiveChannelsWindow(containerEl?: HTMLElement): Promise
   }
 
   if (!containerEl) {
-    document.title = `${t('components.liveNews.manage') ?? 'Channel management'} - World Monitor`;
+    document.title = `${t('components.liveNews.manage') ?? 'Channel management'} - ${SITE_VARIANT === 'commoditynode' ? 'CommodityNode' : 'World Monitor'}`;
   }
 
   channels = loadChannelsFromStorage();

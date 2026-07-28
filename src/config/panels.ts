@@ -1,5 +1,11 @@
 import type { PanelConfig, MapLayers, DataSourceId } from '@/types';
 import { SITE_VARIANT } from './variant';
+import type { SiteVariant } from './variant-registry';
+import {
+  COMMODITYNODE_MAP_LAYERS,
+  COMMODITYNODE_MOBILE_MAP_LAYERS,
+  COMMODITYNODE_PANELS,
+} from './variants/commoditynode';
 // boundary-ignore: isDesktopRuntime is a pure env probe with no service dependencies
 import { isDesktopRuntime } from '@/services/runtime';
 // boundary-ignore: getSecretState is a pure env/keychain probe with no service dependencies
@@ -1107,13 +1113,14 @@ const ENERGY_MOBILE_MAP_LAYERS: MapLayers = {
 // UNIFIED PANEL REGISTRY
 // ============================================
 
-type PanelVariant = 'full' | 'tech' | 'finance' | 'commodity' | 'energy' | 'happy';
+type PanelVariant = SiteVariant;
 
 const VARIANT_PANEL_CONFIGS: Record<PanelVariant, Record<string, PanelConfig>> = {
   full: FULL_PANELS,
   tech: TECH_PANELS,
   finance: FINANCE_PANELS,
   commodity: COMMODITY_PANELS,
+  commoditynode: COMMODITYNODE_PANELS,
   energy: ENERGY_PANELS,
   happy: HAPPY_PANELS,
 };
@@ -1128,6 +1135,7 @@ function getVariantPanelConfigs(variant: string): Record<string, PanelConfig> | 
 export const ALL_PANELS: Record<string, PanelConfig> = {
   ...HAPPY_PANELS,
   ...COMMODITY_PANELS,
+  ...COMMODITYNODE_PANELS,
   ...ENERGY_PANELS,
   ...TECH_PANELS,
   ...FINANCE_PANELS,
@@ -1140,6 +1148,7 @@ export const VARIANT_DEFAULTS: Record<string, string[]> = {
   tech:      Object.keys(VARIANT_PANEL_CONFIGS.tech),
   finance:   Object.keys(VARIANT_PANEL_CONFIGS.finance),
   commodity: Object.keys(VARIANT_PANEL_CONFIGS.commodity),
+  commoditynode: Object.keys(VARIANT_PANEL_CONFIGS.commoditynode),
   energy:    Object.keys(VARIANT_PANEL_CONFIGS.energy),
   happy:     Object.keys(VARIANT_PANEL_CONFIGS.happy),
 };
@@ -1163,6 +1172,15 @@ export const VARIANT_PANEL_OVERRIDES: Partial<Record<string, Partial<Record<stri
     map:         { name: 'Commodity Map' },
     'live-news': { name: 'Commodity Headlines' },
     insights:    { name: 'AI Commodity Insights' },
+  },
+  commoditynode: {
+    map:                   { name: 'Commodity Impact Map' },
+    'impact-universe':     { name: 'Impact Universe' },
+    'event-pulse':         { name: 'Material Commodity Events' },
+    commodities:           { name: 'Benchmark & Proxy Tape' },
+    'supply-chain':         { name: 'Supply Chain & Shipping' },
+    'route-risk':           { name: 'Routes & Chokepoints' },
+    'market-implications':  { name: 'Evidence-backed Market Implications' },
   },
   energy: {
     map:         { name: 'Energy Atlas Map' },
@@ -1309,6 +1327,8 @@ export const DEFAULT_MAP_LAYERS = SITE_VARIANT === 'happy'
       ? FINANCE_MAP_LAYERS
       : SITE_VARIANT === 'commodity'
         ? COMMODITY_MAP_LAYERS
+        : SITE_VARIANT === 'commoditynode'
+          ? COMMODITYNODE_MAP_LAYERS
         : SITE_VARIANT === 'energy'
           ? ENERGY_MAP_LAYERS
           : FULL_MAP_LAYERS;
@@ -1321,6 +1341,8 @@ export const MOBILE_DEFAULT_MAP_LAYERS = SITE_VARIANT === 'happy'
       ? FINANCE_MOBILE_MAP_LAYERS
       : SITE_VARIANT === 'commodity'
         ? COMMODITY_MOBILE_MAP_LAYERS
+        : SITE_VARIANT === 'commoditynode'
+          ? COMMODITYNODE_MOBILE_MAP_LAYERS
         : SITE_VARIANT === 'energy'
           ? ENERGY_MOBILE_MAP_LAYERS
           : FULL_MOBILE_MAP_LAYERS;

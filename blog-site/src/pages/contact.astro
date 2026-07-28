@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/contact/');
+---
+
+<Base
+  title="Contact"
+  metaTitle="Contact CommodityNode"
+  description="Public channels for CommodityNode corrections, source questions, security reports, and product feedback."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Contact</p>
+    <h1>Send the issue to the channel that can verify it.</h1>
+    <p class="article-dek">
+      CommodityNode keeps editorial and source discussions public whenever they contain no
+      confidential information. That makes the response and resulting change auditable.
+    </p>
+
+    <h2>Editorial correction or source question</h2>
+    <p>
+      Use the <a href={`${site.sourceUrl}/issues/new`} target="_blank" rel="noopener noreferrer">public issue tracker</a>.
+      Include the exact page, claim, source URL, and retrieval date.
+    </p>
+
+    <h2>Security report</h2>
+    <p>
+      Do not publish exploit details or secrets. Use the repository's
+      <a href={`${site.sourceUrl}/security/advisories/new`} target="_blank" rel="noopener noreferrer">private security advisory</a>
+      channel. Never include an API key, access token, or personal data in a public issue.
+    </p>
+
+    <h2>Product and accessibility feedback</h2>
+    <p>
+      Open a public issue with the device, browser, page URL, expected behavior, and what
+      happened. Accessibility reports are triaged as product defects, not feature requests.
+    </p>
+
+    <h2>Response expectations</h2>
+    <p>
+      The project does not promise 24/7 monitoring. Critical security and false-publication
+      reports take priority; other reports are handled in the public queue as capacity allows.
+    </p>
+  </article>
+</Base>

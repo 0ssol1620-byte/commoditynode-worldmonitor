@@ -695,6 +695,8 @@ export interface MapLayers {
   miningSites: boolean;
   processingPlants: boolean;
   commodityPorts: boolean;
+  /** Reviewed, published commodity events. Optional to preserve upstream variants. */
+  commodityEvents?: boolean;
   webcams: boolean;
   // Health layers
   diseaseOutbreaks: boolean;

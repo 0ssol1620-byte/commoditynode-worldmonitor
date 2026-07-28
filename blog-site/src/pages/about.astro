@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/about/');
+---
+
+<Base
+  title="About CommodityNode"
+  description="CommodityNode is an evidence-linked commodity impact intelligence product built on an attributed AGPL fork of WorldMonitor."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">About</p>
+    <h1>Trace every conclusion back to its evidence.</h1>
+    <p class="article-dek">
+      CommodityNode maps how physical events travel through assets, routes, benchmarks, companies, and industries. The source trail stays beside the conclusion.
+    </p>
+
+    <h2>What we are building</h2>
+    <p>
+      The live product combines a geographic operating picture with a typed relationship graph. The research site explains the methods, assumptions, and limitations behind those views.
+    </p>
+
+    <h2>Open-source foundation</h2>
+    <p>
+      CommodityNode is built from an attributed fork of WorldMonitor and remains licensed under AGPL-3.0-only. The deployed build publishes its exact commit and corresponding source so users can inspect what is running.
+    </p>
+
+    <h2>What we do not claim</h2>
+    <p>
+      A relationship on the map is not proof of price causation. We distinguish reviewed facts,
+      reported claims, and analyst inference, and we leave uncertain links unpublished until the
+      evidence supports them.
+    </p>
+
+    <p>
+      <a href={site.liveUrl}>Open live intelligence</a> or review the <a href={site.sourceUrl}>source repository</a>.
+    </p>
+  </article>
+</Base>

@@ -1,0 +1,222 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/brief/');
+---
+
+<Base
+  title="Custom commodity exposure brief"
+  metaTitle="Request a Custom Commodity Exposure Brief | CommodityNode"
+  description="Describe the commodity exposure decision your team needs to make. CommodityNode will assess source coverage, scope, and delivery fit before proposing work."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page brief-page">
+    <p class="section-label">Custom research</p>
+    <h1>Request a commodity exposure brief</h1>
+    <p class="article-dek">
+      Tell us the decision, exposure, and time horizon. A request is not a purchase or
+      a promise of coverage; we first check whether the available evidence can support
+      the work.
+    </p>
+
+    <div class="brief-layout">
+      <section aria-labelledby="brief-includes">
+        <h2 id="brief-includes">What a qualified brief can include</h2>
+        <ul>
+          <li>benchmark and proxy definitions with source and delay labels;</li>
+          <li>physical assets, routes, and chokepoints tied to the exposure;</li>
+          <li>reviewed one-to-three-hop impact paths and stated invalidation conditions;</li>
+          <li>company or industry transmission channels with explicit limitations;</li>
+          <li>a source register and correction path.</li>
+        </ul>
+        <p>
+          We do not promise price targets, investment outcomes, uninterrupted live data,
+          or access to records whose rights do not permit the requested use.
+        </p>
+      </section>
+
+      <form
+        class="brief-form"
+        data-brief-form
+        data-capability-ready="false"
+        aria-busy="true"
+        novalidate
+      >
+        <div class="brief-form-grid">
+          <label>
+            <span>Name</span>
+            <input name="name" autocomplete="name" maxlength="120" required disabled />
+          </label>
+          <label>
+            <span>Work email</span>
+            <input name="email" type="email" autocomplete="email" maxlength="254" required disabled />
+          </label>
+          <label>
+            <span>Organization</span>
+            <input name="organization" autocomplete="organization" maxlength="160" required disabled />
+          </label>
+          <label>
+            <span>Role <small>optional</small></span>
+            <input name="role" autocomplete="organization-title" maxlength="120" disabled />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Commodity coverage</legend>
+          <div class="brief-checkboxes">
+            <label><input type="checkbox" name="commodities" value="copper" disabled /> Copper</label>
+            <label><input type="checkbox" name="commodities" value="crude-oil" disabled /> Crude oil</label>
+            <label><input type="checkbox" name="commodities" value="gold" disabled /> Gold</label>
+            <label><input type="checkbox" name="commodities" value="cocoa" disabled /> Cocoa</label>
+          </div>
+        </fieldset>
+
+        <label>
+          <span>What decision should the brief support?</span>
+          <textarea
+            name="decision"
+            minlength="40"
+            maxlength="1200"
+            rows="6"
+            required
+            disabled
+            placeholder="Describe the operational, procurement, risk, or market question and the exposure that matters."
+          ></textarea>
+        </label>
+        <label>
+          <span>Decision timeframe</span>
+          <input
+            name="timeframe"
+            maxlength="120"
+            required
+            disabled
+            placeholder="For example: before the Q4 sourcing review"
+          />
+        </label>
+        <label class="brief-consent">
+          <input type="checkbox" name="consent" required disabled />
+          <span>
+            CommodityNode may use these details to assess and reply to this request.
+            See the <a href="/privacy/">privacy policy</a>.
+          </span>
+        </label>
+        <label class="form-honeypot" aria-hidden="true">
+          Website
+          <input name="website" tabindex="-1" autocomplete="off" disabled />
+        </label>
+        <button type="submit" class="primary-action" disabled>
+          Submit request
+        </button>
+        <p class="form-status" data-brief-status role="status" aria-live="polite">
+          Checking request availability…
+        </p>
+      </form>
+    </div>
+  </article>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-brief-form]');
+  const status = form?.querySelector<HTMLElement>('[data-brief-status]');
+  let started = false;
+
+  const setBriefAvailability = (available: boolean) => {
+    if (!form || !status) return;
+    form.dataset.capabilityReady = String(available);
+    form.setAttribute('aria-busy', 'false');
+    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement>(
+      'input, textarea, button',
+    ).forEach((control) => {
+      control.disabled = !available;
+    });
+    status.textContent = available
+      ? ''
+      : 'Custom brief requests are currently unavailable.';
+  };
+
+  const hydrateBriefCapability = async () => {
+    try {
+      const response = await fetch('/api/commoditynode-capabilities', {
+        credentials: 'omit',
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error('capability_unavailable');
+      const result = await response.json() as {
+        briefRequest?: { available?: boolean };
+      };
+      setBriefAvailability(result.briefRequest?.available === true);
+    } catch {
+      setBriefAvailability(false);
+    }
+  };
+
+  void hydrateBriefCapability();
+
+  form?.addEventListener('focusin', () => {
+    if (started) return;
+    started = true;
+    window.dispatchEvent(new CustomEvent('commoditynode:analytics', {
+      detail: {
+        event: 'custom_brief_started',
+        properties: {
+          routeType: 'lead_workflow',
+          placement: 'brief_form',
+          conversion: 'custom_brief',
+        },
+      },
+    }));
+  });
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (form.dataset.capabilityReady !== 'true') return;
+    if (!form.reportValidity() || !status) return;
+    const data = new FormData(form);
+    const commodityIds = data.getAll('commodities').map(String);
+    if (commodityIds.length === 0) {
+      status.textContent = 'Select at least one commodity.';
+      return;
+    }
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    button.disabled = true;
+    status.textContent = 'Submitting request…';
+    try {
+      const response = await fetch('/api/commoditynode-brief-request', {
+        method: 'POST',
+        credentials: 'omit',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.get('name'),
+          email: data.get('email'),
+          organization: data.get('organization'),
+          role: data.get('role'),
+          commodityIds,
+          decision: data.get('decision'),
+          timeframe: data.get('timeframe'),
+          consent: data.get('consent') === 'on',
+          consentVersion: 1,
+          website: data.get('website'),
+          source: 'brief_page',
+        }),
+      });
+      if (!response.ok) throw new Error('request_failed');
+      form.reset();
+      status.textContent = 'Request received. We will reply after checking coverage and fit.';
+      window.dispatchEvent(new CustomEvent('commoditynode:analytics', {
+        detail: {
+          event: 'custom_brief_submitted',
+          properties: {
+            routeType: 'lead_workflow',
+            placement: 'brief_form',
+            conversion: 'custom_brief',
+          },
+        },
+      }));
+    } catch {
+      status.textContent = 'The request service is unavailable right now. Please try again later.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>

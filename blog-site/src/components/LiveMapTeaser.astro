@@ -1,0 +1,78 @@
+---
+interface Props {
+  liveUrl: string;
+}
+
+const { liveUrl } = Astro.props;
+---
+
+<section class="home-live-teaser" aria-labelledby="live-map-teaser-title">
+  <header>
+    <div>
+      <p class="section-label">Live workspace</p>
+      <h2 id="live-map-teaser-title">See how a material event can reach a commodity market.</h2>
+    </div>
+    <p>
+      Start with a verified event, locate the affected asset, then inspect the physical
+      constraint, benchmark exposure, and the evidence behind each link.
+    </p>
+  </header>
+
+  <div class="live-teaser-frame">
+    <div class="live-teaser-preview">
+      <div class="live-teaser-question">
+        <span>Reviewed historical case</span>
+        <strong>What did the Cobre Panama production halt put at risk?</strong>
+        <p>Read left to right. Every step separates evidence from inference.</p>
+      </div>
+      <ol class="live-teaser-path" aria-label="Cobre Panama impact path">
+        <li data-kind="event">
+          <span>01 · Event</span>
+          <strong>Production halted</strong>
+          <small>Verified historical event</small>
+        </li>
+        <li data-kind="asset">
+          <span>02 · Asset</span>
+          <strong>Cobre Panama mine</strong>
+          <small>Colon, Panama</small>
+        </li>
+        <li data-kind="flow">
+          <span>03 · Physical flow</span>
+          <strong>Copper concentrate</strong>
+          <small>Export supply removed</small>
+        </li>
+        <li data-kind="market">
+          <span>04 · Market exposure</span>
+          <strong>Copper benchmarks</strong>
+          <small>Inference, not a forecast</small>
+        </li>
+      </ol>
+      <div class="live-teaser-evidence">
+        <div>
+          <span>Evidence state</span>
+          <strong>Reviewed</strong>
+        </div>
+        <div>
+          <span>Inference distance</span>
+          <strong>3 links</strong>
+        </div>
+        <div>
+          <span>Live quote state</span>
+          <strong>Shown only when available</strong>
+        </div>
+      </div>
+    </div>
+    <div class="live-teaser-rail">
+      <div>
+        <span class="live-teaser-state">Instant preview</span>
+        <p>The full map loads only after you choose to open the workspace.</p>
+      </div>
+      <a
+        class="primary-action"
+        href={liveUrl}
+        data-commoditynode-event="live_opened"
+        data-commoditynode-placement="home_explainer"
+      >Open the live workspace</a>
+    </div>
+  </div>
+</section>

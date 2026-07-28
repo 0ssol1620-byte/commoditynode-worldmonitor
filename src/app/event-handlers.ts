@@ -749,7 +749,10 @@ export class EventHandlerManager implements AppModule {
     const closeBtn = document.getElementById('mobileMenuClose');
     if (!hamburger || !overlay || !menu || !closeBtn) return;
 
-    hamburger.addEventListener('click', () => this.openMobileMenu());
+    hamburger.addEventListener('click', () => {
+      this.closeMissionPresetPopover();
+      this.openMobileMenu();
+    });
     overlay.addEventListener('click', () => this.closeMobileMenu());
     closeBtn.addEventListener('click', () => this.closeMobileMenu());
 
@@ -822,8 +825,10 @@ export class EventHandlerManager implements AppModule {
       this.openMissionPresetPopover(document.getElementById('hamburgerBtn'), true);
     });
 
+    const canShowDesktopMissionControl = window.matchMedia('(min-width: 981px)').matches;
     const shouldPrompt =
       !this.ctx.isMobile &&
+      canShowDesktopMissionControl &&
       !window.location.search &&
       !loadStoredMissionPreset() &&
       !isMissionPresetPromptDismissed();
@@ -835,6 +840,7 @@ export class EventHandlerManager implements AppModule {
       // the idle wait can outlast an early user choice.
       scheduleAfterFirstPaint(() => {
         if (this.ctx.isDestroyed) return;
+        if (!window.matchMedia('(min-width: 981px)').matches) return;
         if (loadStoredMissionPreset() || isMissionPresetPromptDismissed()) return;
         this.openMissionPresetPopover(document.getElementById('missionPresetBtn'), false);
       });
@@ -1357,7 +1363,7 @@ export class EventHandlerManager implements AppModule {
 
     const preview = document.createElement('iframe');
     preview.className = 'embed-preview-frame';
-    preview.title = 'World Monitor live map preview';
+    preview.title = `${SITE_VARIANT === 'commoditynode' ? 'CommodityNode' : 'World Monitor'} live map preview`;
     preview.loading = 'lazy';
     preview.referrerPolicy = 'strict-origin-when-cross-origin';
     preview.src = embedUrl;

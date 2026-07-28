@@ -5,6 +5,7 @@ import { describeFreshness } from '@/services/persistent-cache';
 import type { MarketImplicationCard, MarketImplicationsData, TransmissionNode } from '@/services/market-implications';
 import { FrameworkSelector } from './FrameworkSelector';
 import { hasPremiumAccess } from '@/services/panel-gating';
+import { SITE_VARIANT } from '@/config';
 
 function directionClass(dir: string): string {
   const d = dir.toUpperCase();
@@ -67,14 +68,25 @@ function renderCard(card: MarketImplicationCard): string {
 export class MarketImplicationsPanel extends Panel {
   private fwSelector: FrameworkSelector;
 
-  constructor() {
+  constructor(options: {
+    premium?: 'locked' | false;
+    frameworkAccess?: boolean;
+    title?: string;
+    infoTooltip?: string;
+  } = {}) {
+    const premium = options.premium === false ? undefined : (options.premium ?? 'locked');
     super({
       id: 'market-implications',
-      title: t('components.marketImplications.title'),
-      infoTooltip: t('components.marketImplications.infoTooltip'),
-      premium: 'locked',
+      title: options.title ?? t('components.marketImplications.title'),
+      infoTooltip: options.infoTooltip ?? t('components.marketImplications.infoTooltip'),
+      premium,
     });
-    this.fwSelector = new FrameworkSelector({ panelId: 'market-implications', isPremium: hasPremiumAccess(), panel: this, note: t('components.marketImplications.appliesToNext') });
+    this.fwSelector = new FrameworkSelector({
+      panelId: 'market-implications',
+      isPremium: options.frameworkAccess ?? hasPremiumAccess(),
+      panel: this,
+      note: t('components.marketImplications.appliesToNext'),
+    });
     this.header.appendChild(this.fwSelector.el);
 
     this.content.addEventListener('click', (e) => {
@@ -123,10 +135,35 @@ export class MarketImplicationsPanel extends Panel {
   }
 
   public showUnavailable(message = t('components.marketImplications.unavailable')): void {
+    if (SITE_VARIANT === 'commoditynode') {
+      this.showReferenceCase();
+      return;
+    }
     this.setDataBadge('unavailable');
     const html = `
       <div style="font-size:12px;color:var(--text-dim);line-height:1.5;padding:16px 0;text-align:center">${escapeHtml(message)}</div>
     `;
     this.setSafeContent(unsafeRawHtml(html, 'legacy Panel.setContent() migration'));
+  }
+
+  public showReferenceCase(): void {
+    this.setDataBadge('cached', 'reference');
+    const html = `
+      <div class="cn-implication-reference">
+        <div class="cn-implication-reference__status">
+          <strong>No reviewed current signal is available.</strong>
+          <span>A historical case remains visible so the analytical method is still useful.</span>
+        </div>
+        <div class="cn-implication-reference__path">
+          <div><span>Verified event</span><strong>Cobre Panama production halt</strong></div>
+          <div><span>Physical constraint</span><strong>Copper concentrate supply removed</strong></div>
+          <div><span>Exposure to test</span><strong>Copper benchmarks and miners</strong></div>
+        </div>
+        <div class="cn-implication-reference__limit">
+          Historical reference only. It is not a current recommendation, price target, or directional signal.
+        </div>
+      </div>
+    `;
+    this.setSafeContent(unsafeRawHtml(html, 'static CommodityNode implication reference case'));
   }
 }

@@ -1,0 +1,178 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { absoluteUrl, site } from '../../lib/site-variant';
+import {
+  commodityNodeRobotsContent,
+  resolveCommodityNodeRoutePolicy,
+} from '../../../../shared/commoditynode-route-policy';
+
+export async function getStaticPaths() {
+  const companies = (await getCollection('companies')).filter(
+    (company) =>
+      company.data.publishable
+      && company.data.publicationState === 'published'
+      && !company.data.isFixture
+      && company.data.evidence.length > 0,
+  );
+  return companies.map((company) => ({
+    params: { slug: company.id },
+    props: { company },
+  }));
+}
+
+interface Props {
+  company: CollectionEntry<'companies'>;
+}
+
+const { company } = Astro.props;
+const { data } = company;
+const canonicalUrl = absoluteUrl(`/companies/${company.id}/`);
+const routePolicy = resolveCommodityNodeRoutePolicy(`/companies/${company.id}/`, {
+  publicationState: data.publicationState,
+  evidenceCount: data.evidence.length,
+  isFixture: data.isFixture,
+});
+const robots = commodityNodeRobotsContent(routePolicy);
+const evidenceById = new Map(data.evidence.map((record) => [record.id, record]));
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${canonicalUrl}#organization`,
+  name: data.name,
+  description: data.description,
+  url: canonicalUrl,
+  location: { '@type': 'Country', name: data.country },
+  ...(data.ticker ? { tickerSymbol: data.ticker } : {}),
+  subjectOf: data.evidence.map((record) => ({
+    '@type': 'CreativeWork',
+    name: record.label,
+    url: record.url,
+  })),
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Research', item: site.origin },
+    { '@type': 'ListItem', position: 2, name: 'Companies', item: absoluteUrl('/companies/') },
+    { '@type': 'ListItem', position: 3, name: data.name, item: canonicalUrl },
+  ],
+};
+---
+
+<Base
+  title={`${data.name} commodity exposure`}
+  metaTitle={`${data.name}: Commodity Exposure | CommodityNode`}
+  description={data.description}
+  canonicalUrl={canonicalUrl}
+  robots={robots}
+  jsonLd={jsonLd}
+  breadcrumbLd={breadcrumbLd}
+>
+  <article class="commodity-hub">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Research</a><span aria-hidden="true">/</span>
+      <a href="/companies/">Companies</a><span aria-hidden="true">/</span>
+      <span aria-current="page">{data.name}</span>
+    </nav>
+
+    <header class="commodity-hub-header">
+      <div>
+        <p class="section-label">Reviewed company exposure · {data.reviewedAt.toISOString().slice(0, 10)}</p>
+        <h1>{data.name}</h1>
+        <p class="commodity-dek">{data.description}</p>
+      </div>
+      <div class="coverage-block">
+        <span>Evidence state</span>
+        <strong class="coverage-state is-live">Published</strong>
+        <small>{data.evidence.length} exact source records</small>
+      </div>
+    </header>
+
+    <section class="benchmark-contract" aria-labelledby="company-contract-title">
+      <div class="benchmark-contract-heading">
+        <div>
+          <p class="section-label">Exposure contract</p>
+          <h2 id="company-contract-title">{data.exposureType} · {data.commodityIds.join(', ')}</h2>
+        </div>
+        {data.ticker && <code>{data.ticker}</code>}
+      </div>
+      <dl>
+        <div><dt>Country</dt><dd>{data.country}</dd></div>
+        <div><dt>Reviewed by</dt><dd>{data.reviewedBy}</dd></div>
+        <div><dt>Reviewed</dt><dd>{data.reviewedAt.toISOString().slice(0, 10)}</dd></div>
+      </dl>
+    </section>
+
+    <div class="commodity-hub-grid">
+      <section aria-labelledby="mechanisms-title">
+        <p class="section-label">Transmission</p>
+        <h2 id="mechanisms-title">Documented exposure mechanisms</h2>
+        <ol class="supply-stage-list">
+          {data.exposureMechanisms.map((mechanism, index) => (
+            <li><span>{String(index + 1).padStart(2, '0')}</span><strong>{mechanism}</strong></li>
+          ))}
+        </ol>
+      </section>
+      <section aria-labelledby="limitations-title">
+        <p class="section-label">Limits</p>
+        <h2 id="limitations-title">What this record does not establish</h2>
+        <div class="exposure-list">
+          <ul>{data.limitations.map((limitation) => <li>{limitation}</li>)}</ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="source-register" aria-labelledby="assets-title">
+      <div>
+        <p class="section-label">Physical assets</p>
+        <h2 id="assets-title">Evidence-linked operating relationships</h2>
+      </div>
+      <ol>
+        {data.assets.map((asset) => (
+          <li>
+            <strong>{asset.name} · {asset.type}</strong>
+            <span>{asset.status}</span>
+            <time datetime={asset.asOf.toISOString()}>
+              As reviewed {asset.asOf.toISOString().slice(0, 10)}
+            </time>
+            <small>
+              {asset.evidenceIds.map((id) => evidenceById.get(id)?.publisher).filter(Boolean).join(' · ')}
+            </small>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    {data.relatedEventIds.map((eventId) => (
+      <section class="hub-live-bridge" aria-labelledby={`related-${eventId}`}>
+        <div>
+          <p class="section-label">Related Event Pulse</p>
+          <h2 id={`related-${eventId}`}>Inspect the event before using the exposure.</h2>
+          <p>The event record separates supported claims, inference, unknowns, and the reviewed impact path.</p>
+        </div>
+        <a class="primary-action" href={`/events/${eventId}/`}>Open the evidence record</a>
+      </section>
+    ))}
+
+    <section class="source-register" aria-labelledby="company-sources-title">
+      <div>
+        <p class="section-label">Source register</p>
+        <h2 id="company-sources-title">Exact records used on this page</h2>
+      </div>
+      <ol>
+        {data.evidence.map((record) => (
+          <li>
+            <a href={record.url} target="_blank" rel="noopener noreferrer">{record.label}</a>
+            <span>{record.publisher}</span>
+            <small>{record.locator}</small>
+            <time datetime={record.retrievedAt.toISOString()}>
+              Retrieved {record.retrievedAt.toISOString().slice(0, 10)}
+            </time>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </article>
+</Base>

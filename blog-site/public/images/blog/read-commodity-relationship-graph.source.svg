@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#071116"/>
+  <rect x="48" y="48" width="1104" height="534" rx="12" fill="#050d11" stroke="#27454e"/>
+  <g fill="none" stroke="#173038">
+    <ellipse cx="600" cy="315" rx="470" ry="222"/><ellipse cx="600" cy="315" rx="340" ry="160"/><ellipse cx="600" cy="315" rx="210" ry="98"/>
+  </g>
+  <g stroke="#3a626b" stroke-width="2">
+    <path d="M150 170L280 110L390 190L275 255L150 170"/>
+    <path d="M570 105L715 90L850 150L900 250L745 225L570 105"/>
+    <path d="M145 420L280 365L390 465L225 520L145 420"/>
+    <path d="M500 430L625 390L750 410L870 455L765 535L640 515L500 430"/>
+  </g>
+  <g stroke="#55c9bf" stroke-width="3">
+    <path d="M280 110L570 105"/><path d="M390 190L500 430"/><path d="M745 225L625 390"/>
+  </g>
+  <g fill="#12232a" stroke-width="4">
+    <circle cx="150" cy="170" r="22" stroke="#c8b46b"/><circle cx="280" cy="110" r="18" stroke="#c8b46b"/>
+    <circle cx="390" cy="190" r="20" stroke="#c8b46b"/><circle cx="275" cy="255" r="17" stroke="#c8b46b"/>
+    <circle cx="570" cy="105" r="22" stroke="#e5a84b"/><circle cx="715" cy="90" r="18" stroke="#e5a84b"/>
+    <circle cx="850" cy="150" r="20" stroke="#e5a84b"/><circle cx="900" cy="250" r="17" stroke="#e5a84b"/>
+    <circle cx="745" cy="225" r="19" stroke="#e5a84b"/><circle cx="145" cy="420" r="22" stroke="#38b6ad"/>
+    <circle cx="280" cy="365" r="18" stroke="#38b6ad"/><circle cx="390" cy="465" r="20" stroke="#38b6ad"/>
+    <circle cx="225" cy="520" r="17" stroke="#38b6ad"/><circle cx="500" cy="430" r="20" stroke="#83ad70"/>
+    <circle cx="625" cy="390" r="17" stroke="#83ad70"/><circle cx="750" cy="410" r="21" stroke="#83ad70"/>
+    <circle cx="870" cy="455" r="17" stroke="#83ad70"/><circle cx="765" cy="535" r="19" stroke="#83ad70"/>
+    <circle cx="640" cy="515" r="17" stroke="#83ad70"/>
+  </g>
+  <g fill="#83e1d9">
+    <circle cx="280" cy="110" r="5"/><circle cx="570" cy="105" r="5"/><circle cx="625" cy="390" r="5"/>
+  </g>
+</svg>

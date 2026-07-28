@@ -19,6 +19,7 @@ import {
   SITE_VARIANT,
   LAYER_TO_SOURCE,
   isPanelInVariantDefaults,
+  isCommoditySiteVariant,
 } from '@/config';
 import { resolveNewsCategories, enabledNewsCategoryKeys } from '@/config/feed-resolution';
 import {
@@ -122,6 +123,10 @@ import type {
   SectorValuation,
 } from '@/components/MarketPanel';
 import type { ChinaCorporateDisclosureSnapshot } from '@/components/market-disclosures';
+import type {
+  ImpactUniversePanel,
+  ImpactUniverseQuote,
+} from '@/components/ImpactUniversePanel';
 import { mountCommunityWidget } from '@/components/CommunityWidget';
 
 import type { StockAnalysisPanel } from '@/components/StockAnalysisPanel';
@@ -626,8 +631,9 @@ export class DataLoaderManager implements AppModule {
 
     try {
       markLcpDebug('wm:data:feed-digest-start');
+      const digestVariant = SITE_VARIANT === 'commoditynode' ? 'commodity' : SITE_VARIANT;
       const resp = await publicRpcFetch(
-        toApiUrl(`/api/news/v1/list-feed-digest?variant=${SITE_VARIANT}&lang=${getCurrentLanguage()}`),
+        toApiUrl(`/api/news/v1/list-feed-digest?variant=${digestVariant}&lang=${getCurrentLanguage()}`),
         { signal: AbortSignal.timeout(this.digestRequestTimeoutMs) },
       );
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -756,7 +762,7 @@ export class DataLoaderManager implements AppModule {
 
     // Happy variant only loads news data -- skip all geopolitical/financial/military data
     if (SITE_VARIANT !== 'happy') {
-      if (shouldLoadAny(['markets', 'heatmap', 'commodities', 'crypto', 'energy-complex', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens'])) {
+      if (shouldLoadAny(['markets', 'heatmap', 'commodities', 'impact-universe', 'crypto', 'energy-complex', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens'])) {
         tasks.push({ name: 'markets', task: () => runGuarded('markets', () => this.loadMarkets()) });
       }
       if (hasPremiumAccess() && shouldLoad('stock-analysis')) {
@@ -790,7 +796,7 @@ export class DataLoaderManager implements AppModule {
       }
 
       // Trade policy + supply-chain data (FULL, FINANCE, COMMODITY, ENERGY variants use supply-chain surface)
-      if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || SITE_VARIANT === 'commodity' || SITE_VARIANT === 'energy') {
+      if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || isCommoditySiteVariant(SITE_VARIANT) || SITE_VARIANT === 'energy') {
         if (shouldLoad('trade-policy')) {
           tasks.push({ name: 'tradePolicy', task: () => runGuarded('tradePolicy', () => this.loadTradePolicy()) });
         }
@@ -1377,7 +1383,9 @@ export class DataLoaderManager implements AppModule {
         if (items.length === 0) {
           const failures = getFeedFailures();
           const failedFeeds = fallbackFeeds.filter(f => failures.has(f.name));
-          if (failedFeeds.length > 0) {
+          if (SITE_VARIANT === 'commoditynode' && category === 'commodity-news') {
+            panel.showCommodityNodeReferenceState();
+          } else if (failedFeeds.length > 0) {
             const names = failedFeeds.map(f => f.name).join(', ');
             panel.showError(`${t('common.noNewsAvailable')} (${names} failed)`);
           }
@@ -1567,7 +1575,9 @@ export class DataLoaderManager implements AppModule {
 
     this.ctx.allNews = collectedNews;
     this.ctx.initialLoadComplete = true;
-    mountCommunityWidget();
+    if (SITE_VARIANT !== 'commoditynode') {
+      mountCommunityWidget();
+    }
 
     this.ctx.map?.updateHotspotActivity(this.ctx.allNews);
 
@@ -1921,13 +1931,22 @@ export class DataLoaderManager implements AppModule {
       }
 
       const commoditiesPanel = this.ctx.panels['commodities'] as CommoditiesPanel | undefined;
+      const universePanel = this.ctx.panels['impact-universe'] as ImpactUniversePanel | undefined;
       const energyPanel = this.ctx.panels['energy-complex'] as EnergyComplexPanel | undefined;
-      const mapCommodity = (c: MarketData) => ({ symbol: c.symbol, display: c.display, price: c.price, change: c.change, sparkline: c.sparkline });
+      const mapCommodity = (c: MarketData): ImpactUniverseQuote & { sparkline?: number[] } => ({
+        symbol: c.symbol,
+        display: c.display,
+        price: c.price,
+        change: c.change,
+        sparkline: c.sparkline,
+      });
       const energySymbols = new Set(['CL=F', 'BZ=F', 'NG=F']);
       const filterCommodityTape = (data: MarketData[]) => data.filter((item) => item.symbol !== '^VIX' && !energySymbols.has(item.symbol));
       const filterEnergyTape = (data: MarketData[]) => data.filter((item) => energySymbols.has(item.symbol));
+      const filterUniverse = (data: MarketData[]) =>
+        data.filter((item) => item.symbol !== '^VIX' && !item.symbol.endsWith('=X'));
 
-      if (commoditiesPanel || energyPanel) {
+      if (commoditiesPanel || energyPanel || universePanel) {
         // Hydrate commodities from bootstrap (same pattern as sectors/markets)
         const hydratedCommodities = getHydratedData('commodityQuotes') as ListCommodityQuotesResponse | undefined;
         const skipFetch = stocksResult.rateLimited && stocksResult.data.length === 0;
@@ -1949,8 +1968,10 @@ export class DataLoaderManager implements AppModule {
           }));
           const commodityMapped = filterCommodityTape(data).map(mapCommodity);
           const energyMapped = filterEnergyTape(data);
-          if (commoditiesPanel && commodityMapped.some(d => d.price !== null)) {
-            commoditiesPanel.renderCommodities(commodityMapped);
+          const universeMapped = filterUniverse(data).map(mapCommodity);
+          universePanel?.renderCommodities(universeMapped);
+          if (commodityMapped.some(d => d.price !== null)) {
+            commoditiesPanel?.renderCommodities(commodityMapped);
             metalsLoaded = true;
           }
           if (energyMapped.some(d => d.price !== null)) {
@@ -1964,14 +1985,18 @@ export class DataLoaderManager implements AppModule {
             onBatch: (partial) => {
               const commodityMapped = filterCommodityTape(partial).map(mapCommodity);
               const energyMapped = filterEnergyTape(partial);
-              if (commoditiesPanel) commoditiesPanel.renderCommodities(commodityMapped);
+              universePanel?.renderCommodities(filterUniverse(partial).map(mapCommodity));
+              commoditiesPanel?.renderCommodities(commodityMapped);
               energyPanel?.updateTape(energyMapped);
             },
           });
           const commodityMapped = filterCommodityTape(commoditiesResult.data).map(mapCommodity);
           const energyMapped = filterEnergyTape(commoditiesResult.data);
-          if (commoditiesPanel && commodityMapped.some(d => d.price !== null)) {
-            commoditiesPanel.renderCommodities(commodityMapped);
+          universePanel?.renderCommodities(
+            filterUniverse(commoditiesResult.data).map(mapCommodity),
+          );
+          if (commodityMapped.some(d => d.price !== null)) {
+            commoditiesPanel?.renderCommodities(commodityMapped);
             metalsLoaded = true;
           }
           if (energyMapped.some(d => d.price !== null)) {
@@ -1981,6 +2006,7 @@ export class DataLoaderManager implements AppModule {
         }
         if (!metalsLoaded) commoditiesPanel?.renderCommodities([]);
         if (!energyLoaded) energyPanel?.updateTape([]);
+        if (!metalsLoaded && !energyLoaded) universePanel?.renderCommodities([]);
       }
 
       // Load ECB FX rates for CommoditiesPanel FX tab
@@ -2114,7 +2140,7 @@ export class DataLoaderManager implements AppModule {
           sectorContext,
           earningsContext,
           frameworkAppend: getActiveFrameworkForPanel('daily-market-brief')?.systemPromptAppend,
-          newsCategories: SITE_VARIANT === 'commodity'
+          newsCategories: isCommoditySiteVariant(SITE_VARIANT)
             ? ['commodity-news', 'gold-silver', 'mining-news', 'energy', 'critical-minerals']
             : SITE_VARIANT === 'energy'
               ? ['live-news', 'energy', 'supply-chain']
@@ -3529,11 +3555,14 @@ export class DataLoaderManager implements AppModule {
       if (totalItems > 0) {
         dataFreshness.recordUpdate('supply_chain', totalItems);
       } else if (anyUnavailable) {
+        scPanel.showReferenceState();
         dataFreshness.recordError('supply_chain', 'Supply chain upstream temporarily unavailable');
+      } else {
+        scPanel.showReferenceState();
       }
     } catch (e) {
       console.error('[App] Supply chain failed:', e);
-      this.callPanel('supply-chain', 'showError', undefined, () => void this.loadSupplyChain());
+      scPanel.showReferenceState();
       this.ctx.statusPanel?.updateApi('SupplyChain', { status: 'error' });
       dataFreshness.recordError('supply_chain', String(e));
     }

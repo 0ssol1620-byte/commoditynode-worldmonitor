@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode, site } from '../../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const author = (await getCollection('authors'))
+  .find((entry) => entry.id === 'commoditynode-editorial');
+if (!author) throw new Error('CommodityNode editorial author record is missing');
+
+const canonicalUrl = absoluteUrl('/authors/commoditynode-editorial/');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': `${canonicalUrl}#profile`,
+  url: canonicalUrl,
+  mainEntity: {
+    '@type': 'Organization',
+    '@id': `${canonicalUrl}#organization`,
+    name: author.data.name,
+    description: author.data.bio,
+    url: canonicalUrl,
+    parentOrganization: {
+      '@type': 'Organization',
+      '@id': `${site.origin}/#organization`,
+      name: site.name,
+      url: site.origin,
+    },
+  },
+};
+---
+
+<Base
+  title={author.data.name}
+  metaTitle={`${author.data.name} | CommodityNode Research`}
+  description={author.data.bio}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <article class="static-page prose">
+    <p class="section-label">Accountability</p>
+    <h1>{author.data.name}</h1>
+    <p class="article-dek">{author.data.role}</p>
+
+    <p>{author.data.bio}</p>
+
+    <h2>What this byline means</h2>
+    <p>
+      CommodityNode uses this organizational byline when a named individual
+      contributor is not recorded. It does not represent a fabricated person.
+      The desk is accountable for source links, benchmark definitions, visible
+      caveats, corrections, and publication-state controls.
+    </p>
+
+    <h2>Review scope</h2>
+    <ul>
+      {author.data.expertise.map((item) => <li>{item}</li>)}
+    </ul>
+
+    <h2>Disclosures</h2>
+    <ul>
+      {author.data.disclosures.map((item) => <li>{item}</li>)}
+      <li>Articles are published without advertising until a page passes a separate manual ad-eligibility review.</li>
+      <li>Benchmark names can appear without a live quote when market-data display rights have not been approved.</li>
+    </ul>
+
+    <p>
+      Report a source or wording problem through the
+      {' '}<a href="/corrections/">corrections process</a>.
+    </p>
+  </article>
+</Base>

@@ -34,6 +34,10 @@ async function bootEmbed(): Promise<void> {
     const params = parseEmbedParams(window.location.search);
     document.documentElement.dataset.theme = params.theme;
     document.documentElement.dataset.variant = params.variant;
+    document.title =
+      params.variant === 'commoditynode'
+        ? 'CommodityNode Live Map Embed'
+        : 'World Monitor Live Map Embed';
     document.body.dataset.embedReady = 'false';
 
     await initI18n();
@@ -57,10 +61,16 @@ async function bootEmbed(): Promise<void> {
 
     const attribution = document.createElement('a');
     attribution.className = 'wm-embed-attribution';
-    attribution.href = buildWorldMonitorAttributionUrl(new URL('/dashboard', window.location.origin).toString(), getReferrerHost());
+    attribution.href = buildWorldMonitorAttributionUrl(
+      new URL(params.variant === 'commoditynode' ? '/live/' : '/dashboard', window.location.origin).toString(),
+      getReferrerHost(),
+    );
     attribution.target = '_blank';
     attribution.rel = 'noopener noreferrer';
-    attribution.textContent = 'Live map by World Monitor';
+    attribution.textContent =
+      params.variant === 'commoditynode'
+        ? 'Live map by CommodityNode'
+        : 'Live map by World Monitor';
     root.appendChild(attribution);
 
     const loader = new EmbedDataLoader(map, params.layerIds);

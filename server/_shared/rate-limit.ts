@@ -1,6 +1,6 @@
 import { Ratelimit, type Duration } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import { getClientIp } from './client-ip';
+import { getClientIp } from './client-ip.js';
 // @ts-expect-error — JS module, no declaration file
 import { captureSilentError } from '../../api/_sentry-edge.js';
 // @ts-expect-error — JS module, no declaration file
@@ -12,7 +12,7 @@ import { durationToSeconds, limitWithFallback, resetRateLimitFallbackForTest } f
 // the helpers' original home and existing callers import them from this
 // module (getClientIp: api/ask.ts, api/a2a.ts, api/mcp-proxy.ts;
 // UNKNOWN_CLIENT_IP: turnstile.ts; plus the rate-limit test suites).
-export { getClientIp, hasCloudflareTransitProof, UNKNOWN_CLIENT_IP } from './client-ip';
+export { getClientIp, hasCloudflareTransitProof, UNKNOWN_CLIENT_IP } from './client-ip.js';
 
 // @upstash/redis defaults to 5 retries with exponential backoff (~4.3s total)
 // before surfacing an unreachable-Redis error. The node test runner sets
@@ -227,6 +227,8 @@ export const ENDPOINT_RATE_POLICIES: Record<string, EndpointRatePolicy> = {
   // these hit Convex + Resend per request.
   '/api/leads/v1/submit-contact': { limit: 3, window: '1 h' },
   '/api/leads/v1/register-interest': { limit: 5, window: '1 h' },
+  '/api/commoditynode-newsletter': { limit: 5, window: '1 h' },
+  '/api/commoditynode-brief-request': { limit: 3, window: '1 h' },
   // Scenario engine: legacy /api/scenario/v1/run capped at 10 jobs/min/IP via
   // inline Upstash INCR. Gateway now enforces the same budget with per-IP
   // keying in checkEndpointRateLimit.

@@ -73,6 +73,7 @@ function extractOpen() {
     'setTrustedHtml',
     'trustedHtml',
     'track',
+    'SITE_VARIANT',
     `${js}\nreturn __UnifiedSettingsOpenHarness;`,
   );
 }
@@ -88,6 +89,7 @@ const Harness = extractOpen()(
   () => {},
   (value) => value,
   () => {},
+  'full',
 );
 
 function makeInstance(initialTab = 'settings') {

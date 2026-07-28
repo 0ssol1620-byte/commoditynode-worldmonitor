@@ -135,6 +135,26 @@ test.describe('public map embed', () => {
     await testInfo.attach('embed-direct', { path: screenshotPath, contentType: 'image/png' });
   });
 
+  test('renders CommodityNode attribution and public asset layers', async ({ page }) => {
+    await stubWorldAtlas(page);
+    await page.goto(
+      '/embed?layers=miningSites,processingPlants,commodityPorts,commodityHubs,tradeRoutes'
+      + '&center=15,10&zoom=1.2&theme=dark&variant=commoditynode',
+    );
+
+    await expect(page.locator('html')).toHaveAttribute('data-variant', 'commoditynode');
+    await expect(page).toHaveTitle('CommodityNode Live Map Embed');
+    await expect(page.locator('.wm-embed-attribution')).toHaveText(
+      'Live map by CommodityNode',
+    );
+    await expect(page.locator('.wm-embed-attribution')).toHaveAttribute(
+      'href',
+      /^http:\/\/127\.0\.0\.1:4173\/\?utm_source=embed/,
+    );
+    await expectCurrentMapRenderer(page);
+    await expect(page.locator('body')).toHaveAttribute('data-embed-ready', 'true');
+  });
+
   test('loads inside a third-party iframe host page', async ({ page, baseURL }, testInfo) => {
     await stubWorldAtlas(page);
     const localBaseUrl = baseURL ?? 'http://127.0.0.1:4173';

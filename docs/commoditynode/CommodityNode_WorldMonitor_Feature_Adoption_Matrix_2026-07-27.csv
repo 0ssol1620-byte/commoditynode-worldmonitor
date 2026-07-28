@@ -1,0 +1,38 @@
+area,decision,commoditynode_application
+License & provenance,KEEP + EXTEND,"AGPL notices preserved; add deployed-source offer, fork notice, change ledger, build SHA mapping"
+Product variant,EXTEND,Create additive commoditynode variant; commodity variant remains upstream reference
+Variant detection,MINIMAL PATCH,Recognize live.commoditynode.com and VITE_VARIANT=commoditynode through a centralized valid-variant registry
+Variant metadata,EXTEND,"CommodityNode title, description, categories, product claims, canonical live URL"
+Build scripts,MINIMAL PATCH,Add dev/build/E2E/visual scripts for commoditynode
+Dashboard shell,KEEP,"Retain initialization, panel lifecycle, bootstrap, refresh scheduler"
+Panel framework,KEEP,"Reuse lifecycle, event delegation, resizing, lazy visibility; new panels extend base class"
+Panel registry,ADAPT VIA REGISTRY,Register only CommodityNode panels and entitlements; avoid editing giant tables repeatedly
+2D map,KEEP + BRAND,"Primary analytical surface for facilities, routes, events, hazards, company assets"
+Map layer registry,EXTEND,"Commodity production, asset, trade, event and exposure layers with evidence metadata"
+Marker type system,KEEP + EXTEND,"Add commodity_event, mine, plant, port, route, company_asset, impact_anchor marker kinds"
+Spatial clustering,KEEP,Cluster facilities/events by zoom and category; aggregate without implying causal relation
+URL state,KEEP + EXTEND,"Shareable map, commodity, event, layers, time range and selected path state"
+Bootstrap hydration,KEEP + NARROW,CommodityNode fast/slow keys only; omit irrelevant domains from initial payload
+Adaptive polling,KEEP,"Visibility-aware refresh for market, event, route, asset-status feeds"
+Cache architecture,KEEP,Retain stale-on-error and stampede prevention; add dataset rights/freshness envelope
+Railway seeders,ADAPT,"Commodity prices, EIA/USGS/USDA/WB, events, routes, ontology snapshots, image jobs"
+Feed aggregation,KEEP + CURATE,"Commodity, energy, mining, agriculture, shipping, policy and filing feeds only"
+Source freshness,KEEP + REDESIGN UX,Private ops detail; public modules show concise Fresh/Stale/Unavailable without QA jargon
+Market quotes,ADAPT,"Futures, equity/ETF proxies and official series with strict instrument contracts"
+Commodity quote panel,REBUILD,"Benchmark cards with source, delay, unit, relationship and stale status; no mislabeled proxy"
+Commodity geography,IMPORT AS CANDIDATES,"Seed mines, processing plants and ports into provenance registry; verify each record before publication"
+Mining sites layer,KEEP + ENRICH,"Capacity, operator, commodities, status, source, event proximity and linked hub"
+Processing plants layer,KEEP + ENRICH,Smelters/refineries/separation facilities linked to commodity routes
+Commodity ports layer,KEEP + ENRICH,"Bulk/energy/mineral ports, throughput context and route links"
+Pipelines,KEEP SELECTIVELY,Oil/gas/NGL pipelines relevant to commodity supply and disruption
+Waterways/chokepoints,KEEP,"Trade-transmission surface for oil, gas, grains, ores and fertilizers"
+Weather/natural hazards,KEEP,"Overlay disruption candidates near mines, ports, crops and energy assets"
+Macro/economic data,KEEP SELECTIVELY,"Demand, inventory, freight, rate and FX context tied to commodity pages"
+Impact Universe graph,BUILD NEW,"Ontology explorer, path propagation, evidence drawer, map/graph synchronization"
+Evidence drawer,BUILD NEW,"Claim, source locator, relation, direction, lag, confidence, validity and reviewer"
+Astro blog,EXPAND INTO RESEARCH SURFACE,Apex SEO/editorial site deployed separately; retain folder initially to minimize merge conflicts
+Documentation,KEEP INTERNAL/DEVELOPER,"Fork docs, data catalog, source offer, API docs and methodology"
+Visual regression,KEEP + ADD VARIANT,"CommodityNode live map, graph, mobile and research snapshots"
+Military/flight/siren/cyber UI,DISABLE,Not part of public product except when transformed into a direct commodity event signal
+Airline intelligence,DISABLE,Remove from CommodityNode defaults; retain only jet-fuel research routes if justified
+World Monitor branding,DO NOT USE,CommodityNode identity; factual attribution and source link only

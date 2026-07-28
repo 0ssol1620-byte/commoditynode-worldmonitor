@@ -45,8 +45,10 @@ export const BASELINE_ADVISORIES_BY_LOCKFILE = {
   // first-party Tailwind sources; postcss never ships in public/pro/. The
   // clean fix means bumping the `overrides.postcss` pin (8.5.12 → ≥8.5.23),
   // which drags a public/pro/ bundle rebuild into a lockfile-hygiene change —
-  // same trade-off as GHSA-395f below. Drop when the pin next bumps.
-  'pro-test/package-lock.json': ['GHSA-qjx8-664m-686j', 'GHSA-w24r-5266-9c3c', 'GHSA-395f-4hp3-45gv', 'GHSA-r28c-9q8g-f849'],
+  // same trade-off as GHSA-395f below. The Clerk and PostCSS advisories that
+  // used to be listed here no longer appear in npm's production audit and were
+  // removed instead of letting the baseline become a permanent exception list.
+  'pro-test/package-lock.json': ['GHSA-395f-4hp3-45gv'],
   // GHSA-mh99-v99m-4gvg reaches scripts only through ExcelJS's archive
   // dependencies. ExcelJS is used by operator-run seed/backfill scripts with
   // exact workbook paths; no request input reaches a minimatch brace pattern.
@@ -211,10 +213,12 @@ function readAuditReport({ workspace, packageJson, lockfile }) {
   const result = spawnSync('npm', ['audit', '--omit=dev', '--json'], {
     cwd: auditWorkspace.cwd,
     encoding: 'utf8',
+    shell: process.platform === 'win32',
   });
 
   try {
-    const json = result.stdout.trim();
+    if (result.error) throw result.error;
+    const json = (result.stdout ?? '').trim();
 
     if (!json) {
       process.stderr.write(result.stderr);

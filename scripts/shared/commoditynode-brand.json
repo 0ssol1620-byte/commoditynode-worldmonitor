@@ -1,0 +1,25 @@
+{
+  "name": "CommodityNode",
+  "liveLabel": "Live Intelligence",
+  "researchLabel": "Research",
+  "researchUrl": "https://commoditynode.com",
+  "liveUrl": "https://commoditynode.com/live/",
+  "sourceUrl": "https://github.com/0ssol1620-byte/commoditynode-worldmonitor",
+  "tagline": "Evidence-linked commodity impact intelligence",
+  "colors": {
+    "canvas": "#061015",
+    "surface": "#0b171d",
+    "surfaceRaised": "#102128",
+    "border": "#21404a",
+    "text": "#e8eef1",
+    "textMuted": "#91a5ad",
+    "signal": "#39d0c3",
+    "signalMuted": "#1d817a",
+    "accent": "#f3b54a",
+    "danger": "#e35d6a"
+  },
+  "typography": {
+    "ui": "\"Source Sans 3 Variable\", \"Source Sans 3\", \"Segoe UI\", ui-sans-serif, system-ui, sans-serif",
+    "data": "\"IBM Plex Mono\", \"SFMono-Regular\", Consolas, monospace"
+  }
+}

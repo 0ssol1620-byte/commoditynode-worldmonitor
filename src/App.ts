@@ -15,6 +15,7 @@ import {
   restoreFreeMapPanelAccess,
   FREE_MAX_PANELS,
   FREE_MAX_SOURCES,
+  isCommoditySiteVariant,
 } from '@/config';
 import { sanitizeLayersForVariant } from '@/config/map-layer-definitions';
 import type { MapVariant } from '@/config/map-layer-definitions';
@@ -107,6 +108,7 @@ import { EventHandlerManager } from '@/app/event-handlers';
 import { replaceRawI18nKeyPlaceholders } from '@/app/i18n-raw-key-healer';
 import { resolveUserRegion, resolvePreciseUserCoordinates, type PreciseCoordinates } from '@/utils/user-location';
 import { showProBanner } from '@/components/ProBanner';
+import { VARIANT_META } from '@/config/variant-meta';
 import { initAuthState, subscribeAuthState } from '@/services/auth-state';
 import {
   CLOUD_PREFS_APPLIED_EVENT,
@@ -506,6 +508,10 @@ export class App {
       const panel = this.state.panels['chokepoint-strip'] as ChokepointStripPanel | undefined;
       if (panel) primeTask('chokepoint-strip', () => panel.fetchData());
     }
+    if (shouldPrime('route-risk')) {
+      const panel = this.state.panels['route-risk'] as ChokepointStripPanel | undefined;
+      if (panel) primeTask('route-risk', () => panel.fetchData());
+    }
     if (shouldPrime('climate-news')) {
       const panel = this.state.panels['climate-news'] as ClimateNewsPanel | undefined;
       if (panel) primeTask('climate-news', () => panel.fetchData());
@@ -560,7 +566,7 @@ export class App {
     if (shouldPrime('market-breadth')) {
       primeTask('marketBreadth', () => this.dataLoader.loadMarketBreadth());
     }
-    if (shouldPrimeAny(['markets', 'heatmap', 'commodities', 'crypto', 'energy-complex'])) {
+    if (shouldPrimeAny(['markets', 'heatmap', 'commodities', 'impact-universe', 'crypto', 'energy-complex'])) {
       primeTask('markets', () => this.dataLoader.loadMarkets());
     }
     if (shouldPrime('polymarket')) {
@@ -1281,16 +1287,23 @@ export class App {
     // Localize the static index.html shell — <title>, meta description, and
     // the accessible <h1> are baked in English before the app boots; once i18n
     // is ready we swap them to the user's locale.
-    document.title = t('shell.documentTitle');
+    const shellMeta = VARIANT_META[SITE_VARIANT] ?? VARIANT_META.full;
+    const shellTitle = SITE_VARIANT === 'commoditynode'
+      ? shellMeta.title
+      : t('shell.documentTitle');
+    const shellDescription = SITE_VARIANT === 'commoditynode'
+      ? shellMeta.description
+      : t('shell.metaDescription');
+    document.title = shellTitle;
     const setMeta = (sel: string, val: string) => {
       const el = document.querySelector(sel);
       if (el) el.setAttribute('content', val);
     };
-    setMeta('meta[name="description"]', t('shell.metaDescription'));
-    setMeta('meta[property="og:title"]', t('shell.documentTitle'));
-    setMeta('meta[property="og:description"]', t('shell.metaDescription'));
-    setMeta('meta[name="twitter:title"]', t('shell.documentTitle'));
-    setMeta('meta[name="twitter:description"]', t('shell.metaDescription'));
+    setMeta('meta[name="description"]', shellDescription);
+    setMeta('meta[property="og:title"]', shellTitle);
+    setMeta('meta[property="og:description"]', shellDescription);
+    setMeta('meta[name="twitter:title"]', shellTitle);
+    setMeta('meta[name="twitter:description"]', shellDescription);
     // Mirror of OG_LOCALE in pro-test/src/i18n.ts. The two packages have
     // separate Vite roots and bundlers and can't share an import — keep the
     // tables aligned by hand when adding a locale here OR there.
@@ -1304,7 +1317,7 @@ export class App {
     const baseLang = (document.documentElement.lang || 'en').split('-')[0] || 'en';
     setMeta('meta[property="og:locale"]', ogLocaleMap[baseLang] || `${baseLang}_${baseLang.toUpperCase()}`);
     const srH1 = document.querySelector('body > h1');
-    if (srH1) srH1.textContent = t('shell.documentTitle');
+    if (srH1) srH1.textContent = shellTitle;
     const aiFlow = getAiFlowSettings();
     if (aiFlow.browserModel || isDesktopRuntime()) {
       await mlWorker.init();
@@ -1576,7 +1589,9 @@ export class App {
     await this.panelLayout.init();
     markLcpDebug('wm:layout:init-complete');
     this.eventHandlers.setupSearchControls();
-    showProBanner(this.state.container);
+    if (SITE_VARIANT !== 'commoditynode') {
+      showProBanner(this.state.container);
+    }
     this.updateConnectivityUi();
     window.addEventListener('online', this.handleConnectivityChange);
     window.addEventListener('offline', this.handleConnectivityChange);
@@ -2120,7 +2135,7 @@ export class App {
           name: 'markets',
           fn: () => this.dataLoader.loadMarkets(),
           intervalMs: REFRESH_INTERVALS.markets,
-          condition: () => this.isAnyPanelNearViewport(['markets', 'heatmap', 'commodities', 'crypto', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens']),
+          condition: () => this.isAnyPanelNearViewport(['markets', 'heatmap', 'commodities', 'impact-universe', 'crypto', 'crypto-heatmap', 'defi-tokens', 'ai-tokens', 'other-tokens']),
         },
         {
           name: 'predictions',
@@ -2267,7 +2282,7 @@ export class App {
     // PRO-gated: the isNearViewport check is a visibility gate, not an entitlement gate,
     // so without hasPremiumAccess() here we'd still hit the 6 WTO RPCs every poll for
     // free users once the panel scrolled into view.
-    if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || SITE_VARIANT === 'commodity' || SITE_VARIANT === 'energy') {
+    if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance' || isCommoditySiteVariant(SITE_VARIANT) || SITE_VARIANT === 'energy') {
       this.refreshScheduler.scheduleRefresh('tradePolicy', () => this.dataLoader.loadTradePolicy(), REFRESH_INTERVALS.tradePolicy, () => hasPremiumAccess() && this.isPanelNearViewport('trade-policy'));
       this.refreshScheduler.scheduleRefresh('supplyChain', () => this.dataLoader.loadSupplyChain(), REFRESH_INTERVALS.supplyChain, () => this.isPanelNearViewport('supply-chain'));
       this.refreshScheduler.scheduleRefresh('chinaCorridors', () => this.dataLoader.loadChinaCorridors(), REFRESH_INTERVALS.chinaCorridors, () => this.isPanelNearViewport('china-corridors'));
@@ -2371,6 +2386,13 @@ export class App {
       () => (this.state.panels['chokepoint-strip'] as ChokepointStripPanel).fetchData(),
       REFRESH_INTERVALS.chokepointStrip,
       () => this.isPanelNearViewport('chokepoint-strip')
+    );
+
+    this.refreshScheduler.scheduleRefresh(
+      'route-risk',
+      () => (this.state.panels['route-risk'] as ChokepointStripPanel).fetchData(),
+      REFRESH_INTERVALS.chokepointStrip,
+      () => this.isPanelNearViewport('route-risk')
     );
 
     this.refreshScheduler.scheduleRefresh(

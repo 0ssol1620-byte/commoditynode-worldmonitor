@@ -33,7 +33,7 @@ describe('blog FAQPage JSON-LD extraction (#5001)', () => {
       '',
       '**Is the free tier usable?**',
       '',
-      'Yes — it ships [56 layers](https://www.worldmonitor.app/) with no signup.',
+      'Yes — it ships [57 layers](https://www.worldmonitor.app/) with no signup.',
       '',
       '**When is paid worth it?**',
       '',
@@ -56,7 +56,7 @@ describe('blog FAQPage JSON-LD extraction (#5001)', () => {
     assert.equal(ld.mainEntity[0].name, 'Is the free tier usable?');
     assert.equal(
       ld.mainEntity[0].acceptedAnswer.text,
-      'Yes — it ships 56 layers with no signup.',
+      'Yes — it ships 57 layers with no signup.',
       'markdown links must be flattened to text',
     );
   });

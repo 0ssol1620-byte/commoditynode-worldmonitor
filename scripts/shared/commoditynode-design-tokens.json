@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "product": "CommodityNode",
+  "rationale": {
+    "uiTypeface": "Source Sans 3 was selected for long-form research readability, compact dashboard labels, and stable tabular numerals.",
+    "dataTypeface": "IBM Plex Mono is restricted to prices, timestamps, units, identifiers, and other aligned data.",
+    "surfaces": "Solid neutral surfaces and hairline borders replace atmospheric gradients, glass blur, and decorative glow.",
+    "motion": "Frequent controls are immediate; occasional state transitions use explicit properties and short, non-bouncy easing."
+  },
+  "typography": {
+    "ui": "\"Source Sans 3 Variable\", \"Source Sans 3\", \"Segoe UI\", ui-sans-serif, system-ui, sans-serif",
+    "data": "\"IBM Plex Mono\", \"SFMono-Regular\", Consolas, ui-monospace, monospace",
+    "weights": {
+      "regular": 400,
+      "medium": 520,
+      "semibold": 640,
+      "bold": 720
+    }
+  },
+  "color": {
+    "dark": {
+      "canvas": "#071116",
+      "canvasAlt": "#09151a",
+      "surface": "#0d1a20",
+      "surfaceRaised": "#12232a",
+      "surfaceSelected": "#163037",
+      "borderSubtle": "#173038",
+      "border": "#27454e",
+      "borderStrong": "#3a626b",
+      "text": "#edf3f4",
+      "textSecondary": "#c7d4d8",
+      "textMuted": "#93a8ae",
+      "textFaint": "#71878e",
+      "signal": "#55c9bf",
+      "signalMuted": "#246b66",
+      "signalStrong": "#83e1d9",
+      "attention": "#d5aa5b",
+      "danger": "#dc6f7a",
+      "info": "#7fa8c7",
+      "mapCanvas": "#050d11",
+      "mapLand": "#102329",
+      "mapStroke": "#3b6872"
+    },
+    "light": {
+      "canvas": "#f3f6f5",
+      "canvasAlt": "#eaf0ef",
+      "surface": "#ffffff",
+      "surfaceRaised": "#f8faf9",
+      "surfaceSelected": "#e2f1ef",
+      "borderSubtle": "#dce5e4",
+      "border": "#c4d2d2",
+      "borderStrong": "#8fa7aa",
+      "text": "#132126",
+      "textSecondary": "#34484f",
+      "textMuted": "#566d74",
+      "textFaint": "#6f8288",
+      "signal": "#167c74",
+      "signalMuted": "#b8dcd8",
+      "signalStrong": "#0d625c",
+      "attention": "#8a641d",
+      "danger": "#a63f4d",
+      "info": "#356c93",
+      "mapCanvas": "#dfe9e8",
+      "mapLand": "#c9d9d7",
+      "mapStroke": "#6b8d91"
+    }
+  },
+  "space": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "6": "24px",
+    "8": "32px",
+    "12": "48px",
+    "16": "64px"
+  },
+  "radius": {
+    "control": "3px",
+    "surface": "4px",
+    "overlay": "6px"
+  },
+  "motion": {
+    "fast": "120ms",
+    "standard": "180ms",
+    "overlay": "240ms",
+    "easeOut": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "easeInOut": "cubic-bezier(0.77, 0, 0.175, 1)"
+  },
+  "zIndex": {
+    "base": 0,
+    "sticky": 20,
+    "drawer": 40,
+    "popover": 60,
+    "modal": 80,
+    "toast": 100
+  }
+}

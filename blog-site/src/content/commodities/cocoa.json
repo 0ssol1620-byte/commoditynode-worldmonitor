@@ -1,0 +1,32 @@
+{
+  "name": "Cocoa",
+  "shortName": "Cocoa",
+  "description": "Cocoa supply is concentrated in West Africa and shaped by weather, crop disease, farm economics, port logistics, grinding demand, inventories, and contract structure.",
+  "group": "agriculture",
+  "coverage": "live",
+  "benchmark": {
+    "name": "ICE U.S. Cocoa futures",
+    "symbol": "CC=F",
+    "instrumentType": "futures_benchmark",
+    "exchange": "ICE Futures U.S.",
+    "unit": "USD/metric ton",
+    "currency": "USD",
+    "provider": "Yahoo Finance via provider adapter",
+    "delayPolicy": "Provider-defined; use the displayed as-of timestamp.",
+    "caveat": "The futures quote does not represent every origin differential or local farm-gate price."
+  },
+  "productionRegions": ["Côte d’Ivoire", "Ghana", "Ecuador", "Nigeria", "Cameroon"],
+  "supplyStages": ["Farm", "Cooperative", "Warehouse", "Port", "Grinder", "Manufacturer"],
+  "demandSectors": ["Chocolate", "Food manufacturing", "Cosmetics"],
+  "marketContext": "Read the futures benchmark beside crop arrivals, weather, disease reports, farm incentives, port movement, certified stocks, grindings, and origin differentials. Production evidence and contract pricing update on different calendars. A sharp futures move can therefore precede confirmed crop data or reflect positioning as well as physical supply.",
+  "evidence": [
+    {
+      "label": "FAOSTAT Crops and livestock products",
+      "url": "https://www.fao.org/faostat/en/#data/QCL",
+      "publisher": "Food and Agriculture Organization of the United Nations",
+      "retrievedAt": "2026-07-27"
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-27"
+}

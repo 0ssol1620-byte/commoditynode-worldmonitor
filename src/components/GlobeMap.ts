@@ -75,6 +75,46 @@ const SAT_TYPE_EMOJI: Record<string, string> = { sar: '\u{1F4E1}', optical: '\u{
 const SAT_TYPE_LABEL: Record<string, string> = { sar: 'SAR Imaging', optical: 'Optical Imaging', military: 'Military', sigint: 'SIGINT' };
 const SAT_OPERATOR_NAME: Record<string, string> = { CN: 'China', RU: 'Russia', US: 'United States', EU: 'ESA / EU', KR: 'South Korea', IN: 'India', TR: 'Turkey', OTHER: 'Other' };
 
+const COMMODITYNODE_GLOBE_LAYER_GROUPS = [
+  {
+    id: 'assets',
+    label: 'Reference assets',
+    layers: ['minerals', 'economic'],
+  },
+  {
+    id: 'flows',
+    label: 'Flows and routes',
+    layers: ['pipelines', 'tradeRoutes', 'waterways', 'ais'],
+  },
+  {
+    id: 'risk',
+    label: 'Operational context',
+    layers: ['natural', 'weather', 'fires', 'outages', 'climate'],
+  },
+] as const satisfies ReadonlyArray<{
+  id: string;
+  label: string;
+  layers: readonly (keyof MapLayers)[];
+}>;
+
+const COMMODITYNODE_GLOBE_LAYER_CODES: Partial<Record<keyof MapLayers, string>> = {
+  minerals: 'MX',
+  economic: 'EC',
+  pipelines: 'PL',
+  tradeRoutes: 'TR',
+  waterways: 'CH',
+  ais: 'AIS',
+  natural: 'NE',
+  weather: 'WX',
+  fires: 'FR',
+  outages: 'IO',
+  climate: 'CL',
+};
+
+const COMMODITYNODE_GLOBE_LAYER_KEYS = new Set<keyof MapLayers>(
+  COMMODITYNODE_GLOBE_LAYER_GROUPS.flatMap((group) => [...group.layers]),
+);
+
 function saveWebcamMarkerMode(mode: string): void {
   try {
     localStorage.setItem('wm-webcam-marker-mode', mode);
@@ -1208,7 +1248,23 @@ export class GlobeMap {
       setTrustedHtml(el, trustedHtml(GlobeMap.wrapHit(`<div style="font-size:10px;color:#88aaff;text-shadow:0 0 3px #88aaff88;">🖥</div>`), "legacy direct innerHTML migration"));
       el.title = `${d.name} (${d.owner})`;
     } else if (d._kind === 'waterway') {
-      setTrustedHtml(el, trustedHtml(GlobeMap.wrapHit(`<div style="font-size:10px;color:#44aadd;text-shadow:0 0 3px #44aadd88;">⚓</div>`), "legacy direct innerHTML migration"));
+      setTrustedHtml(el, trustedHtml(GlobeMap.wrapHit(`
+        <div style="
+          position:relative;
+          width:9px;
+          height:9px;
+          border:1.5px solid #55c7e8;
+          border-radius:50%;
+          background:#07161d;
+          box-shadow:0 0 5px rgba(85,199,232,.45);
+        ">
+          <span style="
+            position:absolute;
+            inset:2px;
+            border-radius:50%;
+            background:#8de8f5;
+          "></span>
+        </div>`), "legacy direct innerHTML migration"));
       el.title = d.name;
     } else if (d._kind === 'mineral') {
       setTrustedHtml(el, trustedHtml(GlobeMap.wrapHit(`<div style="font-size:10px;color:#cc88ff;text-shadow:0 0 3px #cc88ff88;">💎</div>`), "legacy direct innerHTML migration"));
@@ -1921,7 +1977,14 @@ export class GlobeMap {
   }
 
   private createLayerToggles(): void {
-    const layerDefs = getLayersForVariant((SITE_VARIANT || 'full') as MapVariant, 'globe');
+    const layerDefs = getLayersForVariant(
+      (SITE_VARIANT || 'full') as MapVariant,
+      'globe',
+    ).filter(
+      (definition) =>
+        SITE_VARIANT !== 'commoditynode'
+        || COMMODITYNODE_GLOBE_LAYER_KEYS.has(definition.key),
+    );
     const _wmKey = getSecretState('WORLDMONITOR_API_KEY').present;
     const layers = layerDefs.map(def => ({
       key: def.key,
@@ -1934,6 +1997,47 @@ export class GlobeMap {
     el.className = 'layer-toggles deckgl-layer-toggles';
     el.style.bottom = 'auto';
     el.style.top = '10px';
+    const renderLayerRow = ({
+      key,
+      label,
+      icon,
+      premium,
+    }: (typeof layers)[number]): string => {
+      const isLocked = premium === 'locked' && !_wmKey;
+      const isEnhanced = premium === 'enhanced' && !_wmKey;
+      const explainLabel = escapeHtml(`Explain ${label} layer`);
+      const hasExplanation = hasCuratedLayerExplanation(key);
+      const visibleIcon =
+        SITE_VARIANT === 'commoditynode'
+          ? escapeHtml(COMMODITYNODE_GLOBE_LAYER_CODES[key] ?? 'DT')
+          : icon;
+      return `
+        <div class="layer-toggle-row" data-layer="${key}">
+          <label class="layer-toggle${isLocked ? ' layer-toggle-locked' : ''}" data-layer="${key}">
+            <input type="checkbox" ${this.layers[key] ? 'checked' : ''}${isLocked ? ' disabled' : ''}>
+            <span class="toggle-icon" aria-hidden="true">${visibleIcon}</span>
+            <span class="toggle-label">${label}${isLocked ? ' \uD83D\uDD12' : ''}${isEnhanced ? ' <span class="layer-pro-badge">PRO</span>' : ''}</span>
+          </label>
+          <button type="button" class="layer-explain-btn${hasExplanation ? ' has-layer-explanation' : ''}" data-layer="${key}" aria-label="${explainLabel}" title="${explainLabel}">i</button>
+        </div>`;
+    };
+    const layerRows =
+      SITE_VARIANT === 'commoditynode'
+        ? COMMODITYNODE_GLOBE_LAYER_GROUPS.map((group) => {
+            const rows = group.layers
+              .map((key) => layers.find((item) => item.key === key))
+              .filter((item): item is (typeof layers)[number] => Boolean(item))
+              .map(renderLayerRow)
+              .join('');
+            return rows
+              ? `
+                <section class="cn-map-layer-group" aria-labelledby="cn-globe-layer-group-${group.id}">
+                  <h3 id="cn-globe-layer-group-${group.id}">${group.label}</h3>
+                  ${rows}
+                </section>`
+              : '';
+          }).join('')
+        : layers.map(renderLayerRow).join('');
     setTrustedHtml(el, trustedHtml(`
       <div class="toggle-header">
         <span>${t('components.deckgl.layersTitle')}</span>
@@ -1941,26 +2045,14 @@ export class GlobeMap {
       </div>
       <input type="text" class="layer-search" placeholder="${t('components.deckgl.layerSearch')}" autocomplete="off" spellcheck="false" />
       <div class="toggle-list" style="max-height:32vh;overflow-y:auto;scrollbar-width:thin;">
-        ${layers.map(({ key, label, icon, premium }) => {
-          const isLocked = premium === 'locked' && !_wmKey;
-          const isEnhanced = premium === 'enhanced' && !_wmKey;
-          const explainLabel = escapeHtml(`Explain ${label} layer`);
-          const hasExplanation = hasCuratedLayerExplanation(key);
-          return `
-          <div class="layer-toggle-row" data-layer="${key}">
-            <label class="layer-toggle${isLocked ? ' layer-toggle-locked' : ''}" data-layer="${key}">
-              <input type="checkbox" ${this.layers[key] ? 'checked' : ''}${isLocked ? ' disabled' : ''}>
-              <span class="toggle-icon">${icon}</span>
-              <span class="toggle-label">${label}${isLocked ? ' \uD83D\uDD12' : ''}${isEnhanced ? ' <span class="layer-pro-badge">PRO</span>' : ''}</span>
-            </label>
-            <button type="button" class="layer-explain-btn${hasExplanation ? ' has-layer-explanation' : ''}" data-layer="${key}" aria-label="${explainLabel}" title="${explainLabel}">i</button>
-          </div>`;
-        }).join('')}
+        ${layerRows}
       </div>`, "legacy direct innerHTML migration"));
-    const authorBadge = document.createElement('div');
-    authorBadge.className = 'map-author-badge';
-    authorBadge.textContent = '© Elie Habib · Someone™';
-    el.appendChild(authorBadge);
+    if (SITE_VARIANT !== 'commoditynode') {
+      const authorBadge = document.createElement('div');
+      authorBadge.className = 'map-author-badge';
+      authorBadge.textContent = '© Elie Habib · Someone™';
+      el.appendChild(authorBadge);
+    }
     this.container.appendChild(el);
 
     el.querySelectorAll('.layer-toggle input').forEach(input => {
@@ -2150,8 +2242,10 @@ export class GlobeMap {
       markers.push(...this.repairShipMarkers);
     }
     if (this.layers.webcams) markers.push(...this.webcamMarkers);
-    markers.push(...this.newsLocationMarkers);
-    markers.push(...this.flashMarkers);
+    if (SITE_VARIANT !== 'commoditynode') {
+      markers.push(...this.newsLocationMarkers);
+      markers.push(...this.flashMarkers);
+    }
 
     try {
       this.globe.htmlElementsData(markers);

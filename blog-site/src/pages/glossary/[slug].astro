@@ -1,8 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { GLOSSARY_TERMS } from '../../data/glossary';
+import { isCommodityNode } from '../../lib/site-variant';
 
 export function getStaticPaths() {
+  if (isCommodityNode) return [];
   return GLOSSARY_TERMS.map((term) => ({
     params: { slug: term.slug },
     props: { term },

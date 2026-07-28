@@ -17,6 +17,20 @@
       "removal_issue": null
     },
     {
+      "path": "api/commoditynode-analytics.ts",
+      "category": "internal-helper",
+      "reason": "First-party, privacy-minimal aggregate event sink used only by the CommodityNode research shell. It accepts a closed event allowlist, stores daily counters without identifiers, exposes no read API, and is not a user-facing data contract.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-legacy.ts",
+      "category": "non-json",
+      "reason": "HTML-only 410 Gone response for retired CommodityNode routes. It deliberately provides no JSON data API and exists to prevent misleading redirects from removed research pages.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
       "path": "api/mcp.ts",
       "category": "external-protocol",
       "reason": "MCP streamable-HTTP transport — JSON-RPC 2.0 envelope dictated by the Model Context Protocol spec, not something we can or should redefine as proto. After the api/mcp.ts → api/mcp/ structural split, this file is a thin re-export shim that preserves the Vercel edge route URL and the public export surface; the actual handler and supporting modules live under api/mcp/ (each listed below).",
@@ -90,6 +104,13 @@
       "path": "api/mcp/registry/rpc-tools.ts",
       "category": "external-protocol",
       "reason": "MCP TOOL_REGISTRY RPC-tool entries (with _execute, incl. describe_tool). Extracted from api/mcp.ts during the structural split; same external-protocol constraint as the parent shim.",
+      "owner": "@SebastienMelki",
+      "removal_issue": null
+    },
+    {
+      "path": "api/mcp/registry/commoditynode-tools.ts",
+      "category": "external-protocol",
+      "reason": "CommodityNode MCP TOOL_REGISTRY entries exposed only through the MCP JSON-RPC tools/list and tools/call methods. This module exports protocol tool definitions and read-only executors, not an HTTP product API route; the public envelope remains dictated by the MCP specification.",
       "owner": "@SebastienMelki",
       "removal_issue": null
     },
@@ -757,6 +778,48 @@
       "reason": "Migrating to analyst/v1.ListAgentSkills in commit 9 of #3207. Blocked on sebuf#150.",
       "owner": "@SebastienMelki",
       "removal_issue": "#3207"
+    },
+    {
+      "path": "api/commoditynode-graph.ts",
+      "category": "migration-pending",
+      "reason": "Compatibility endpoint for the first governed CommodityNode graph slice while the equivalent typed impact-graph sebuf service is generated and adopted by clients in this feature branch.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-newsletter.ts",
+      "category": "migration-pending",
+      "reason": "Consent-gated double-opt-in command endpoint. It is independently rate limited and will move to the typed CommodityNode product service before the public API contract is frozen.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-brief-request.ts",
+      "category": "migration-pending",
+      "reason": "Consent-gated B2B intake command endpoint with a bounded anti-abuse envelope. It will move to the typed CommodityNode product service before the public API contract is frozen.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
+    },
+    {
+      "path": "api/commoditynode-newsletter-confirm.ts",
+      "category": "non-json",
+      "reason": "Human-facing HTML confirmation landing page reached from a transactional email.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-newsletter-unsubscribe.ts",
+      "category": "non-json",
+      "reason": "Human-facing HTML unsubscribe landing page reached from a transactional email.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": null
+    },
+    {
+      "path": "api/commoditynode-capabilities.ts",
+      "category": "migration-pending",
+      "reason": "Read-only capability negotiation for fail-closed CommodityNode lead and account surfaces while the typed product service contract is finalized.",
+      "owner": "@0ssol1620-byte",
+      "removal_issue": "TBD"
     }
   ]
 }

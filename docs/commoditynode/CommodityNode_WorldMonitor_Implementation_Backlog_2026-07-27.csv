@@ -1,0 +1,117 @@
+id,phase,workstream,task,priority,dependencies,implementation_status
+CNWM-001,0,Fork compliance,Create the official GitHub fork under the CommodityNode organization and record the upstream base SHA/tag.,P0,—,complete
+CNWM-002,0,Fork compliance,Preserve upstream LICENSE and copyright notices without modification.,P0,CNWM-001,complete
+CNWM-003,0,Fork compliance,Add NOTICE.md with factual derivation statement and no affiliation implication.,P0,CNWM-001,complete
+CNWM-004,0,Fork compliance,"Add UPSTREAM.md, SOURCE-OFFER.md and CHANGES-COMMODITYNODE.md.",P0,CNWM-001,complete
+CNWM-005,0,Fork compliance,Implement /source page and footer source-code link.,P0,CNWM-004,complete
+CNWM-006,0,Fork compliance,"Expose build-info JSON with commit SHA, build date, variant and source URL.",P0,CNWM-004,complete
+CNWM-007,0,Fork compliance,Add CI guard that rejects a deploy when source URL/tag does not match build SHA.,P0,CNWM-006,complete
+CNWM-008,0,Fork compliance,Create third-party license and data-source inventory.,P0,CNWM-001,complete
+CNWM-009,0,Brand,Remove World Monitor name/logo from CommodityNode user-facing surfaces while retaining attribution.,P0,CNWM-003,complete
+CNWM-010,0,Source baseline,"Snapshot current CommodityNode Jekyll route, content, data, image and chart inventories.",P0,—,complete
+CNWM-011,0,Source baseline,Freeze current production deployment and document Vercel project/source commit.,P0,CNWM-010,complete
+CNWM-012,0,Public UX,Remove public Publication gate/0-of-6 compliance portal from production navigation.,P0,CNWM-011,complete
+CNWM-013,1,Variant,Create src/config/variants/commoditynode.ts as an additive variant.,P0,CNWM-001,complete
+CNWM-014,1,Variant,Centralize valid variant names and add commoditynode host/build detection.,P0,CNWM-013,complete
+CNWM-015,1,Variant,"Add CommodityNode metadata, theme tokens and public product facts.",P0,CNWM-013,complete
+CNWM-016,1,Build,Add dev/build/test/e2e/visual scripts for commoditynode.,P0,CNWM-013,complete
+CNWM-017,1,Panel defaults,"Define the minimal initial panel set: map, Event Pulse, benchmark tape, disruptions, routes, monitors.",P0,CNWM-013,complete
+CNWM-018,1,Map defaults,Define desktop and mobile CommodityNode layer budgets.,P1,CNWM-013,complete
+CNWM-019,1,Brand,Create shared CommodityNode design token source consumed by SPA and Astro.,P1,CNWM-015,complete
+CNWM-020,1,Shell,"Add CommodityNode global nav, cross-surface links and source attribution.",P1,CNWM-017,complete
+CNWM-021,1,CORS,Add CommodityNode apex/live/API/editorial origins to allowlists.,P0,CNWM-014,complete
+CNWM-022,1,Deployment,Create separate Vercel projects for research and live/API surfaces from one fork.,P0,CNWM-016,complete
+CNWM-023,1,Upstream sync,Create upstream-main mirror branch and automated sync PR workflow.,P1,CNWM-001,complete
+CNWM-024,1,Patch ledger,Track direct modifications to upstream hot files and conflict owners.,P1,CNWM-021,complete
+CNWM-025,2,Research surface,Expand the existing Astro blog-site into the CommodityNode apex research product.,P0,CNWM-020,complete
+CNWM-026,2,Content schemas,"Define collections for commodities, events, research, companies, industries, authors and sources.",P0,CNWM-023,complete
+CNWM-027,2,Home,Build the editorial home with a lazy live-map teaser and no ads.,P1,CNWM-023,complete
+CNWM-028,2,Directory,Build commodity directory with benchmark/proxy semantics and coverage states.,P1,CNWM-024,complete
+CNWM-029,2,Commodity hub,Build reusable Commodity Hub template.,P0,CNWM-024,complete
+CNWM-030,2,Event Pulse,Build Event Pulse index and detail templates.,P1,CNWM-024,complete
+CNWM-031,2,Research,"Build Research index/detail, author and reviewer components.",P1,CNWM-024,complete
+CNWM-032,2,Companies,Build company/asset exposure pages only for evidence-backed records.,P1,CNWM-024,complete
+CNWM-033,2,Trust pages,"Build Methodology, Sources, Editorial Policy, Corrections, About, Contact and legal pages.",P0,CNWM-023,complete
+CNWM-034,2,Source page,Integrate AGPL source offer into both footer and dedicated source page.,P0,CNWM-005,complete
+CNWM-035,2,Search,Implement static/content search that excludes drafts and private records.,P2,CNWM-024,complete
+CNWM-036,2,Legacy redirects,Implement route dispositions for reports/tools/legacy SaaS routes.,P1,CNWM-010,complete
+CNWM-037,3,Database,"Provision PostgreSQL as durable source of truth for registry, claims, graph and editorial workflow.",P0,CNWM-020,in_progress
+CNWM-038,3,Registry,"Implement DataSourceRegistry with terms, rights, cadence, attribution and owner.",P0,CNWM-035,complete
+CNWM-039,3,Market contract,Implement MarketInstrument/BenchmarkContract schemas.,P0,CNWM-035,complete
+CNWM-040,3,Provider adapters,"Wrap Yahoo/yfinance, official series and alternatives behind provider adapters.",P0,CNWM-037,complete
+CNWM-041,3,yfinance,"Implement yfinance/Yahoo proxy adapter with staggered fetch, cache and explicit source labels.",P0,CNWM-038,complete
+CNWM-042,3,Official data,"Add EIA, USGS, USDA, World Bank/FRED adapters for approved series.",P1,CNWM-036,complete
+CNWM-043,3,Asset registry,Import upstream commodity geography as candidate records.,P1,CNWM-035,complete
+CNWM-044,3,Claim ledger,Implement Claim and SourceRecord tables with exact locators.,P0,CNWM-035,complete
+CNWM-045,3,Rights ledger,Implement rights status and expiry at dataset and media-asset level.,P0,CNWM-036,complete
+CNWM-046,3,Freshness envelope,"Add asOf, fetchedAt, staleAt, expiresAt and status to all public data responses.",P1,CNWM-036,complete
+CNWM-047,3,Fail-soft,Replace global publication kill switch with dataset/module/page publication contracts.,P0,CNWM-036,complete
+CNWM-048,3,Health,Create private data-health dashboard and concise public status badges.,P1,CNWM-045,complete
+CNWM-049,4,Map data,Create CommodityNode marker discriminants and typed render adapters.,P0,"CNWM-014,CNWM-041",complete
+CNWM-050,4,Layers,"Implement verified mines, plants, ports, pipelines, routes and events layers.",P0,CNWM-046,complete
+CNWM-051,4,Layer UX,Create grouped layer drawer with presets by commodity and event type.,P1,CNWM-048,complete
+CNWM-052,4,Selection,Build unified entity/event detail drawer.,P1,CNWM-048,complete
+CNWM-053,4,Map ↔ research,Deep-link live entities/events to Commodity Hubs and Event Pulses.,P1,"CNWM-049,CNWM-027",complete
+CNWM-054,4,Search,"Add commodity, facility, company, event and route search.",P1,CNWM-048,complete
+CNWM-055,4,Event animation,Render bounded pulse/ripple animation for verified events.,P1,CNWM-048,complete
+CNWM-056,4,Performance,Lazy-load globe and non-default layers; keep flat map as analytical default.,P0,CNWM-048,complete
+CNWM-057,4,Mobile,Create mobile bottom-sheet workflow and reduced default layers.,P1,CNWM-048,complete
+CNWM-058,4,Unavailable states,Implement source-specific stale/unavailable/partial map states.,P1,CNWM-044,complete
+CNWM-059,4,Commodity presets,"Ship Copper, Crude Oil, Gold and Cocoa map presets first.",P1,CNWM-048,complete
+CNWM-060,4,Visual QA,Create deterministic map/globe golden screenshots.,P1,CNWM-048,complete
+CNWM-061,5,News ingestion,Curate commodity-specific RSS/official/filing source catalog.,P0,CNWM-036,complete
+CNWM-062,5,Deduplication,"Normalize canonical URLs, titles and event fingerprints.",P1,CNWM-059,complete
+CNWM-063,5,Extraction,"Generate schema-bound event candidates: commodity, entity, location, type, direction and materiality.",P1,CNWM-060,complete
+CNWM-064,5,Corroboration,Require source diversity and primary evidence for high-materiality events.,P0,CNWM-061,complete
+CNWM-065,5,Editorial queue,"Build private review UI for event facts, claims, entities and graph candidates.",P0,"CNWM-061,CNWM-042",complete
+CNWM-066,5,Event publication,Publish approved Event Pulse records to Astro content/data build.,P1,CNWM-063,complete
+CNWM-067,5,Visual brief,Generate structured AI editorial visual brief from approved event facts.,P1,CNWM-063,complete
+CNWM-068,5,Reference rights,"Allow input/reference images only when owned, licensed or public-domain and registered.",P0,CNWM-066,complete
+CNWM-069,5,Image generation,Generate text-free editorial visuals and variants.,P2,CNWM-067,complete
+CNWM-070,5,UI overlay,"Render facts, dates, labels, logos and values as HTML/SVG over imagery.",P1,CNWM-068,complete
+CNWM-071,5,Image optimization,"Create AVIF/WebP/JPEG fallbacks, srcset, dimensions and blur placeholders.",P1,CNWM-068,complete
+CNWM-072,5,Media audit,"Store generation model, brief hash, references, rights, reviewer and disclosure.",P1,CNWM-068,complete
+CNWM-073,6,Ontology schema,"Implement Entity, Edge, Evidence, Event and GraphSnapshot schemas.",P0,"CNWM-035,CNWM-042",complete
+CNWM-074,6,Entity resolution,"Resolve company, mine, plant, port, commodity and country aliases.",P1,CNWM-071,complete
+CNWM-075,6,Edge workflow,Create candidate → reviewed → published → superseded/rejected lifecycle.,P0,CNWM-071,complete
+CNWM-076,6,Propagation,Implement explainable 1–3 hop impact path scoring.,P1,CNWM-073,complete
+CNWM-077,6,Graph API,"Add subgraph, path, evidence and snapshot RPCs.",P1,CNWM-073,complete
+CNWM-078,6,Graph renderer,Build Impact Universe using Graphology/Sigma or a dedicated WebGL graph island.,P1,CNWM-075,complete
+CNWM-079,6,Clustering,Implement semantic clusters and progressive expansion.,P1,CNWM-076,complete
+CNWM-080,6,Evidence drawer,Build edge/node evidence and invalidation drawer.,P0,CNWM-075,complete
+CNWM-081,6,Map sync,Synchronize selected map entity/event with graph focus.,P1,"CNWM-076,CNWM-050",complete
+CNWM-082,6,Timeline,Add event/path playback with deterministic snapshots.,P2,CNWM-079,complete
+CNWM-083,6,Table parity,Provide accessible path list/table equivalent to graph.,P0,CNWM-076,complete
+CNWM-084,6,Example vertical,Complete Copper event → mine → route → company → industry vertical slice.,P0,CNWM-071..081,complete
+CNWM-085,7,Newsletter,Implement Weekly Commodity Impact Brief signup and consent records.,P1,CNWM-023,in_progress
+CNWM-086,7,Analytics,Define privacy-aware event taxonomy across research and live surfaces.,P1,CNWM-020,complete
+CNWM-087,7,Watchlists,"Enable account-based saved commodities, companies and routes.",P2,CNWM-057,in_progress
+CNWM-088,7,Alerts,Enable deduplicated Event Pulse and route alerts.,P2,CNWM-086,in_progress
+CNWM-089,7,Pro contracts,"Define validated paid entitlements: historical replay, exports, advanced paths and API.",P2,CNWM-086,complete
+CNWM-090,7,Billing,Activate checkout only after product facts and legal/privacy gates pass.,P2,CNWM-088,complete
+CNWM-091,7,B2B lead,Add custom commodity exposure brief request workflow.,P1,CNWM-029,in_progress
+CNWM-092,7,API plans,"Define API keys, quotas, public/free and paid scopes.",P2,"CNWM-075,CNWM-088",complete
+CNWM-093,7,MCP tools,"Expose commodity event, benchmark, route and evidence tools.",P3,CNWM-091,complete
+CNWM-094,7,Revenue instrumentation,"Track newsletter, custom brief, Pro and API conversions separately from ads.",P2,CNWM-085..091,complete
+CNWM-095,8,Index policy,Create explicit indexability matrix by route type and publication state.,P0,CNWM-023,complete
+CNWM-096,8,Structured data,"Add Organization, WebSite, BreadcrumbList, Article/NewsArticle, Dataset and ImageObject where valid.",P1,CNWM-094,complete
+CNWM-097,8,Canonical/hreflang,Implement canonical and language rules across apex/live/legacy URLs.,P1,CNWM-094,complete
+CNWM-098,8,Image SEO,"Publish descriptive filenames, alt text, image sitemap and primaryImageOfPage.",P1,CNWM-069,complete
+CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0,CNWM-025..029,complete
+CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete
+CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,complete
+CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictions and ad stack.,P0,CNWM-099,complete
+CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,complete
+CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after migration.,P1,CNWM-094,planned
+CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned
+CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,complete
+CNWM-107,9,Security,"Review CORS, CSP, API keys, rate limits and secret boundaries for all domains.",P0,CNWM-019,complete
+CNWM-108,9,Privacy,"Implement account export/deletion, retention and audit logging.",P1,CNWM-086,complete
+CNWM-109,9,Performance,Enforce separate research/live bundle and Core Web Vitals budgets.,P0,"CNWM-023,CNWM-055",complete
+CNWM-110,9,Accessibility,"Complete keyboard, screen-reader, contrast, motion and chart/table parity review.",P0,CNWM-081,complete
+CNWM-111,9,Reliability,"Run provider, Redis, DB, image and AI outage simulations.",P0,"CNWM-044,CNWM-056",complete
+CNWM-112,9,Upstream,Perform first upstream sync rehearsal and resolve conflicts using patch ledger.,P1,"CNWM-021,CNWM-022",complete
+CNWM-113,9,Release,Create immutable release tag and production source snapshot.,P0,CNWM-007,planned
+CNWM-114,9,Operations,"Create incident, data correction, rights takedown and rollback runbooks.",P1,CNWM-108,complete
+CNWM-115,9,Launch QA,Run full desktop/mobile/browser/content/data/license/ad/SEO audit.,P0,all,in_progress
+CNWM-116,9,Post-launch,"Create weekly quality review covering data freshness, corrections, source rights, CWV and content performance.",P1,CNWM-112,complete

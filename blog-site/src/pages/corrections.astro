@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import { absoluteUrl, isCommodityNode, site } from '../lib/site-variant';
+
+if (!isCommodityNode) return Astro.redirect('/blog/');
+const canonicalUrl = absoluteUrl('/corrections/');
+---
+
+<Base
+  title="Corrections"
+  metaTitle="Corrections Policy and Log | CommodityNode"
+  description="How CommodityNode receives, assesses, records, and publishes corrections."
+  canonicalUrl={canonicalUrl}
+>
+  <article class="static-page prose">
+    <p class="section-label">Accountability</p>
+    <h1>Corrections are part of the record.</h1>
+    <p class="article-dek">
+      A changed source, wrong unit, stale benchmark, unsupported relationship, or misleading
+      conclusion is corrected where readers encountered it—not hidden in a private queue.
+    </p>
+
+    <h2>Report a problem</h2>
+    <p>
+      Open a <a href={`${site.sourceUrl}/issues/new`} target="_blank" rel="noopener noreferrer">public source issue</a>
+      with the page URL, disputed statement, supporting source, and the change you believe is
+      required. Do not post personal, confidential, or embargoed information.
+    </p>
+
+    <h2>Correction levels</h2>
+    <table>
+      <thead><tr><th>Level</th><th>Example</th><th>Published response</th></tr></thead>
+      <tbody>
+        <tr><td>Minor</td><td>Typography that does not change meaning</td><td>Correct in place</td></tr>
+        <tr><td>Material</td><td>Wrong unit, date, source interpretation, or relationship</td><td>Dated note and revision</td></tr>
+        <tr><td>Critical</td><td>False event, materially unsupported conclusion, or rights violation</td><td>Immediate withdrawal, notice, and audit preservation</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Response workflow</h2>
+    <ol>
+      <li>Acknowledge and preserve the reported version.</li>
+      <li>Re-check the primary source, benchmark contract, and downstream paths.</li>
+      <li>Record whether the report is confirmed, partly confirmed, or not substantiated.</li>
+      <li>Publish the correction or explain why no change was made.</li>
+      <li>Recalculate affected graph paths and derived outputs.</li>
+    </ol>
+
+    <h2>Published corrections</h2>
+    <p>
+      No material corrections have been recorded for the CommodityNode research surface as of
+      2026-07-27. This section will list dated entries rather than disappear when the first
+      correction occurs.
+    </p>
+  </article>
+</Base>

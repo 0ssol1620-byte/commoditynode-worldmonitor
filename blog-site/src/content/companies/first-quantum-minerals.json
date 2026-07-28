@@ -1,0 +1,68 @@
+{
+  "name": "First Quantum Minerals",
+  "ticker": "TSX: FM",
+  "country": "Canada",
+  "description": "Reviewed primary records link First Quantum Minerals directly to Cobre Panama copper output. This page documents that operating exposure, not valuation or investment advice.",
+  "commodityIds": ["copper"],
+  "exposureType": "producer",
+  "exposureMechanisms": [
+    "Cobre Panama production and concentrate sales contributed directly to the operator’s copper output before the November 2023 ramp-down.",
+    "Punta Rincón port disruption constrained shipment of copper concentrate that the company reported as already produced but unsold."
+  ],
+  "assets": [
+    {
+      "id": "cobre-panama",
+      "name": "Cobre Panama",
+      "type": "mine",
+      "status": "Preservation and safe management after the November 2023 production halt",
+      "asOf": "2026-07-28",
+      "commodityIds": ["copper"],
+      "evidenceIds": ["first-quantum-production", "panama-mef-2024"]
+    },
+    {
+      "id": "punta-rincon-port",
+      "name": "Punta Rincón port",
+      "type": "port",
+      "status": "Historical shipment constraint documented in the reviewed event record",
+      "asOf": "2026-07-28",
+      "commodityIds": ["copper"],
+      "evidenceIds": ["first-quantum-production"]
+    }
+  ],
+  "relatedEventIds": ["cobre-panama-production-halt"],
+  "limitations": [
+    "The reviewed evidence does not establish a reliable restart date, a permanent closure, or a future operating framework for Cobre Panama.",
+    "This record does not isolate the event’s effect on a copper benchmark or estimate First Quantum Minerals’ equity value."
+  ],
+  "evidence": [
+    {
+      "id": "first-quantum-production",
+      "label": "2023 preliminary production and 2024–2026 guidance",
+      "url": "https://www.first-quantum.com/news/first-quantum-minerals-announces-2023-preliminary-production-2024-2026-guidance-and-balance-sheet-initiatives/",
+      "publisher": "First Quantum Minerals",
+      "retrievedAt": "2026-07-28",
+      "locator": "Cobre Panama section: November ramp-down, preservation and safe-management status, production, suspended guidance, and unsold concentrate."
+    },
+    {
+      "id": "panama-court-ruling",
+      "label": "Supreme Court declares Law 406 unconstitutional",
+      "url": "https://www.organojudicial.gob.pa/noticias/judiciales/CSJ-declara-inconstitucional-la-Ley-406-de-20-de-octubre-de-2023",
+      "publisher": "Judicial Branch of Panama",
+      "retrievedAt": "2026-07-28",
+      "locator": "Announcement dated 28 November 2023; decision issued on 27 November 2023."
+    },
+    {
+      "id": "panama-mef-2024",
+      "label": "Panama Economic and Social Report 2024",
+      "url": "https://www.mef.gob.pa/wp-content/uploads/2025/05/MEF-DAES.-Informe-Economico-y-Social-2024.pdf",
+      "publisher": "Ministry of Economy and Finance of Panama",
+      "retrievedAt": "2026-07-28",
+      "locator": "Mining and quarrying section, page 27: no copper extraction or exports were recorded in 2024."
+    }
+  ],
+  "reviewedBy": "CommodityNode Editorial",
+  "reviewedAt": "2026-07-28",
+  "publicationState": "published",
+  "isFixture": false,
+  "publishable": true
+}

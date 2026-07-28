@@ -1,0 +1,20 @@
+---
+interface Props {
+  placement: 'article-mid' | 'article-end';
+  enabled: boolean;
+}
+
+const { placement, enabled } = Astro.props;
+---
+
+{enabled && (
+  <aside
+    class="commoditynode-ad-slot"
+    aria-label="Advertisement"
+    data-commoditynode-ad-slot={placement}
+  >
+    <span>Advertisement</span>
+    <div data-commoditynode-ad-mount></div>
+  </aside>
+)}
+

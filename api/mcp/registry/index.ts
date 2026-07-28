@@ -4,12 +4,17 @@ import type { PublicToolShape, ToolDef } from '../types';
 import { compressDescription, utf8ByteLength } from '../utils';
 import { CACHE_TOOLS } from './cache-tools';
 import { RPC_TOOLS } from './rpc-tools';
+import { COMMODITYNODE_TOOLS } from './commoditynode-tools';
 
 // Merged tool registry — cache tools first (no `_execute`), then RPC tools
 // (with `_execute`). Order is observable: `tools/list` emits tools in
 // this same order, and `describe_tool({tool_name: 'nonexistent'})` returns
 // the available-list sorted before responding.
-export const TOOL_REGISTRY: ToolDef[] = [...CACHE_TOOLS, ...RPC_TOOLS];
+export const TOOL_REGISTRY: ToolDef[] = [
+  ...CACHE_TOOLS,
+  ...COMMODITYNODE_TOOLS,
+  ...RPC_TOOLS,
+];
 
 // Public shape for tools/list — strips internal _-prefixed fields, adds MCP
 // annotations, and injects the universal `summary` flag (issue #3678) into
