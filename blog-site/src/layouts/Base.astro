@@ -58,6 +58,29 @@ const robotsContent = robots
   ?? (routePolicy
     ? commodityNodeRobotsContent(routePolicy)
     : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+const resolvedJsonLd = jsonLd ?? (isCommodityNode
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      '@id': `${resolvedCanonicalUrl}#webpage`,
+      name: pageTitle,
+      description,
+      url: resolvedCanonicalUrl,
+      isPartOf: {
+        '@type': 'WebSite',
+        '@id': `${site.origin}/#website`,
+        name: site.publication,
+        url: site.origin,
+      },
+      publisher: {
+        '@type': 'Organization',
+        '@id': `${site.origin}/#organization`,
+        name: site.name,
+        url: site.origin,
+      },
+      inLanguage: 'en-US',
+    }
+  : undefined);
 
 function stringifyJsonLd(value: Record<string, unknown>): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
@@ -117,8 +140,8 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
     {!isCommodityNode && <link rel="apple-touch-icon" sizes="180x180" href="/favico/apple-touch-icon.png" />}
     <link rel="alternate" type="application/rss+xml" title={site.publication} href={site.rssPath} />
 
-    {jsonLd && (
-      <script type="application/ld+json" set:html={stringifyJsonLd(jsonLd)} />
+    {resolvedJsonLd && (
+      <script type="application/ld+json" set:html={stringifyJsonLd(resolvedJsonLd)} />
     )}
     {breadcrumbLd && (
       <script type="application/ld+json" set:html={stringifyJsonLd(breadcrumbLd)} />
@@ -227,7 +250,7 @@ function stringifyJsonLd(value: Record<string, unknown>): string {
               <button type="button" class="footer-privacy-button" data-open-privacy-settings>
                 Privacy settings
               </button>
-              <a href="/source/">AGPL source</a>
+              <a href={`${site.liveUrl.replace(/\/$/, '')}/source/`}>AGPL source</a>
             </>
           ) : (
             <>

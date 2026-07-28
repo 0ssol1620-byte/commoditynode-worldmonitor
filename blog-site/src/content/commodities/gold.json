@@ -1,7 +1,7 @@
 {
   "name": "Gold",
   "shortName": "Gold",
-  "description": "Gold is both a physical commodity and a financial asset. Its market context includes mine supply, recycling, central-bank activity, investment flows, real yields, currencies, and futures positioning.",
+  "description": "Gold is a physical commodity and financial asset shaped by mine supply, recycling, central-bank activity, investment flows, real yields, currencies, and futures positioning.",
   "group": "precious-metals",
   "coverage": "live",
   "benchmark": {

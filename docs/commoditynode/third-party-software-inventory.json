@@ -8,8 +8,8 @@
     "pro-test/package-lock.json",
     "scripts/package-lock.json"
   ],
-  "lockfileSetSha256": "581b22e86afe5afc1caca6310839c363b6cc79e87ea43d81d4dc4ead380af980",
-  "packageCount": 2369,
+  "lockfileSetSha256": "35e9bf0c4dcbe55eefc5b2c097bb364b9c79538646f63007b9c680a12e27d337",
+  "packageCount": 2371,
   "unresolvedLicenseCount": 0,
   "reviewRequired": [],
   "notes": [
@@ -927,6 +927,18 @@
       "installRoots": [
         "root",
         "scripts"
+      ]
+    },
+    {
+      "name": "@axe-core/playwright",
+      "version": "4.12.1",
+      "license": "MPL-2.0",
+      "licenseSource": "lockfile",
+      "licenseEvidence": null,
+      "repository": null,
+      "homepage": null,
+      "installRoots": [
+        "root"
       ]
     },
     {
@@ -13092,6 +13104,18 @@
       "name": "aws4fetch",
       "version": "1.0.20",
       "license": "MIT",
+      "licenseSource": "lockfile",
+      "licenseEvidence": null,
+      "repository": null,
+      "homepage": null,
+      "installRoots": [
+        "root"
+      ]
+    },
+    {
+      "name": "axe-core",
+      "version": "4.12.1",
+      "license": "MPL-2.0",
       "licenseSource": "lockfile",
       "licenseEvidence": null,
       "repository": null,

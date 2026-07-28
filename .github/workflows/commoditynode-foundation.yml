@@ -81,6 +81,9 @@ jobs:
       - name: Build CommodityNode
         run: npm run build:commoditynode
 
+      - name: Audit public crawl and search inventory
+        run: npm run commoditynode:crawl
+
       - name: Enforce CommodityNode performance budget
         run: npm run commoditynode:performance
 

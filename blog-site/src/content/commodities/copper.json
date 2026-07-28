@@ -1,7 +1,7 @@
 {
   "name": "Copper",
   "shortName": "Copper",
-  "description": "Copper is a globally traded industrial metal whose price and physical availability reflect mine output, smelter capacity, inventories, freight constraints, construction demand, and electrical-equipment demand.",
+  "description": "Copper is a globally traded industrial metal shaped by mine output, smelter capacity, inventories, freight constraints, construction, and electrical-equipment demand.",
   "group": "industrial-metals",
   "coverage": "live",
   "benchmark": {

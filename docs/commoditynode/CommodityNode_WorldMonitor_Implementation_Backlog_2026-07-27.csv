@@ -101,7 +101,7 @@ CNWM-099,8,Content gate,Implement internal people-first publication contract.,P0
 CNWM-100,8,Ad allowlist,Implement route-level manual ad eligibility.,P0,CNWM-094,complete
 CNWM-101,8,Ad layout,"Add reserved, labeled slots only to qualified long-form pages.",P1,CNWM-099,complete
 CNWM-102,8,Consent,Implement privacy/CMP behavior required by target jurisdictions and ad stack.,P0,CNWM-099,complete
-CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,in_progress
+CNWM-103,8,AdSense readiness,"Run public crawl and remove under-construction, internal QA and low-value shells.",P0,CNWM-094..101,complete
 CNWM-104,8,Search Console,Submit clean sitemaps and monitor index coverage after migration.,P1,CNWM-094,planned
 CNWM-105,8,Application gate,Reapply for AdSense only after all internal release gates pass.,P1,CNWM-102,planned
 CNWM-106,9,Security,"Harden RSS/URL fetch allowlists, SSRF controls, HTML sanitization and output encoding.",P0,CNWM-059,complete

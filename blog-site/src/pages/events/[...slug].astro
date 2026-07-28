@@ -63,13 +63,19 @@ if (eventMedia && !eventJpeg) {
 const eventOgImage = eventJpeg
   ? `https://commoditynode.com${eventJpeg.publicUrl}`
   : undefined;
+const eventSubject = event.data.entities[0]?.name ?? event.data.location.label;
+const eventTypeLabel = event.data.eventType.replaceAll('_', ' ');
+const eventMetaTitle = `${eventSubject}: ${event.data.commodityIds[0]} supply evidence | CommodityNode`;
+const eventMetaDescription =
+  `Source-linked record of the ${eventSubject} ${eventTypeLabel}, with verified claims, `
+  + 'supply transmission, limitations, and unresolved questions.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'NewsArticle',
   '@id': `${eventUrl}#article`,
   headline: event.data.title,
-  description: event.data.summary,
+  description: eventMetaDescription,
   url: eventUrl,
   mainEntityOfPage: {
     '@type': 'WebPage',
@@ -155,8 +161,8 @@ const breadcrumbLd = {
 
 <Base
   title={event.data.title}
-  metaTitle={`${event.data.title} | Commodity Event Pulse`}
-  description={event.data.summary}
+  metaTitle={eventMetaTitle}
+  description={eventMetaDescription}
   canonicalUrl={eventUrl}
   ogType="article"
   publishedTime={publishedAt.toISOString()}

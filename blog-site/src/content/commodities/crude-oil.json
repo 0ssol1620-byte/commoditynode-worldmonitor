@@ -1,7 +1,7 @@
 {
   "name": "Crude Oil",
   "shortName": "Crude oil",
-  "description": "Crude oil links upstream production, storage, pipelines, ports, tanker routes, refineries, product inventories, and end demand. CommodityNode separates the WTI benchmark from Brent and from physical grades.",
+  "description": "Crude oil links production, storage, pipelines, ports, tanker routes, refineries, inventories, and end demand. This page distinguishes WTI from Brent and physical grades.",
   "group": "energy",
   "coverage": "live",
   "benchmark": {
