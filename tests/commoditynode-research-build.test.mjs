@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
 import { describe, it } from 'node:test';
 
 const root = resolve(import.meta.dirname, '..');
 const researchRoot = resolve(root, 'public/commoditynode-site');
 const read = (path) => readFileSync(resolve(researchRoot, path), 'utf8');
+const STATIC_SCRIPT_NONCE = 'wm-static-bootstrap';
+
+const htmlFiles = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const path = resolve(directory, entry.name);
+  if (entry.isDirectory()) return htmlFiles(path);
+  return entry.isFile() && entry.name.endsWith('.html') ? [path] : [];
+});
 
 describe('CommodityNode research build', () => {
   it('publishes an indexable, product-specific research surface', (t) => {
@@ -89,6 +96,40 @@ describe('CommodityNode research build', () => {
     assert.ok(files.some((file) => file.includes('ibm-plex-mono') && file.endsWith('.woff2')));
     assert.doesNotMatch(css, /backdrop-filter|transition:\s*all|linear-gradient/);
     assert.doesNotMatch(css, /url\(\.\/files\//);
+  });
+
+  it('allows every research script through the production CSP', (t) => {
+    if (!existsSync(researchRoot)) {
+      t.skip('run npm run build:commoditynode before the CSP assertion');
+      return;
+    }
+
+    const vercel = JSON.parse(readFileSync(resolve(root, 'vercel.json'), 'utf8'));
+    const globalCsp = vercel.headers
+      .flatMap((entry) => entry.headers ?? [])
+      .find((header) => header.key === 'Content-Security-Policy')
+      ?.value ?? '';
+    assert.match(
+      globalCsp,
+      new RegExp(`(?:^|\\s)'nonce-${STATIC_SCRIPT_NONCE}'(?:\\s|;|$)`),
+      'the production CSP must trust the static research-script nonce',
+    );
+
+    const missingNonce = [];
+    for (const path of htmlFiles(researchRoot)) {
+      const html = readFileSync(path, 'utf8');
+      const scriptTags = [...html.matchAll(/<script\b[^>]*>/gi)].map((match) => match[0]);
+      for (const tag of scriptTags) {
+        if (!new RegExp(`\\bnonce=["']${STATIC_SCRIPT_NONCE}["']`).test(tag)) {
+          missingNonce.push(`${relative(researchRoot, path)}: ${tag.slice(0, 120)}`);
+        }
+      }
+    }
+    assert.deepEqual(
+      missingNonce,
+      [],
+      `research scripts would be blocked by the production CSP:\n${missingNonce.join('\n')}`,
+    );
   });
 
   it('publishes substantive trust pages and three original articles', (t) => {
