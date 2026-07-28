@@ -5,6 +5,8 @@ import {
   sha256Hex,
 } from '../server/commoditynode/lead-contract.js';
 
+export const config = { runtime: 'edge' };
+
 function html(title: string, message: string, status: number): Response {
   return new Response(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">

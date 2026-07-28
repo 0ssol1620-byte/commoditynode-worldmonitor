@@ -1,5 +1,7 @@
 import { ConvexHttpClient } from 'convex/browser';
 
+export const config = { runtime: 'edge' };
+
 function json(value: unknown, status: number): Response {
   return Response.json(value, {
     status,

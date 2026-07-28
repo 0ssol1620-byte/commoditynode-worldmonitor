@@ -10,6 +10,8 @@ import {
   normalizeCommodityNodeEmail,
 } from '../server/commoditynode/lead-contract.js';
 
+export const config = { runtime: 'edge' };
+
 const PATH = '/api/commoditynode-brief-request';
 
 function headers(request: Request): Record<string, string> {

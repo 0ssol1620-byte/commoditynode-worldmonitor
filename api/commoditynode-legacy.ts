@@ -8,6 +8,8 @@ const SECURITY_HEADERS = {
   'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
 };
 
+export const config = { runtime: 'edge' };
+
 const BODY = `<!doctype html>
 <html lang="en">
 <head>

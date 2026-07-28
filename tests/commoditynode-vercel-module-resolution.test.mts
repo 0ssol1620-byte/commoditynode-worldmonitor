@@ -4,13 +4,18 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VERCEL_FUNCTION_CLOSURE = [
+const COMMODITYNODE_FUNCTIONS = [
+  'api/commoditynode-alert-sync.ts',
   'api/commoditynode-analytics.ts',
   'api/commoditynode-brief-request.ts',
   'api/commoditynode-graph.ts',
+  'api/commoditynode-legacy.ts',
   'api/commoditynode-newsletter.ts',
   'api/commoditynode-newsletter-confirm.ts',
   'api/commoditynode-newsletter-unsubscribe.ts',
+] as const;
+const VERCEL_FUNCTION_CLOSURE = [
+  ...COMMODITYNODE_FUNCTIONS,
   'server/_shared/rate-limit.ts',
   'server/commoditynode/impact-graph-service.ts',
   'server/commoditynode/lead-contract.ts',
@@ -36,5 +41,16 @@ test('CommodityNode Vercel functions use Node ESM-resolvable relative imports', 
           + 'Vercel Node does not resolve extensionless ESM imports after transpilation.',
       );
     }
+  }
+});
+
+test('CommodityNode Vercel functions explicitly use the Web Request-compatible edge runtime', () => {
+  for (const relativePath of COMMODITYNODE_FUNCTIONS) {
+    const source = readFileSync(`${ROOT}/${relativePath}`, 'utf8');
+    assert.match(
+      source,
+      /export const config\s*=\s*\{\s*runtime:\s*['"]edge['"]\s*\}/,
+      `${relativePath}: Web Request handlers must declare the Vercel edge runtime.`,
+    );
   }
 });

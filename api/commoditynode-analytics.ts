@@ -8,6 +8,8 @@ import {
 } from '../shared/commoditynode-analytics.js';
 import { checkRateLimit } from '../server/_shared/rate-limit.js';
 
+export const config = { runtime: 'edge' };
+
 const RETENTION_SECONDS = 400 * 24 * 60 * 60;
 const BASE_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',

@@ -9,6 +9,8 @@ import {
 } from '../server/commoditynode/impact-graph-service.js';
 import { checkRateLimit } from '../server/_shared/rate-limit.js';
 
+export const config = { runtime: 'edge' };
+
 const CACHE_CONTROL = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
 const MAX_TEXT_PARAMETER_LENGTH = 160;
 

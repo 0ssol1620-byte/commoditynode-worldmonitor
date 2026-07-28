@@ -5,6 +5,8 @@ import {
   sha256Hex,
 } from '../server/commoditynode/lead-contract.js';
 
+export const config = { runtime: 'edge' };
+
 function html(title: string, message: string, status: number, token?: string): Response {
   const unsubscribe = token
     ? `<p><a href="https://commoditynode.com/api/commoditynode-newsletter-unsubscribe?token=${token}">Unsubscribe this address</a></p>`
